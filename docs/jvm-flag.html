@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVM Flag</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --root: #f59e0b;
+      --category: #3b82f6;
+      --flag: #34d399;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    header h1 span { color: var(--root); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--category);
+      background: var(--bg);
+    }
+
+    main {
+      max-width: 42rem;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    .breadcrumb {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .flag-name {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--flag);
+      word-break: break-all;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .description {
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .description.empty {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 0.9rem;
+    }
+
+    .error code {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .research {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .research-hint {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+      line-height: 1.5;
+    }
+
+    .research-prompt {
+      width: 100%;
+      min-height: 4rem;
+      padding: 0.75rem;
+      font: inherit;
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      resize: none;
+      field-sizing: content;
+    }
+
+    .research-prompt:focus {
+      outline: none;
+      border-color: var(--category);
+    }
+
+    .research-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-copy {
+      padding: 0.45rem 0.85rem;
+      font: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .btn-copy:hover {
+      border-color: var(--category);
+      background: var(--bg);
+    }
+
+    .btn-copy:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .copy-status {
+      font-size: 0.75rem;
+      color: var(--flag);
+      min-height: 1.1em;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a id="back-graph" href="java-version.html" class="back-link">← Back</a>
+    <h1><span id="title-version">Java</span> JVM Flag</h1>
+  </header>
+
+  <main id="content">
+    <p class="error">Loading…</p>
+  </main>
+
+  <script>
+    const DEFAULT_JAVA = "25";
+
+    function resolveJavaVersion() {
+      const java = new URLSearchParams(window.location.search).get("java");
+      if (java == null || String(java).trim() === "") return DEFAULT_JAVA;
+      const version = String(java).trim();
+      return /^\d+$/.test(version) ? version : DEFAULT_JAVA;
+    }
+
+    function resolveFlagId() {
+      const flag = new URLSearchParams(window.location.search).get("flag");
+      return flag == null ? "" : String(flag).trim();
+    }
+
+    const JAVA_VERSION = resolveJavaVersion();
+    const FLAG_ID = resolveFlagId();
+    const DATA_URL = `json/java-${JAVA_VERSION}.json`;
+
+    document.getElementById("title-version").textContent = `Java ${JAVA_VERSION}`;
+    document.getElementById("back-graph").href =
+      `java-version.html?java=${encodeURIComponent(JAVA_VERSION)}`;
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function buildParentMap(edges) {
+      const parent = new Map();
+      for (const e of edges) {
+        parent.set(e.target, e.source);
+      }
+      return parent;
+    }
+
+    function buildBreadcrumb(flagNode, nodesById, parentByTarget) {
+      const parts = [];
+      let cur = parentByTarget.get(flagNode.id);
+      while (cur && cur !== "root") {
+        const node = nodesById.get(cur);
+        if (node) parts.unshift(node.label);
+        cur = parentByTarget.get(cur);
+      }
+      return parts.length ? parts.join(" › ") : "";
+    }
+
+    function showError(html) {
+      document.getElementById("content").innerHTML = `<p class="error">${html}</p>`;
+    }
+
+    function buildSearchPrompt(flag, breadcrumb) {
+      const name = flag.flag || flag.label;
+      const lines = [
+        `I need detailed information about the following JVM flag for Java ${JAVA_VERSION}:`,
+        "",
+        `Flag: ${name}`,
+      ];
+      if (breadcrumb) lines.push(`Category: ${breadcrumb}`);
+      if (flag.description) {
+        lines.push("", "Known summary:", flag.description);
+      }
+      lines.push(
+        "",
+        "Please explain:",
+        "- What this flag does and when to use it",
+        "- Default value (if applicable) and valid syntax",
+        "- Performance, memory, or compatibility implications",
+        `- Whether it changed or was added/removed across Java versions (especially vs Java ${JAVA_VERSION})`,
+        "- Links to official Oracle/OpenJDK documentation if available"
+      );
+      return lines.join("\n");
+    }
+
+    async function copyPrompt(text) {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        return;
+      }
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+
+    function fitPromptHeight(ta) {
+      ta.style.height = "auto";
+      ta.style.height = `${ta.scrollHeight}px`;
+    }
+
+    function setupCopyButton() {
+      const btn = document.getElementById("copy-prompt");
+      const ta = document.getElementById("search-prompt");
+      const status = document.getElementById("copy-status");
+      if (!btn || !ta) return;
+
+      fitPromptHeight(ta);
+      ta.addEventListener("input", () => fitPromptHeight(ta));
+      window.addEventListener("resize", () => fitPromptHeight(ta), { passive: true });
+
+      btn.addEventListener("click", async () => {
+        btn.disabled = true;
+        try {
+          await copyPrompt(ta.value);
+          status.textContent = "Copied to clipboard.";
+        } catch {
+          status.textContent = "Copy failed — select the text and copy manually.";
+        } finally {
+          btn.disabled = false;
+          setTimeout(() => { status.textContent = ""; }, 2500);
+        }
+      });
+    }
+
+    function renderFlag(flag, breadcrumb) {
+      document.title = `${flag.flag || flag.label} — Java ${JAVA_VERSION}`;
+      const desc = flag.description
+        ? `<p class="description">${escapeHtml(flag.description)}</p>`
+        : `<p class="description empty">No description available for this flag.</p>`;
+      const prompt = buildSearchPrompt(flag, breadcrumb);
+
+      document.getElementById("content").innerHTML = `
+        ${breadcrumb ? `<p class="breadcrumb">${escapeHtml(breadcrumb)}</p>` : ""}
+        <p class="flag-name">${escapeHtml(flag.flag || flag.label)}</p>
+        <h2 class="section-title">Description</h2>
+        ${desc}
+        <section class="research" aria-labelledby="research-title">
+          <h2 class="section-title" id="research-title">Search for further information</h2>
+          <p class="research-hint">Copy this prompt into your preferred search or AI assistant to learn more about this flag.</p>
+          <textarea id="search-prompt" class="research-prompt" rows="1" aria-label="Search prompt">${escapeHtml(prompt)}</textarea>
+          <div class="research-actions">
+            <button type="button" id="copy-prompt" class="btn-copy">Copy to clipboard</button>
+            <span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
+          </div>
+        </section>
+      `;
+      setupCopyButton();
+    }
+
+    if (!FLAG_ID) {
+      showError("Missing <code>flag</code> query parameter.");
+    } else {
+      fetch(DATA_URL)
+        .then(r => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return r.json();
+        })
+        .then(data => {
+          const nodes = data.nodes || [];
+          const edges = data.edges || [];
+          const flag = nodes.find(n => n.type === "flag" && n.flagId === FLAG_ID);
+          if (!flag) {
+            showError(
+              `Flag not found for <code>flag=${escapeHtml(FLAG_ID)}</code> in Java ${JAVA_VERSION}.`
+            );
+            return;
+          }
+          const nodesById = new Map(nodes.map(n => [n.id, n]));
+          const parentByTarget = buildParentMap(edges);
+          const breadcrumb = buildBreadcrumb(flag, nodesById, parentByTarget);
+          renderFlag(flag, breadcrumb);
+        })
+        .catch(() => {
+          showError(
+            `Could not load <code>${escapeHtml(DATA_URL)}</code>.<br>` +
+            `Serve the <code>docs/</code> folder over HTTP, then open this page with valid <code>java</code> and <code>flag</code> parameters.`
+          );
+        });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,2087 @@
+{
+  "metadata": {
+    "title": "Java 25 JVM Flags",
+    "version": "25",
+    "description": "Graph representation of JVM flags organized by category"
+  },
+  "nodes": [
+    {
+      "id": "root",
+      "label": "Java 25 JVM Flags",
+      "type": "root"
+    },
+    {
+      "id": "runtime",
+      "label": "Runtime",
+      "type": "category"
+    },
+    {
+      "id": "heap",
+      "label": "Heap",
+      "type": "category"
+    },
+    {
+      "id": "object-layout",
+      "label": "Object Layout",
+      "type": "category"
+    },
+    {
+      "id": "metaspace",
+      "label": "Metaspace",
+      "type": "category"
+    },
+    {
+      "id": "stack",
+      "label": "Stack",
+      "type": "category"
+    },
+    {
+      "id": "garbage-collection",
+      "label": "Garbage Collection",
+      "type": "category"
+    },
+    {
+      "id": "jit-compiler",
+      "label": "JIT Compiler",
+      "type": "category"
+    },
+    {
+      "id": "code-cache",
+      "label": "Code Cache",
+      "type": "category"
+    },
+    {
+      "id": "threads-synchronization",
+      "label": "Threads and Synchronization",
+      "type": "category"
+    },
+    {
+      "id": "class-loading",
+      "label": "Class Loading",
+      "type": "category"
+    },
+    {
+      "id": "logging",
+      "label": "Logging",
+      "type": "category"
+    },
+    {
+      "id": "diagnostics",
+      "label": "Diagnostics",
+      "type": "category"
+    },
+    {
+      "id": "containers",
+      "label": "Containers",
+      "type": "category"
+    },
+    {
+      "id": "virtual-threads",
+      "label": "Virtual Threads",
+      "type": "category"
+    },
+    {
+      "id": "modules",
+      "label": "Modules",
+      "type": "category"
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "type": "category"
+    },
+    {
+      "id": "system-properties",
+      "label": "System Properties",
+      "type": "category"
+    },
+    {
+      "id": "gc-default",
+      "label": "Default",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-serial",
+      "label": "SerialGC",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-parallel",
+      "label": "ParallelGC",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-zgc",
+      "label": "ZGC",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-shenandoah",
+      "label": "Shenandoah",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-epsilon",
+      "label": "EpsilonGC",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-threads",
+      "label": "GC Threads",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-g1-tuning",
+      "label": "G1 Tuning",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-allocation",
+      "label": "Allocation",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-string-dedup",
+      "label": "String Deduplication",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-explicit",
+      "label": "Explicit GC",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-logging",
+      "label": "Logging",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "jit-execution-modes",
+      "label": "Execution Modes",
+      "type": "subcategory",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-tiered",
+      "label": "Tiered Compilation",
+      "type": "subcategory",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-compilation",
+      "label": "Compilation",
+      "type": "subcategory",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-inlining",
+      "label": "Inlining",
+      "type": "subcategory",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-escape-analysis",
+      "label": "Escape Analysis",
+      "type": "subcategory",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-intrinsics",
+      "label": "Intrinsics",
+      "type": "subcategory",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "sync-monitors",
+      "label": "Monitors",
+      "type": "subcategory",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "sync-safepoints",
+      "label": "Safepoints",
+      "type": "subcategory",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "class-cds",
+      "label": "CDS",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-verification",
+      "label": "Verification",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "logging-unified",
+      "label": "Unified Logging",
+      "type": "subcategory",
+      "parent": "logging"
+    },
+    {
+      "id": "diag-heap-dumps",
+      "label": "Heap Dumps",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-error-handling",
+      "label": "Error Handling",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-native-memory",
+      "label": "Native Memory",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-flight-recorder",
+      "label": "Flight Recorder",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "flag-version",
+      "label": "-version",
+      "type": "flag",
+      "flag": "-version",
+      "description": "Prints the product version to stdout and exits.",
+      "flagId": "64f94ac0-3459-597f-bd30-21d985f58123"
+    },
+    {
+      "id": "flag-showversion",
+      "label": "-showversion",
+      "type": "flag",
+      "flag": "-showversion",
+      "description": "Prints version information to stderr when the JVM starts.",
+      "flagId": "c9e88dd9-6e5f-5e2e-bf81-4bcc1339b2b1"
+    },
+    {
+      "id": "flag-help",
+      "label": "-help",
+      "type": "flag",
+      "flag": "-help",
+      "description": "Prints a summary of standard command-line options and exits.",
+      "flagId": "84acc198-2298-5aac-9b06-8f8e7f3b3b86"
+    },
+    {
+      "id": "flag-x",
+      "label": "-X",
+      "type": "flag",
+      "flag": "-X",
+      "description": "Prints help on all non-standard (-X) options and exits.",
+      "flagId": "b1591795-827e-556a-8c22-663bc8c1ee4c"
+    },
+    {
+      "id": "flag-printflagsfinal",
+      "label": "-XX:+PrintFlagsFinal",
+      "type": "flag",
+      "flag": "-XX:+PrintFlagsFinal",
+      "description": "Prints the final values of all VM flags after argument parsing and exits.",
+      "flagId": "ffec9684-d685-586c-a10b-143f041357e2"
+    },
+    {
+      "id": "flag-unlockdiagnostic",
+      "label": "-XX:+UnlockDiagnosticVMOptions",
+      "type": "flag",
+      "flag": "-XX:+UnlockDiagnosticVMOptions",
+      "description": "Unlocks options intended for JVM diagnosis and troubleshooting.",
+      "flagId": "8d05e192-a4fd-57ad-b32f-f564dae21946"
+    },
+    {
+      "id": "flag-unlockexperimental",
+      "label": "-XX:+UnlockExperimentalVMOptions",
+      "type": "flag",
+      "flag": "-XX:+UnlockExperimentalVMOptions",
+      "description": "Unlocks options that are experimental and may change or be removed.",
+      "flagId": "bd6367e7-9fca-54a5-ab97-c3089a0e20bd"
+    },
+    {
+      "id": "flag-xms",
+      "label": "-Xms<size>",
+      "type": "flag",
+      "flag": "-Xms<size>",
+      "description": "Sets the initial size of the Java heap (same as -XX:InitialHeapSize).",
+      "flagId": "ac50790d-e18c-5fb4-b262-110cfb726918"
+    },
+    {
+      "id": "flag-xmx",
+      "label": "-Xmx<size>",
+      "type": "flag",
+      "flag": "-Xmx<size>",
+      "description": "Sets the maximum size of the Java heap (same as -XX:MaxHeapSize).",
+      "flagId": "1a2240a9-fad2-5d9c-ad37-e09456862bef"
+    },
+    {
+      "id": "flag-initialheapsize",
+      "label": "-XX:InitialHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:InitialHeapSize=<size>",
+      "description": "Sets the initial Java heap size in bytes; equivalent to -Xms.",
+      "flagId": "5ae3f3d3-f0c6-5e4b-85c8-c038b76391e3"
+    },
+    {
+      "id": "flag-maxheapsize",
+      "label": "-XX:MaxHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:MaxHeapSize=<size>",
+      "description": "Sets the maximum Java heap size in bytes; equivalent to -Xmx.",
+      "flagId": "80713948-fc40-522d-9175-4cc55652beef"
+    },
+    {
+      "id": "flag-minheapsize",
+      "label": "-XX:MinHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:MinHeapSize=<size>",
+      "description": "Sets the minimum Java heap size the JVM will use.",
+      "flagId": "f7a14a36-8f07-5ea4-a799-97fed99f64a7"
+    },
+    {
+      "id": "flag-softmaxheapsize",
+      "label": "-XX:SoftMaxHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:SoftMaxHeapSize=<size>",
+      "description": "Soft upper bound on heap size; the JVM may shrink below -Xmx when memory is unused.",
+      "flagId": "0a6b2e34-810c-5e97-9780-eb5e0121cb32"
+    },
+    {
+      "id": "flag-initialrampercentage",
+      "label": "-XX:InitialRAMPercentage=<n>",
+      "type": "flag",
+      "flag": "-XX:InitialRAMPercentage=<n>",
+      "description": "Initial heap size as a percentage of physical RAM (alternative to -Xms).",
+      "flagId": "9a4d43d6-2f93-539f-b3f3-3a9101c9a2a3"
+    },
+    {
+      "id": "flag-minrampercentage",
+      "label": "-XX:MinRAMPercentage=<n>",
+      "type": "flag",
+      "flag": "-XX:MinRAMPercentage=<n>",
+      "description": "Minimum heap size as a percentage of physical RAM.",
+      "flagId": "1494566e-374a-58d5-a794-c09f6c058b9b"
+    },
+    {
+      "id": "flag-maxrampercentage",
+      "label": "-XX:MaxRAMPercentage=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxRAMPercentage=<n>",
+      "description": "Maximum heap size as a percentage of physical RAM (alternative to -Xmx).",
+      "flagId": "19693250-84d4-551f-a275-10d567837ba7"
+    },
+    {
+      "id": "flag-usecompressedoops",
+      "label": "-XX:+UseCompressedOops",
+      "type": "flag",
+      "flag": "-XX:+UseCompressedOops",
+      "description": "Uses 32-bit object references when the heap is under ~32 GB to save memory.",
+      "flagId": "848c1fa4-2d68-520f-bb14-8575ba840204"
+    },
+    {
+      "id": "flag-usecompressedclasspointers",
+      "label": "-XX:+UseCompressedClassPointers",
+      "type": "flag",
+      "flag": "-XX:+UseCompressedClassPointers",
+      "description": "Stores class metadata in a separate compressed region to reduce footprint.",
+      "flagId": "405ab49c-732b-5b87-9c00-beca36cb3792"
+    },
+    {
+      "id": "flag-usecompactobjectheaders",
+      "label": "-XX:+UseCompactObjectHeaders",
+      "type": "flag",
+      "flag": "-XX:+UseCompactObjectHeaders",
+      "description": "Uses compact object headers to reduce per-object memory overhead.",
+      "flagId": "300a9ec9-f4de-5947-b948-7ff5d2dcaab5"
+    },
+    {
+      "id": "flag-metaspacesize",
+      "label": "-XX:MetaspaceSize=<size>",
+      "type": "flag",
+      "flag": "-XX:MetaspaceSize=<size>",
+      "description": "Initial threshold at which a GC is triggered to reclaim metaspace.",
+      "flagId": "8f8ba20f-204a-51dc-82fd-981fe0d69ce6"
+    },
+    {
+      "id": "flag-maxmetaspacesize",
+      "label": "-XX:MaxMetaspaceSize=<size>",
+      "type": "flag",
+      "flag": "-XX:MaxMetaspaceSize=<size>",
+      "description": "Upper limit on native memory used for class metadata (metaspace).",
+      "flagId": "26aedd03-480c-5c63-a985-9f022bbd7587"
+    },
+    {
+      "id": "flag-compressedclassspacesize",
+      "label": "-XX:CompressedClassSpaceSize=<size>",
+      "type": "flag",
+      "flag": "-XX:CompressedClassSpaceSize=<size>",
+      "description": "Maximum size of the compressed class space used with compressed class pointers.",
+      "flagId": "0953dba7-ece3-55ff-84b8-7d960b7ae086"
+    },
+    {
+      "id": "flag-minmetaspacefreeratio",
+      "label": "-XX:MinMetaspaceFreeRatio=<n>",
+      "type": "flag",
+      "flag": "-XX:MinMetaspaceFreeRatio=<n>",
+      "description": "Minimum percentage of metaspace that must be free after a GC.",
+      "flagId": "c9b49e32-2b52-5cb6-81c5-31d72dbb64c3"
+    },
+    {
+      "id": "flag-maxmetaspacefreeratio",
+      "label": "-XX:MaxMetaspaceFreeRatio=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxMetaspaceFreeRatio=<n>",
+      "description": "Maximum percentage of metaspace that may be free after a GC.",
+      "flagId": "e8bd54c9-9106-5d58-a039-d6804fdf6ceb"
+    },
+    {
+      "id": "flag-xss",
+      "label": "-Xss<size>",
+      "type": "flag",
+      "flag": "-Xss<size>",
+      "description": "Sets the thread stack size (same as -XX:ThreadStackSize).",
+      "flagId": "66782c3d-4fb4-5fd5-ac01-389b6fdfa6e1"
+    },
+    {
+      "id": "flag-threadstacksize",
+      "label": "-XX:ThreadStackSize=<kb>",
+      "type": "flag",
+      "flag": "-XX:ThreadStackSize=<kb>",
+      "description": "Stack size in kilobytes for each Java thread.",
+      "flagId": "79cf06dd-bc0b-5002-867d-4075fa5a67ba"
+    },
+    {
+      "id": "flag-vmthreadstacksize",
+      "label": "-XX:VMThreadStackSize=<kb>",
+      "type": "flag",
+      "flag": "-XX:VMThreadStackSize=<kb>",
+      "description": "Stack size for VM internal threads.",
+      "flagId": "b3378820-29d3-501e-b5a9-cab871913c10"
+    },
+    {
+      "id": "flag-compilerthreadstacksize",
+      "label": "-XX:CompilerThreadStackSize=<kb>",
+      "type": "flag",
+      "flag": "-XX:CompilerThreadStackSize=<kb>",
+      "description": "Stack size for JIT compiler threads.",
+      "flagId": "349ab36b-7790-5b0f-b871-c4d4516c2d44"
+    },
+    {
+      "id": "flag-useg1gc",
+      "label": "-XX:+UseG1GC",
+      "type": "flag",
+      "flag": "-XX:+UseG1GC",
+      "description": "Enables the Garbage-First (G1) garbage collector.",
+      "flagId": "74f63ed2-0073-55bb-ace3-21d05103d494"
+    },
+    {
+      "id": "flag-useserialgc",
+      "label": "-XX:+UseSerialGC",
+      "type": "flag",
+      "flag": "-XX:+UseSerialGC",
+      "description": "Uses the single-threaded Serial collector for young and old generations.",
+      "flagId": "5f183c89-013e-5eeb-b905-c88e92153919"
+    },
+    {
+      "id": "flag-useparallelgc",
+      "label": "-XX:+UseParallelGC",
+      "type": "flag",
+      "flag": "-XX:+UseParallelGC",
+      "description": "Uses parallel threads for young-generation collection (Throughput collector).",
+      "flagId": "9f57a959-13a3-53a1-8959-63b43b9e806d"
+    },
+    {
+      "id": "flag-useparalleloldgc",
+      "label": "-XX:+UseParallelOldGC",
+      "type": "flag",
+      "flag": "-XX:+UseParallelOldGC",
+      "description": "Uses parallel threads for old-generation collection with Parallel GC.",
+      "flagId": "82599c05-b479-59e5-80eb-323babb51731"
+    },
+    {
+      "id": "flag-usezgc",
+      "label": "-XX:+UseZGC",
+      "type": "flag",
+      "flag": "-XX:+UseZGC",
+      "description": "Enables the Z Garbage Collector (ZGC), a low-latency concurrent collector.",
+      "flagId": "84fee307-3df1-57fc-902c-8db6bc1f2fd8"
+    },
+    {
+      "id": "flag-zgenerational",
+      "label": "-XX:+ZGenerational",
+      "type": "flag",
+      "flag": "-XX:+ZGenerational",
+      "description": "Runs ZGC in generational mode, collecting young regions more frequently.",
+      "flagId": "ee5a0e3f-2eae-5590-a359-c7eb452d49bb"
+    },
+    {
+      "id": "flag-zuncommitdelay",
+      "label": "-XX:ZUncommitDelay=<seconds>",
+      "type": "flag",
+      "flag": "-XX:ZUncommitDelay=<seconds>",
+      "description": "Seconds of inactivity before ZGC returns unused heap memory to the OS.",
+      "flagId": "b776f7de-0ebf-571b-b1c2-e671209aaac1"
+    },
+    {
+      "id": "flag-useshenandoahgc",
+      "label": "-XX:+UseShenandoahGC",
+      "type": "flag",
+      "flag": "-XX:+UseShenandoahGC",
+      "description": "Enables the Shenandoah low-pause concurrent garbage collector.",
+      "flagId": "02a2a07b-97f7-57fa-93dc-b40009ea430d"
+    },
+    {
+      "id": "flag-shenandoahgcheuristics",
+      "label": "-XX:ShenandoahGCHeuristics=<mode>",
+      "type": "flag",
+      "flag": "-XX:ShenandoahGCHeuristics=<mode>",
+      "description": "Selects Shenandoah heuristics mode (e.g. adaptive, static, aggressive).",
+      "flagId": "fb21b3a7-04db-5f8c-a8a4-dea25bc25106"
+    },
+    {
+      "id": "flag-shenandoahuncommitdelay",
+      "label": "-XX:ShenandoahUncommitDelay=<ms>",
+      "type": "flag",
+      "flag": "-XX:ShenandoahUncommitDelay=<ms>",
+      "description": "Milliseconds before Shenandoah uncommits unused heap pages to the OS.",
+      "flagId": "47680916-be61-51b9-9335-79e66b929fb9"
+    },
+    {
+      "id": "flag-useepsilongc",
+      "label": "-XX:+UseEpsilonGC",
+      "type": "flag",
+      "flag": "-XX:+UseEpsilonGC",
+      "description": "Enables Epsilon, a no-op collector that allocates but does not reclaim memory.",
+      "flagId": "0eae724b-e55f-5f08-bb1e-61f0889e17c0"
+    },
+    {
+      "id": "flag-parallelgcthreads",
+      "label": "-XX:ParallelGCThreads=<n>",
+      "type": "flag",
+      "flag": "-XX:ParallelGCThreads=<n>",
+      "description": "Number of threads used for parallel young or old generation GC.",
+      "flagId": "41742589-1b00-5b6f-8c4d-4433297f5c83"
+    },
+    {
+      "id": "flag-concgcthreads",
+      "label": "-XX:ConcGCThreads=<n>",
+      "type": "flag",
+      "flag": "-XX:ConcGCThreads=<n>",
+      "description": "Number of threads for concurrent GC work (e.g. G1 or ZGC concurrent phases).",
+      "flagId": "8a703edf-6bdc-51f1-9e4c-517eaf0f190c"
+    },
+    {
+      "id": "flag-maxgcpausemillis",
+      "label": "-XX:MaxGCPauseMillis=<ms>",
+      "type": "flag",
+      "flag": "-XX:MaxGCPauseMillis=<ms>",
+      "description": "Soft target for maximum GC pause time in milliseconds (G1 and others).",
+      "flagId": "f18a201f-f963-506a-bdce-9fede7a59d29"
+    },
+    {
+      "id": "flag-g1heapregionsize",
+      "label": "-XX:G1HeapRegionSize=<size>",
+      "type": "flag",
+      "flag": "-XX:G1HeapRegionSize=<size>",
+      "description": "Size of each G1 heap region; must be a power of two between 1 MB and 32 MB.",
+      "flagId": "03922884-d779-5b65-85bc-8f33db417ccc"
+    },
+    {
+      "id": "flag-initiatingheapoccupancypercent",
+      "label": "-XX:InitiatingHeapOccupancyPercent=<n>",
+      "type": "flag",
+      "flag": "-XX:InitiatingHeapOccupancyPercent=<n>",
+      "description": "Heap occupancy percent that triggers concurrent marking in G1.",
+      "flagId": "d9d77338-6d0a-50b3-92bf-73284e868a69"
+    },
+    {
+      "id": "flag-g1reservepercent",
+      "label": "-XX:G1ReservePercent=<n>",
+      "type": "flag",
+      "flag": "-XX:G1ReservePercent=<n>",
+      "description": "Percentage of heap reserved as a false ceiling to reduce promotion failures.",
+      "flagId": "20e30c3a-c54c-596b-bd6e-4e56d34bc4e9"
+    },
+    {
+      "id": "flag-g1heapwastepercent",
+      "label": "-XX:G1HeapWastePercent=<n>",
+      "type": "flag",
+      "flag": "-XX:G1HeapWastePercent=<n>",
+      "description": "Allowed reclaimable garbage in old regions before mixed GC is considered.",
+      "flagId": "18e5db39-3e19-5344-9dd1-e418b7137a5c"
+    },
+    {
+      "id": "flag-g1mixedgccounttarget",
+      "label": "-XX:G1MixedGCCountTarget=<n>",
+      "type": "flag",
+      "flag": "-XX:G1MixedGCCountTarget=<n>",
+      "description": "Target number of old regions collected per mixed G1 GC cycle.",
+      "flagId": "f7a4676e-6a0d-56cf-9a4a-a96517a7c42f"
+    },
+    {
+      "id": "flag-g1newsizepercent",
+      "label": "-XX:G1NewSizePercent=<n>",
+      "type": "flag",
+      "flag": "-XX:G1NewSizePercent=<n>",
+      "description": "Minimum young generation size as a percentage of the heap.",
+      "flagId": "dafbbb46-e157-5ac1-bede-e00074a8ebad"
+    },
+    {
+      "id": "flag-g1maxnewsizepercent",
+      "label": "-XX:G1MaxNewSizePercent=<n>",
+      "type": "flag",
+      "flag": "-XX:G1MaxNewSizePercent=<n>",
+      "description": "Maximum young generation size as a percentage of the heap.",
+      "flagId": "fa424de1-4611-5a27-a5dd-176eb304075f"
+    },
+    {
+      "id": "flag-usetlab",
+      "label": "-XX:+UseTLAB",
+      "type": "flag",
+      "flag": "-XX:+UseTLAB",
+      "description": "Enables thread-local allocation buffers for faster object allocation.",
+      "flagId": "45eb0589-9f78-531a-9826-888e792720ed"
+    },
+    {
+      "id": "flag-tlabsize",
+      "label": "-XX:TLABSize=<bytes>",
+      "type": "flag",
+      "flag": "-XX:TLABSize=<bytes>",
+      "description": "Target size of each thread-local allocation buffer.",
+      "flagId": "ab273a1d-fdb4-5faa-8d84-6138f62ed42f"
+    },
+    {
+      "id": "flag-mintlabsize",
+      "label": "-XX:MinTLABSize=<bytes>",
+      "type": "flag",
+      "flag": "-XX:MinTLABSize=<bytes>",
+      "description": "Minimum allowed TLAB size when resizing.",
+      "flagId": "a7ae8549-1655-5177-9658-f4e0e1c37ee0"
+    },
+    {
+      "id": "flag-tlabwastetargetpercent",
+      "label": "-XX:TLABWasteTargetPercent=<n>",
+      "type": "flag",
+      "flag": "-XX:TLABWasteTargetPercent=<n>",
+      "description": "Target percentage of TLAB space that may be wasted at refill.",
+      "flagId": "9ab68216-302f-55a6-92d5-cb75363b06c3"
+    },
+    {
+      "id": "flag-usestringdeduplication",
+      "label": "-XX:+UseStringDeduplication",
+      "type": "flag",
+      "flag": "-XX:+UseStringDeduplication",
+      "description": "Enables G1 string deduplication to share identical char arrays (G1 only).",
+      "flagId": "685c4540-2661-5a62-827c-4bf40626313a"
+    },
+    {
+      "id": "flag-stringdeduplicationagethreshold",
+      "label": "-XX:StringDeduplicationAgeThreshold=<n>",
+      "type": "flag",
+      "flag": "-XX:StringDeduplicationAgeThreshold=<n>",
+      "description": "Minimum age of a string before it is considered for deduplication.",
+      "flagId": "cffd6e9a-435c-58e7-834d-8cb85fadfb99"
+    },
+    {
+      "id": "flag-disableexplicitgc",
+      "label": "-XX:+DisableExplicitGC",
+      "type": "flag",
+      "flag": "-XX:+DisableExplicitGC",
+      "description": "Ignores calls to System.gc() and Runtime.getRuntime().gc().",
+      "flagId": "1e734b64-40ab-5e78-b241-0c0292c2f533"
+    },
+    {
+      "id": "flag-explicitgcinvokesconcurrent",
+      "label": "-XX:+ExplicitGCInvokesConcurrent",
+      "type": "flag",
+      "flag": "-XX:+ExplicitGCInvokesConcurrent",
+      "description": "Makes System.gc() trigger a concurrent GC cycle instead of a full stop-the-world GC.",
+      "flagId": "b3e1b0f3-ffbb-55d3-b090-6b328a244700"
+    },
+    {
+      "id": "flag-xlog-gc",
+      "label": "-Xlog:gc",
+      "type": "flag",
+      "flag": "-Xlog:gc",
+      "description": "Enables GC logging using the unified -Xlog framework.",
+      "flagId": "6b9ed1f5-ac75-5252-b042-8d998daad3a0"
+    },
+    {
+      "id": "flag-xlog-gc-star",
+      "label": "-Xlog:gc*",
+      "type": "flag",
+      "flag": "-Xlog:gc*",
+      "description": "Enables all GC-related unified log tags at default level.",
+      "flagId": "14cdf997-1cdf-5375-96d9-40c223b11781"
+    },
+    {
+      "id": "flag-xlog-gc-file",
+      "label": "-Xlog:gc*:file=gc.log",
+      "type": "flag",
+      "flag": "-Xlog:gc*:file=gc.log",
+      "description": "Writes unified GC logs to a file (example: gc.log).",
+      "flagId": "3f727000-f30e-5428-98c1-c67fed9badd4"
+    },
+    {
+      "id": "flag-xint",
+      "label": "-Xint",
+      "type": "flag",
+      "flag": "-Xint",
+      "description": "Forces interpreted-only execution; disables the JIT compiler.",
+      "flagId": "593d3d1b-9846-5fc0-bb59-7929085329b4"
+    },
+    {
+      "id": "flag-xcomp",
+      "label": "-Xcomp",
+      "type": "flag",
+      "flag": "-Xcomp",
+      "description": "Forces compilation of every method on first invocation (no interpretation tier).",
+      "flagId": "ac0aa007-1740-5329-9489-387297b578b2"
+    },
+    {
+      "id": "flag-xmixed",
+      "label": "-Xmixed",
+      "type": "flag",
+      "flag": "-Xmixed",
+      "description": "Uses both interpretation and compilation (default execution mode).",
+      "flagId": "19db8b3b-134c-5bb9-8430-9f52fefb4a78"
+    },
+    {
+      "id": "flag-tieredcompilation",
+      "label": "-XX:+TieredCompilation",
+      "type": "flag",
+      "flag": "-XX:+TieredCompilation",
+      "description": "Enables the tiered compilation system with client and server compiler levels.",
+      "flagId": "c7c6756e-03f5-5c09-b997-00e0d2707e61"
+    },
+    {
+      "id": "flag-tieredstopatlevel",
+      "label": "-XX:TieredStopAtLevel=<n>",
+      "type": "flag",
+      "flag": "-XX:TieredStopAtLevel=<n>",
+      "description": "Stops tiered compilation at the given level (1\u20134).",
+      "flagId": "e3006687-7fdb-5370-98d0-1eafff875bfc"
+    },
+    {
+      "id": "flag-compilethreshold",
+      "label": "-XX:CompileThreshold=<n>",
+      "type": "flag",
+      "flag": "-XX:CompileThreshold=<n>",
+      "description": "Number of method invocations before compilation at a given tier.",
+      "flagId": "e4ee1f94-2750-5c77-ae8c-75ad56da49f2"
+    },
+    {
+      "id": "flag-cicompilercount",
+      "label": "-XX:CICompilerCount=<n>",
+      "type": "flag",
+      "flag": "-XX:CICompilerCount=<n>",
+      "description": "Number of compiler threads for tiered or server compilation.",
+      "flagId": "6aacedf1-9318-5c1c-b0d4-4a709b3b9897"
+    },
+    {
+      "id": "flag-xbatch",
+      "label": "-Xbatch",
+      "type": "flag",
+      "flag": "-Xbatch",
+      "description": "Disables background compilation; compiles in the invoking thread.",
+      "flagId": "22a136a8-386e-5bbb-a31c-f6ccb383a871"
+    },
+    {
+      "id": "flag-backgroundcompilation",
+      "label": "-XX:+BackgroundCompilation",
+      "type": "flag",
+      "flag": "-XX:+BackgroundCompilation",
+      "description": "Allows compilation to run in background compiler threads (default on).",
+      "flagId": "86fdbcdf-c170-5acb-80bb-953e3617434b"
+    },
+    {
+      "id": "flag-maxinlinesize",
+      "label": "-XX:MaxInlineSize=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxInlineSize=<n>",
+      "description": "Maximum bytecode size of a method inlined by the JIT.",
+      "flagId": "72289a0c-579a-5221-9fc8-08641083fae0"
+    },
+    {
+      "id": "flag-freqinlinesize",
+      "label": "-XX:FreqInlineSize=<n>",
+      "type": "flag",
+      "flag": "-XX:FreqInlineSize=<n>",
+      "description": "Maximum bytecode size for frequently called methods to be inlined.",
+      "flagId": "f260d67f-8198-5eb6-b9c0-1658357bd32b"
+    },
+    {
+      "id": "flag-inlinesmallcode",
+      "label": "-XX:InlineSmallCode=<n>",
+      "type": "flag",
+      "flag": "-XX:InlineSmallCode=<n>",
+      "description": "Maximum native code size for a callee inlined into a caller.",
+      "flagId": "52064ac3-c722-57df-a194-bb60ef18d076"
+    },
+    {
+      "id": "flag-maxinlinelevel",
+      "label": "-XX:MaxInlineLevel=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxInlineLevel=<n>",
+      "description": "Maximum depth of nested method inlining.",
+      "flagId": "5f1d9355-6ca3-50ac-849b-3c3dd34338db"
+    },
+    {
+      "id": "flag-maxrecursiveinlinelevel",
+      "label": "-XX:MaxRecursiveInlineLevel=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxRecursiveInlineLevel=<n>",
+      "description": "Maximum depth of recursive method inlining.",
+      "flagId": "9caca0f0-9307-5459-a5c5-59bd22e63b9b"
+    },
+    {
+      "id": "flag-doescapeanalysis",
+      "label": "-XX:+DoEscapeAnalysis",
+      "type": "flag",
+      "flag": "-XX:+DoEscapeAnalysis",
+      "description": "Enables escape analysis to eliminate redundant allocations and locks.",
+      "flagId": "121d4fc7-3cc3-5bf1-8593-4ba5e556304f"
+    },
+    {
+      "id": "flag-eliminateallocations",
+      "label": "-XX:+EliminateAllocations",
+      "type": "flag",
+      "flag": "-XX:+EliminateAllocations",
+      "description": "Removes heap allocations for non-escaping objects when escape analysis succeeds.",
+      "flagId": "680fcd1d-ae2b-53c6-8fcb-f0d57fdc17f1"
+    },
+    {
+      "id": "flag-eliminatlocks",
+      "label": "-XX:+EliminateLocks",
+      "type": "flag",
+      "flag": "-XX:+EliminateLocks",
+      "description": "Removes lock operations on objects proven not to escape.",
+      "flagId": "b6cd7b67-6360-5744-ac06-8d6ab6c22682"
+    },
+    {
+      "id": "flag-useaes",
+      "label": "-XX:+UseAES",
+      "type": "flag",
+      "flag": "-XX:+UseAES",
+      "description": "Enables hardware-accelerated AES cipher implementations when available.",
+      "flagId": "8fa73f97-5e52-577d-b6f5-81497c852545"
+    },
+    {
+      "id": "flag-useaesintrinsics",
+      "label": "-XX:+UseAESIntrinsics",
+      "type": "flag",
+      "flag": "-XX:+UseAESIntrinsics",
+      "description": "Uses intrinsics for AES encryption and decryption in supported crypto providers.",
+      "flagId": "0ce56b9a-e5b4-516f-93cd-ec692a871210"
+    },
+    {
+      "id": "flag-usesha",
+      "label": "-XX:+UseSHA",
+      "type": "flag",
+      "flag": "-XX:+UseSHA",
+      "description": "Enables hardware-accelerated SHA implementations when available.",
+      "flagId": "53608a69-c922-5bd6-81bc-c3e40e76b8b0"
+    },
+    {
+      "id": "flag-usecrc32intrinsics",
+      "label": "-XX:+UseCRC32Intrinsics",
+      "type": "flag",
+      "flag": "-XX:+UseCRC32Intrinsics",
+      "description": "Uses CPU intrinsics for CRC32 calculation in java.util.zip.",
+      "flagId": "9cee39e6-1795-56a7-b762-fb045f0736ef"
+    },
+    {
+      "id": "flag-usevectorizedmismatchintrinsic",
+      "label": "-XX:+UseVectorizedMismatchIntrinsic",
+      "type": "flag",
+      "flag": "-XX:+UseVectorizedMismatchIntrinsic",
+      "description": "Uses SIMD intrinsics for Arrays.mismatch and related APIs.",
+      "flagId": "7bd7e2cd-381f-5b37-aa82-4e49a0611b23"
+    },
+    {
+      "id": "flag-initialcodecachesiz",
+      "label": "-XX:InitialCodeCacheSize=<size>",
+      "type": "flag",
+      "flag": "-XX:InitialCodeCacheSize=<size>",
+      "description": "Initial size of the code cache holding JIT-compiled native code.",
+      "flagId": "85567628-0fd8-50e7-a869-7ba84151116d"
+    },
+    {
+      "id": "flag-reservedcodecachesiz",
+      "label": "-XX:ReservedCodeCacheSize=<size>",
+      "type": "flag",
+      "flag": "-XX:ReservedCodeCacheSize=<size>",
+      "description": "Maximum size reserved for the code cache.",
+      "flagId": "0002e587-348a-5b71-af0d-cf20b0db33ea"
+    },
+    {
+      "id": "flag-nonprofiledcodeheapsize",
+      "label": "-XX:NonProfiledCodeHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:NonProfiledCodeHeapSize=<size>",
+      "description": "Size of the non-profiled code heap segment in the code cache.",
+      "flagId": "e5eadb93-fe65-544f-8365-ce21a58ae05a"
+    },
+    {
+      "id": "flag-profiledcodeheapsize",
+      "label": "-XX:ProfiledCodeHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:ProfiledCodeHeapSize=<size>",
+      "description": "Size of the profiled code heap segment in the code cache.",
+      "flagId": "2672db1f-2a57-54d7-9553-d86b91f1c61d"
+    },
+    {
+      "id": "flag-nonnmethodcodeheapsize",
+      "label": "-XX:NonNMethodCodeHeapSize=<size>",
+      "type": "flag",
+      "flag": "-XX:NonNMethodCodeHeapSize=<size>",
+      "description": "Size of the non-nmethod code heap for adapters and buffers.",
+      "flagId": "13cbd04e-ed67-5dc2-a396-cd9e5d4fd344"
+    },
+    {
+      "id": "flag-usecodecacheflushing",
+      "label": "-XX:+UseCodeCacheFlushing",
+      "type": "flag",
+      "flag": "-XX:+UseCodeCacheFlushing",
+      "description": "Allows unused compiled code to be flushed when the code cache is full.",
+      "flagId": "324ca236-ab5b-532c-bf6b-4c5d1333f089"
+    },
+    {
+      "id": "flag-useheavymonitors",
+      "label": "-XX:+UseHeavyMonitors",
+      "type": "flag",
+      "flag": "-XX:+UseHeavyMonitors",
+      "description": "Uses heavyweight monitor implementation for contended locks.",
+      "flagId": "c6ddd0ed-fd75-561b-a326-a90deaecd3ed"
+    },
+    {
+      "id": "flag-monitordeflationmax",
+      "label": "-XX:MonitorDeflationMax=<n>",
+      "type": "flag",
+      "flag": "-XX:MonitorDeflationMax=<n>",
+      "description": "Maximum number of monitors to deflate per safepoint cycle.",
+      "flagId": "0d137e5f-1195-500f-bf57-3cd7478d682e"
+    },
+    {
+      "id": "flag-monitoruseddeflationthreshold",
+      "label": "-XX:MonitorUsedDeflationThreshold=<n>",
+      "type": "flag",
+      "flag": "-XX:MonitorUsedDeflationThreshold=<n>",
+      "description": "Monitor usage count above which deflation is attempted.",
+      "flagId": "718d5835-0115-5147-87b6-ac086010193c"
+    },
+    {
+      "id": "flag-safepointtimeout",
+      "label": "-XX:+SafepointTimeout",
+      "type": "flag",
+      "flag": "-XX:+SafepointTimeout",
+      "description": "Logs or handles JVM threads that fail to reach a safepoint within the delay.",
+      "flagId": "2fe8c421-dce7-5307-a471-350929d4b378"
+    },
+    {
+      "id": "flag-safepointtimeoutdelay",
+      "label": "-XX:SafepointTimeoutDelay=<ms>",
+      "type": "flag",
+      "flag": "-XX:SafepointTimeoutDelay=<ms>",
+      "description": "Milliseconds a thread may be late to a safepoint before timeout handling.",
+      "flagId": "c933a692-4668-5c2b-9df6-ea8e15c9096a"
+    },
+    {
+      "id": "flag-xshare-on",
+      "label": "-Xshare:on",
+      "type": "flag",
+      "flag": "-Xshare:on",
+      "description": "Uses class data sharing (CDS) when a shared archive is available.",
+      "flagId": "73540487-94a3-5a4f-bf21-2fe941ac5c3e"
+    },
+    {
+      "id": "flag-xshare-off",
+      "label": "-Xshare:off",
+      "type": "flag",
+      "flag": "-Xshare:off",
+      "description": "Disables class data sharing.",
+      "flagId": "a9aee58e-b400-5876-a6fa-038069ca97a1"
+    },
+    {
+      "id": "flag-xshare-auto",
+      "label": "-Xshare:auto",
+      "type": "flag",
+      "flag": "-Xshare:auto",
+      "description": "Uses CDS only if a compatible shared archive exists (default).",
+      "flagId": "019a8d39-a6cf-5c2b-8ab2-67d24aa4d3c5"
+    },
+    {
+      "id": "flag-sharedarchivefile",
+      "label": "-XX:SharedArchiveFile=<file>",
+      "type": "flag",
+      "flag": "-XX:SharedArchiveFile=<file>",
+      "description": "Path to a shared classes archive for CDS.",
+      "flagId": "272e963e-e1ea-5429-8673-f3ffdfb92b9a"
+    },
+    {
+      "id": "flag-archiveclassesatexit",
+      "label": "-XX:ArchiveClassesAtExit=<file>",
+      "type": "flag",
+      "flag": "-XX:ArchiveClassesAtExit=<file>",
+      "description": "Writes a CDS archive of loaded classes when the JVM exits.",
+      "flagId": "d9e80946-ce15-5052-8930-a2d56d51e8d4"
+    },
+    {
+      "id": "flag-dumploadedclasslist",
+      "label": "-XX:DumpLoadedClassList=<file>",
+      "type": "flag",
+      "flag": "-XX:DumpLoadedClassList=<file>",
+      "description": "Writes a class list file for building a custom CDS archive.",
+      "flagId": "00823f43-127e-5f6e-9b92-991c2a6aa49e"
+    },
+    {
+      "id": "flag-xverify-all",
+      "label": "-Xverify:all",
+      "type": "flag",
+      "flag": "-Xverify:all",
+      "description": "Verifies all bytecode in loaded classes (slower startup).",
+      "flagId": "a156625c-7fa9-52ec-ba21-f877a1ede1f1"
+    },
+    {
+      "id": "flag-xverify-none",
+      "label": "-Xverify:none",
+      "type": "flag",
+      "flag": "-Xverify:none",
+      "description": "Disables bytecode verification (not recommended for production).",
+      "flagId": "c4f81aa5-01ab-5b12-9803-2ffa7fb33a61"
+    },
+    {
+      "id": "flag-xlog-class-load",
+      "label": "-Xlog:class+load",
+      "type": "flag",
+      "flag": "-Xlog:class+load",
+      "description": "Logs class loading events via the unified logging framework.",
+      "flagId": "73a02214-b91f-5ccf-85e5-6d4241d35def"
+    },
+    {
+      "id": "flag-xlog-safepoint",
+      "label": "-Xlog:safepoint",
+      "type": "flag",
+      "flag": "-Xlog:safepoint",
+      "description": "Logs safepoint begin/end and time-to-safepoint statistics.",
+      "flagId": "bc255d06-8c1a-589e-8963-317f2e372c0a"
+    },
+    {
+      "id": "flag-xlog-os",
+      "label": "-Xlog:os",
+      "type": "flag",
+      "flag": "-Xlog:os",
+      "description": "Logs operating-system and JVM environment information at startup.",
+      "flagId": "f7e8fd66-8651-572b-9e7b-4690045fadbd"
+    },
+    {
+      "id": "flag-xlog-os-container",
+      "label": "-Xlog:os+container",
+      "type": "flag",
+      "flag": "-Xlog:os+container",
+      "description": "Logs container detection and cgroup memory/CPU limits.",
+      "flagId": "f98bfb90-2112-5303-a713-cce64b92eaab"
+    },
+    {
+      "id": "flag-xlog-jit-compilation",
+      "label": "-Xlog:jit+compilation",
+      "type": "flag",
+      "flag": "-Xlog:jit+compilation",
+      "description": "Logs JIT compilation events and decisions.",
+      "flagId": "1f4e1391-b894-502a-812e-6f45f3738a45"
+    },
+    {
+      "id": "flag-xlog-cds",
+      "label": "-Xlog:cds",
+      "type": "flag",
+      "flag": "-Xlog:cds",
+      "description": "Logs class data sharing (CDS) archive load and dump activity.",
+      "flagId": "09fda8aa-b960-51bf-9efe-6a2715b415ba"
+    },
+    {
+      "id": "flag-heapdumponoutofmemoryerror",
+      "label": "-XX:+HeapDumpOnOutOfMemoryError",
+      "type": "flag",
+      "flag": "-XX:+HeapDumpOnOutOfMemoryError",
+      "description": "Creates a heap dump file when an OutOfMemoryError is thrown.",
+      "flagId": "87bd44f2-18fe-5628-af78-9405f42e04cc"
+    },
+    {
+      "id": "flag-heapdumppath",
+      "label": "-XX:HeapDumpPath=<path>",
+      "type": "flag",
+      "flag": "-XX:HeapDumpPath=<path>",
+      "description": "Directory or file path for heap dumps written by the JVM.",
+      "flagId": "f419fac1-1c00-5107-8d3e-c7526ad6ce5b"
+    },
+    {
+      "id": "flag-errorfile",
+      "label": "-XX:ErrorFile=<file>",
+      "type": "flag",
+      "flag": "-XX:ErrorFile=<file>",
+      "description": "File where fatal error reports (hs_err_pid files) are written.",
+      "flagId": "e8358128-334c-50da-99aa-c589b22b152b"
+    },
+    {
+      "id": "flag-onerror",
+      "label": "-XX:OnError=<cmd>",
+      "type": "flag",
+      "flag": "-XX:OnError=<cmd>",
+      "description": "Command or script to run when the JVM encounters a fatal error.",
+      "flagId": "ce1d242c-543f-5ef8-9942-56529c4158e7"
+    },
+    {
+      "id": "flag-onoutofmemoryerror",
+      "label": "-XX:OnOutOfMemoryError=<cmd>",
+      "type": "flag",
+      "flag": "-XX:OnOutOfMemoryError=<cmd>",
+      "description": "Command or script to run when an OutOfMemoryError occurs.",
+      "flagId": "b9d86108-6973-5d8b-ad85-2de2a19b4ea8"
+    },
+    {
+      "id": "flag-exitonoutofmemoryerror",
+      "label": "-XX:+ExitOnOutOfMemoryError",
+      "type": "flag",
+      "flag": "-XX:+ExitOnOutOfMemoryError",
+      "description": "Exits the JVM immediately when an OutOfMemoryError is thrown.",
+      "flagId": "41f7755d-443c-54d5-a53e-9657b841d674"
+    },
+    {
+      "id": "flag-crashonoutofmemoryerror",
+      "label": "-XX:+CrashOnOutOfMemoryError",
+      "type": "flag",
+      "flag": "-XX:+CrashOnOutOfMemoryError",
+      "description": "Crashes the JVM (abort) on OutOfMemoryError instead of catching it.",
+      "flagId": "029aefee-b064-52c2-89d0-821224becabe"
+    },
+    {
+      "id": "flag-nativememorytracking",
+      "label": "-XX:NativeMemoryTracking=off|summary|detail",
+      "type": "flag",
+      "flag": "-XX:NativeMemoryTracking=off|summary|detail",
+      "description": "Tracks native memory usage (off, summary, or detail); has runtime overhead.",
+      "flagId": "6abbb61e-358d-5b52-8861-4d0b3b37c533"
+    },
+    {
+      "id": "flag-printnmtstatistics",
+      "label": "-XX:+PrintNMTStatistics",
+      "type": "flag",
+      "flag": "-XX:+PrintNMTStatistics",
+      "description": "Prints native memory tracking summary at JVM shutdown.",
+      "flagId": "303b03e3-883d-5c46-8c05-43f0cff778b7"
+    },
+    {
+      "id": "flag-startflightrecording",
+      "label": "-XX:StartFlightRecording=<options>",
+      "type": "flag",
+      "flag": "-XX:StartFlightRecording=<options>",
+      "description": "Starts a JDK Flight Recorder (JFR) recording at JVM launch.",
+      "flagId": "7370f0f0-a568-59ab-9427-9c5f46d675fb"
+    },
+    {
+      "id": "flag-flightrecorderoptions",
+      "label": "-XX:FlightRecorderOptions=<options>",
+      "type": "flag",
+      "flag": "-XX:FlightRecorderOptions=<options>",
+      "description": "Sets global JDK Flight Recorder configuration options.",
+      "flagId": "58715b01-b89b-5d5b-8f0d-c7bd35129dfc"
+    },
+    {
+      "id": "flag-oldobjectsamplesize",
+      "label": "-XX:OldObjectSampleSize=<n>",
+      "type": "flag",
+      "flag": "-XX:OldObjectSampleSize=<n>",
+      "description": "Number of old objects to sample per old-generation GC for leak analysis.",
+      "flagId": "95f9d3ae-fc25-5320-879a-c72d75b183d7"
+    },
+    {
+      "id": "flag-usecontainersupport",
+      "label": "-XX:+UseContainerSupport",
+      "type": "flag",
+      "flag": "-XX:+UseContainerSupport",
+      "description": "Detects cgroup limits in containers and adjusts memory and CPU defaults.",
+      "flagId": "0eca3b19-b267-5307-b765-8de5c32ed958"
+    },
+    {
+      "id": "flag-activeprocessorcount",
+      "label": "-XX:ActiveProcessorCount=<n>",
+      "type": "flag",
+      "flag": "-XX:ActiveProcessorCount=<n>",
+      "description": "Overrides the number of CPUs the JVM believes are available.",
+      "flagId": "65f5e3b4-0d1d-545c-aedd-b8522a0acfad"
+    },
+    {
+      "id": "flag-initialrampercentage-containers",
+      "label": "-XX:InitialRAMPercentage=<n>",
+      "type": "flag",
+      "flag": "-XX:InitialRAMPercentage=<n>",
+      "description": "Initial heap as a percentage of container-visible memory in cgroups.",
+      "flagId": "c04b721c-c3cb-5ad5-9f7f-218c25daa698"
+    },
+    {
+      "id": "flag-minrampercentage-containers",
+      "label": "-XX:MinRAMPercentage=<n>",
+      "type": "flag",
+      "flag": "-XX:MinRAMPercentage=<n>",
+      "description": "Minimum heap as a percentage of container-visible memory.",
+      "flagId": "ca38f6b2-6fce-5586-bc86-f0ca52d4d4d3"
+    },
+    {
+      "id": "flag-maxrampercentage-containers",
+      "label": "-XX:MaxRAMPercentage=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxRAMPercentage=<n>",
+      "description": "Maximum heap as a percentage of container-visible memory.",
+      "flagId": "edd3fce3-4eba-52ad-acb7-213e7b6f98f7"
+    },
+    {
+      "id": "flag-vt-scheduler-parallelism",
+      "label": "-Djdk.virtualThreadScheduler.parallelism=<n>",
+      "type": "flag",
+      "flag": "-Djdk.virtualThreadScheduler.parallelism=<n>",
+      "description": "Number of carrier threads in the virtual-thread scheduler fork-join pool.",
+      "flagId": "45237a71-e8a4-54b7-bbe4-aff42234c3d6"
+    },
+    {
+      "id": "flag-vt-scheduler-maxpoolsize",
+      "label": "-Djdk.virtualThreadScheduler.maxPoolSize=<n>",
+      "type": "flag",
+      "flag": "-Djdk.virtualThreadScheduler.maxPoolSize=<n>",
+      "description": "Maximum pool size for the virtual-thread scheduler carrier pool.",
+      "flagId": "6c78ea83-10cd-5ed7-bc85-de259e92fcf7"
+    },
+    {
+      "id": "flag-module-path",
+      "label": "--module-path",
+      "type": "flag",
+      "flag": "--module-path",
+      "description": "Sets the module path for locating modules and their dependencies.",
+      "flagId": "99a3f7d9-0de0-5dab-ab9d-aea59328c110"
+    },
+    {
+      "id": "flag-add-modules",
+      "label": "--add-modules",
+      "type": "flag",
+      "flag": "--add-modules",
+      "description": "Adds modules to the default root set for resolution.",
+      "flagId": "c5db7151-5a0c-584e-a212-c524eb6e7382"
+    },
+    {
+      "id": "flag-add-exports",
+      "label": "--add-exports",
+      "type": "flag",
+      "flag": "--add-exports",
+      "description": "Exports a package from one module to another at runtime.",
+      "flagId": "4c9828a8-fd97-5cd6-85db-acbc46f9ed04"
+    },
+    {
+      "id": "flag-add-opens",
+      "label": "--add-opens",
+      "type": "flag",
+      "flag": "--add-opens",
+      "description": "Opens a package for deep reflection from another module at runtime.",
+      "flagId": "322d7603-ac56-5769-8274-69c7e66dba72"
+    },
+    {
+      "id": "flag-limit-modules",
+      "label": "--limit-modules",
+      "type": "flag",
+      "flag": "--limit-modules",
+      "description": "Limits observable modules to the named set and their dependencies.",
+      "flagId": "627c205a-440e-521d-b8b6-e2fc4ad88075"
+    },
+    {
+      "id": "flag-patch-module",
+      "label": "--patch-module",
+      "type": "flag",
+      "flag": "--patch-module",
+      "description": "Overrides or augments module content from a directory or JAR.",
+      "flagId": "682a0786-3b8e-5740-be8e-f16d069bf980"
+    },
+    {
+      "id": "flag-java-security-manager",
+      "label": "-Djava.security.manager=allow",
+      "type": "flag",
+      "flag": "-Djava.security.manager=allow",
+      "description": "Configures whether a security manager may be installed (deprecated for removal).",
+      "flagId": "5f0cda1c-274c-540b-9e65-bd9ec7fce892"
+    },
+    {
+      "id": "flag-java-security-policy",
+      "label": "-Djava.security.policy=<file>",
+      "type": "flag",
+      "flag": "-Djava.security.policy=<file>",
+      "description": "Sets the security policy file for the SecurityManager.",
+      "flagId": "40d3ed2e-653c-53ab-b665-852180054537"
+    },
+    {
+      "id": "flag-file-encoding",
+      "label": "-Dfile.encoding=UTF-8",
+      "type": "flag",
+      "flag": "-Dfile.encoding=UTF-8",
+      "description": "Default character encoding used by the JVM (e.g. UTF-8).",
+      "flagId": "c59a6b0f-528d-5ce1-a6a6-b3e6a5ee0d74"
+    },
+    {
+      "id": "flag-user-timezone",
+      "label": "-Duser.timezone=UTC",
+      "type": "flag",
+      "flag": "-Duser.timezone=UTC",
+      "description": "Default time zone ID used by java.util.Date and related APIs.",
+      "flagId": "e5ea2a50-f9b1-529a-9c4b-f4f8f894932c"
+    },
+    {
+      "id": "flag-java-io-tmpdir",
+      "label": "-Djava.io.tmpdir=<path>",
+      "type": "flag",
+      "flag": "-Djava.io.tmpdir=<path>",
+      "description": "Default directory for temporary files created by the JVM.",
+      "flagId": "cd6b7b3e-246f-573c-b076-21d2fb37f0e7"
+    }
+  ],
+  "edges": [
+    {
+      "source": "root",
+      "target": "runtime"
+    },
+    {
+      "source": "root",
+      "target": "heap"
+    },
+    {
+      "source": "root",
+      "target": "object-layout"
+    },
+    {
+      "source": "root",
+      "target": "metaspace"
+    },
+    {
+      "source": "root",
+      "target": "stack"
+    },
+    {
+      "source": "root",
+      "target": "garbage-collection"
+    },
+    {
+      "source": "root",
+      "target": "jit-compiler"
+    },
+    {
+      "source": "root",
+      "target": "code-cache"
+    },
+    {
+      "source": "root",
+      "target": "threads-synchronization"
+    },
+    {
+      "source": "root",
+      "target": "class-loading"
+    },
+    {
+      "source": "root",
+      "target": "logging"
+    },
+    {
+      "source": "root",
+      "target": "diagnostics"
+    },
+    {
+      "source": "root",
+      "target": "containers"
+    },
+    {
+      "source": "root",
+      "target": "virtual-threads"
+    },
+    {
+      "source": "root",
+      "target": "modules"
+    },
+    {
+      "source": "root",
+      "target": "security"
+    },
+    {
+      "source": "root",
+      "target": "system-properties"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-default"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-serial"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-parallel"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-zgc"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-shenandoah"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-epsilon"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-threads"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-g1-tuning"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-allocation"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-string-dedup"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-explicit"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-logging"
+    },
+    {
+      "source": "jit-compiler",
+      "target": "jit-execution-modes"
+    },
+    {
+      "source": "jit-compiler",
+      "target": "jit-tiered"
+    },
+    {
+      "source": "jit-compiler",
+      "target": "jit-compilation"
+    },
+    {
+      "source": "jit-compiler",
+      "target": "jit-inlining"
+    },
+    {
+      "source": "jit-compiler",
+      "target": "jit-escape-analysis"
+    },
+    {
+      "source": "jit-compiler",
+      "target": "jit-intrinsics"
+    },
+    {
+      "source": "threads-synchronization",
+      "target": "sync-monitors"
+    },
+    {
+      "source": "threads-synchronization",
+      "target": "sync-safepoints"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-cds"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-verification"
+    },
+    {
+      "source": "logging",
+      "target": "logging-unified"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-heap-dumps"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-error-handling"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-native-memory"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-flight-recorder"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-version"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-showversion"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-help"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-x"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-printflagsfinal"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-unlockdiagnostic"
+    },
+    {
+      "source": "runtime",
+      "target": "flag-unlockexperimental"
+    },
+    {
+      "source": "heap",
+      "target": "flag-xms"
+    },
+    {
+      "source": "heap",
+      "target": "flag-xmx"
+    },
+    {
+      "source": "heap",
+      "target": "flag-initialheapsize"
+    },
+    {
+      "source": "heap",
+      "target": "flag-maxheapsize"
+    },
+    {
+      "source": "heap",
+      "target": "flag-minheapsize"
+    },
+    {
+      "source": "heap",
+      "target": "flag-softmaxheapsize"
+    },
+    {
+      "source": "heap",
+      "target": "flag-initialrampercentage"
+    },
+    {
+      "source": "heap",
+      "target": "flag-minrampercentage"
+    },
+    {
+      "source": "heap",
+      "target": "flag-maxrampercentage"
+    },
+    {
+      "source": "object-layout",
+      "target": "flag-usecompressedoops"
+    },
+    {
+      "source": "object-layout",
+      "target": "flag-usecompressedclasspointers"
+    },
+    {
+      "source": "object-layout",
+      "target": "flag-usecompactobjectheaders"
+    },
+    {
+      "source": "metaspace",
+      "target": "flag-metaspacesize"
+    },
+    {
+      "source": "metaspace",
+      "target": "flag-maxmetaspacesize"
+    },
+    {
+      "source": "metaspace",
+      "target": "flag-compressedclassspacesize"
+    },
+    {
+      "source": "metaspace",
+      "target": "flag-minmetaspacefreeratio"
+    },
+    {
+      "source": "metaspace",
+      "target": "flag-maxmetaspacefreeratio"
+    },
+    {
+      "source": "stack",
+      "target": "flag-xss"
+    },
+    {
+      "source": "stack",
+      "target": "flag-threadstacksize"
+    },
+    {
+      "source": "stack",
+      "target": "flag-vmthreadstacksize"
+    },
+    {
+      "source": "stack",
+      "target": "flag-compilerthreadstacksize"
+    },
+    {
+      "source": "gc-default",
+      "target": "flag-useg1gc"
+    },
+    {
+      "source": "gc-serial",
+      "target": "flag-useserialgc"
+    },
+    {
+      "source": "gc-parallel",
+      "target": "flag-useparallelgc"
+    },
+    {
+      "source": "gc-parallel",
+      "target": "flag-useparalleloldgc"
+    },
+    {
+      "source": "gc-zgc",
+      "target": "flag-usezgc"
+    },
+    {
+      "source": "gc-zgc",
+      "target": "flag-zgenerational"
+    },
+    {
+      "source": "gc-zgc",
+      "target": "flag-softmaxheapsize"
+    },
+    {
+      "source": "gc-zgc",
+      "target": "flag-zuncommitdelay"
+    },
+    {
+      "source": "gc-shenandoah",
+      "target": "flag-useshenandoahgc"
+    },
+    {
+      "source": "gc-shenandoah",
+      "target": "flag-shenandoahgcheuristics"
+    },
+    {
+      "source": "gc-shenandoah",
+      "target": "flag-shenandoahuncommitdelay"
+    },
+    {
+      "source": "gc-epsilon",
+      "target": "flag-useepsilongc"
+    },
+    {
+      "source": "gc-threads",
+      "target": "flag-parallelgcthreads"
+    },
+    {
+      "source": "gc-threads",
+      "target": "flag-concgcthreads"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-maxgcpausemillis"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-g1heapregionsize"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-initiatingheapoccupancypercent"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-g1reservepercent"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-g1heapwastepercent"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-g1mixedgccounttarget"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-g1newsizepercent"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-g1maxnewsizepercent"
+    },
+    {
+      "source": "gc-allocation",
+      "target": "flag-usetlab"
+    },
+    {
+      "source": "gc-allocation",
+      "target": "flag-tlabsize"
+    },
+    {
+      "source": "gc-allocation",
+      "target": "flag-mintlabsize"
+    },
+    {
+      "source": "gc-allocation",
+      "target": "flag-tlabwastetargetpercent"
+    },
+    {
+      "source": "gc-string-dedup",
+      "target": "flag-usestringdeduplication"
+    },
+    {
+      "source": "gc-string-dedup",
+      "target": "flag-stringdeduplicationagethreshold"
+    },
+    {
+      "source": "gc-explicit",
+      "target": "flag-disableexplicitgc"
+    },
+    {
+      "source": "gc-explicit",
+      "target": "flag-explicitgcinvokesconcurrent"
+    },
+    {
+      "source": "gc-logging",
+      "target": "flag-xlog-gc"
+    },
+    {
+      "source": "gc-logging",
+      "target": "flag-xlog-gc-star"
+    },
+    {
+      "source": "gc-logging",
+      "target": "flag-xlog-gc-file"
+    },
+    {
+      "source": "jit-execution-modes",
+      "target": "flag-xint"
+    },
+    {
+      "source": "jit-execution-modes",
+      "target": "flag-xcomp"
+    },
+    {
+      "source": "jit-execution-modes",
+      "target": "flag-xmixed"
+    },
+    {
+      "source": "jit-tiered",
+      "target": "flag-tieredcompilation"
+    },
+    {
+      "source": "jit-tiered",
+      "target": "flag-tieredstopatlevel"
+    },
+    {
+      "source": "jit-compilation",
+      "target": "flag-compilethreshold"
+    },
+    {
+      "source": "jit-compilation",
+      "target": "flag-cicompilercount"
+    },
+    {
+      "source": "jit-compilation",
+      "target": "flag-xbatch"
+    },
+    {
+      "source": "jit-compilation",
+      "target": "flag-backgroundcompilation"
+    },
+    {
+      "source": "jit-inlining",
+      "target": "flag-maxinlinesize"
+    },
+    {
+      "source": "jit-inlining",
+      "target": "flag-freqinlinesize"
+    },
+    {
+      "source": "jit-inlining",
+      "target": "flag-inlinesmallcode"
+    },
+    {
+      "source": "jit-inlining",
+      "target": "flag-maxinlinelevel"
+    },
+    {
+      "source": "jit-inlining",
+      "target": "flag-maxrecursiveinlinelevel"
+    },
+    {
+      "source": "jit-escape-analysis",
+      "target": "flag-doescapeanalysis"
+    },
+    {
+      "source": "jit-escape-analysis",
+      "target": "flag-eliminateallocations"
+    },
+    {
+      "source": "jit-escape-analysis",
+      "target": "flag-eliminatlocks"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-useaes"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-useaesintrinsics"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-usesha"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-usecrc32intrinsics"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-usevectorizedmismatchintrinsic"
+    },
+    {
+      "source": "code-cache",
+      "target": "flag-initialcodecachesiz"
+    },
+    {
+      "source": "code-cache",
+      "target": "flag-reservedcodecachesiz"
+    },
+    {
+      "source": "code-cache",
+      "target": "flag-nonprofiledcodeheapsize"
+    },
+    {
+      "source": "code-cache",
+      "target": "flag-profiledcodeheapsize"
+    },
+    {
+      "source": "code-cache",
+      "target": "flag-nonnmethodcodeheapsize"
+    },
+    {
+      "source": "code-cache",
+      "target": "flag-usecodecacheflushing"
+    },
+    {
+      "source": "sync-monitors",
+      "target": "flag-useheavymonitors"
+    },
+    {
+      "source": "sync-monitors",
+      "target": "flag-monitordeflationmax"
+    },
+    {
+      "source": "sync-monitors",
+      "target": "flag-monitoruseddeflationthreshold"
+    },
+    {
+      "source": "sync-safepoints",
+      "target": "flag-safepointtimeout"
+    },
+    {
+      "source": "sync-safepoints",
+      "target": "flag-safepointtimeoutdelay"
+    },
+    {
+      "source": "class-cds",
+      "target": "flag-xshare-on"
+    },
+    {
+      "source": "class-cds",
+      "target": "flag-xshare-off"
+    },
+    {
+      "source": "class-cds",
+      "target": "flag-xshare-auto"
+    },
+    {
+      "source": "class-cds",
+      "target": "flag-sharedarchivefile"
+    },
+    {
+      "source": "class-cds",
+      "target": "flag-archiveclassesatexit"
+    },
+    {
+      "source": "class-cds",
+      "target": "flag-dumploadedclasslist"
+    },
+    {
+      "source": "class-verification",
+      "target": "flag-xverify-all"
+    },
+    {
+      "source": "class-verification",
+      "target": "flag-xverify-none"
+    },
+    {
+      "source": "logging-unified",
+      "target": "flag-xlog-class-load"
+    },
+    {
+      "source": "logging-unified",
+      "target": "flag-xlog-safepoint"
+    },
+    {
+      "source": "logging-unified",
+      "target": "flag-xlog-os"
+    },
+    {
+      "source": "logging-unified",
+      "target": "flag-xlog-os-container"
+    },
+    {
+      "source": "logging-unified",
+      "target": "flag-xlog-jit-compilation"
+    },
+    {
+      "source": "logging-unified",
+      "target": "flag-xlog-cds"
+    },
+    {
+      "source": "diag-heap-dumps",
+      "target": "flag-heapdumponoutofmemoryerror"
+    },
+    {
+      "source": "diag-heap-dumps",
+      "target": "flag-heapdumppath"
+    },
+    {
+      "source": "diag-error-handling",
+      "target": "flag-errorfile"
+    },
+    {
+      "source": "diag-error-handling",
+      "target": "flag-onerror"
+    },
+    {
+      "source": "diag-error-handling",
+      "target": "flag-onoutofmemoryerror"
+    },
+    {
+      "source": "diag-error-handling",
+      "target": "flag-exitonoutofmemoryerror"
+    },
+    {
+      "source": "diag-error-handling",
+      "target": "flag-crashonoutofmemoryerror"
+    },
+    {
+      "source": "diag-native-memory",
+      "target": "flag-nativememorytracking"
+    },
+    {
+      "source": "diag-native-memory",
+      "target": "flag-printnmtstatistics"
+    },
+    {
+      "source": "diag-flight-recorder",
+      "target": "flag-startflightrecording"
+    },
+    {
+      "source": "diag-flight-recorder",
+      "target": "flag-flightrecorderoptions"
+    },
+    {
+      "source": "diag-flight-recorder",
+      "target": "flag-oldobjectsamplesize"
+    },
+    {
+      "source": "containers",
+      "target": "flag-usecontainersupport"
+    },
+    {
+      "source": "containers",
+      "target": "flag-activeprocessorcount"
+    },
+    {
+      "source": "containers",
+      "target": "flag-initialrampercentage-containers"
+    },
+    {
+      "source": "containers",
+      "target": "flag-minrampercentage-containers"
+    },
+    {
+      "source": "containers",
+      "target": "flag-maxrampercentage-containers"
+    },
+    {
+      "source": "virtual-threads",
+      "target": "flag-vt-scheduler-parallelism"
+    },
+    {
+      "source": "virtual-threads",
+      "target": "flag-vt-scheduler-maxpoolsize"
+    },
+    {
+      "source": "modules",
+      "target": "flag-module-path"
+    },
+    {
+      "source": "modules",
+      "target": "flag-add-modules"
+    },
+    {
+      "source": "modules",
+      "target": "flag-add-exports"
+    },
+    {
+      "source": "modules",
+      "target": "flag-add-opens"
+    },
+    {
+      "source": "modules",
+      "target": "flag-limit-modules"
+    },
+    {
+      "source": "modules",
+      "target": "flag-patch-module"
+    },
+    {
+      "source": "security",
+      "target": "flag-java-security-manager"
+    },
+    {
+      "source": "security",
+      "target": "flag-java-security-policy"
+    },
+    {
+      "source": "system-properties",
+      "target": "flag-file-encoding"
+    },
+    {
+      "source": "system-properties",
+      "target": "flag-user-timezone"
+    },
+    {
+      "source": "system-properties",
+      "target": "flag-java-io-tmpdir"
+    }
+  ]
+}

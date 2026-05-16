@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java 25 JVM Flags — Graph</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --root: #f59e0b;
+      --category: #3b82f6;
+      --subcategory: #a78bfa;
+      --flag: #34d399;
+      --link: #3d4f66;
+      --highlight: #fbbf24;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", ui-monospace, monospace;
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      z-index: 10;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    header h1 span { color: var(--root); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--category);
+      background: var(--bg);
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      max-width: 360px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 0.45rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.8rem;
+    }
+
+    .search-wrap input:focus {
+      outline: none;
+      border-color: var(--category);
+    }
+
+    .stats {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .legend {
+      display: flex;
+      gap: 0.75rem;
+      font-size: 0.7rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    #graph {
+      width: 100%;
+      height: calc(100vh - 52px);
+      cursor: grab;
+    }
+
+    #graph:active { cursor: grabbing; }
+
+    .links { pointer-events: none; }
+
+    .link {
+      stroke: var(--link);
+      stroke-opacity: 0.5;
+      fill: none;
+    }
+
+    .link.highlight { stroke-opacity: 0.9; stroke: var(--highlight); }
+
+    .node circle {
+      stroke: var(--bg);
+      stroke-width: 1.5px;
+      transition: stroke-width 0.15s;
+    }
+
+    .node.highlight circle:not(.hit-area) { stroke: var(--highlight); stroke-width: 2.5px; }
+
+    .node.dimmed { opacity: 0.15; }
+
+    .node.category,
+    .node.subcategory,
+    .node.flag { cursor: pointer; }
+
+    .node.collapsed {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .link.collapsed {
+      opacity: 0;
+    }
+
+    .node.expanded > text { font-weight: 600; }
+
+    .node.flag circle:not(.hit-area) {
+      pointer-events: none;
+    }
+
+    .node.flag circle.hit-area {
+      fill: transparent;
+      stroke: none;
+      cursor: pointer;
+    }
+
+    .node text {
+      font-size: 10px;
+      fill: var(--text);
+      pointer-events: none;
+      paint-order: stroke;
+      stroke: var(--bg);
+      stroke-width: 3px;
+      stroke-linejoin: round;
+    }
+
+    .node.root text { font-size: 12px; font-weight: 600; }
+    .node.category text { font-size: 11px; font-weight: 500; }
+    .node.flag text {
+      font-size: 9px;
+      font-weight: 500;
+      fill: var(--flag);
+    }
+
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.75rem;
+      max-width: 320px;
+      z-index: 200;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      transition: opacity 0.12s;
+    }
+
+    .tooltip.visible { opacity: 1; }
+
+    .tooltip .type {
+      text-transform: uppercase;
+      font-size: 0.65rem;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .tooltip .label { word-break: break-all; }
+
+    .tooltip .flag {
+      margin-top: 0.35rem;
+      color: var(--flag);
+      font-size: 0.7rem;
+    }
+
+    .tooltip.flag-only .label {
+      color: var(--flag);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-top: 0;
+    }
+
+    .error {
+      position: absolute;
+      inset: 52px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      color: #f87171;
+      flex-direction: column;
+      gap: 0.5rem;
+      text-align: center;
+      padding: 2rem;
+      z-index: 5;
+    }
+
+    .error[hidden] {
+      display: none !important;
+      pointer-events: none;
+    }
+
+    .error code { font-size: 0.8rem; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="back-link" aria-label="Back">← Back</a>
+    <h1><span id="title-version">Java 25</span> JVM Flags</h1>
+    <div class="search-wrap">
+      <input type="search" id="search" placeholder="Search flags or categories…" autocomplete="off">
+    </div>
+    <div class="stats" id="stats">Loading graph…</div>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:var(--root)"></span>Root</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--category)"></span>Category</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--subcategory)"></span>Subcategory</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--flag)"></span>Flag</div>
+    </div>
+  </header>
+
+  <div id="error" class="error" hidden></div>
+  <svg id="graph"></svg>
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const COLORS = {
+      root: "#f59e0b",
+      category: "#3b82f6",
+      subcategory: "#a78bfa",
+      flag: "#34d399"
+    };
+
+    const RADII = {
+      root: 18,
+      category: 12,
+      subcategory: 8,
+      flag: 4
+    };
+
+    const DEFAULT_LTS = "25";
+
+    function resolveJavaVersion() {
+      const java = new URLSearchParams(window.location.search).get("java");
+      if (java == null || String(java).trim() === "") return DEFAULT_LTS;
+      const version = String(java).trim();
+      return /^\d+$/.test(version) ? version : DEFAULT_LTS;
+    }
+
+    function dataUrlForVersion(version) {
+      return `json/java-${version}.json`;
+    }
+
+    const JAVA_VERSION = resolveJavaVersion();
+    const DATA_URL = dataUrlForVersion(JAVA_VERSION);
+
+    document.getElementById("title-version").textContent = `Java ${JAVA_VERSION}`;
+    document.title = `Java ${JAVA_VERSION} JVM Flags — Graph`;
+
+    const svg = d3.select("#graph");
+    const tooltip = d3.select("#tooltip");
+    const errorEl = document.getElementById("error");
+    const statsEl = document.getElementById("stats");
+    const searchInput = document.getElementById("search");
+
+    let simulation, g, linkSel, nodeSel, labelSel, zoomBehavior, container;
+    let allNodes = [];
+    let allLinks = [];
+    let nodeById = new Map();
+    let childrenByParent = new Map();
+    let parentByChild = new Map();
+    let expanded = new Set();
+    let graphWidth = 0;
+    let graphHeight = 0;
+    let adjacency = new Map();
+
+    function showError(msg) {
+      statsEl.textContent = "";
+      errorEl.hidden = false;
+      errorEl.innerHTML = msg;
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function radius(d) {
+      return RADII[d.type] || 5;
+    }
+
+    function color(d) {
+      return COLORS[d.type] || "#64748b";
+    }
+
+    function buildAdjacency(nodes, links) {
+      const map = new Map(nodes.map(n => [n.id, new Set()]));
+      for (const l of links) {
+        const s = typeof l.source === "object" ? l.source.id : l.source;
+        const t = typeof l.target === "object" ? l.target.id : l.target;
+        map.get(s)?.add(t);
+        map.get(t)?.add(s);
+      }
+      return map;
+    }
+
+    function buildTreeMaps(links) {
+      childrenByParent = new Map();
+      parentByChild = new Map();
+      for (const l of links) {
+        const s = l.source.id ?? l.source;
+        const t = l.target.id ?? l.target;
+        if (!childrenByParent.has(s)) childrenByParent.set(s, []);
+        childrenByParent.get(s).push(t);
+        parentByChild.set(t, s);
+      }
+    }
+
+    function hasChildren(id) {
+      return (childrenByParent.get(id) || []).length > 0;
+    }
+
+    function isVisible(node) {
+      if (node.type === "root" || node.type === "category") return true;
+      const parentId = parentByChild.get(node.id);
+      if (!parentId) return false;
+      const parent = nodeById.get(parentId);
+      if (node.type === "subcategory") {
+        return expanded.has(parentId);
+      }
+      if (node.type === "flag") {
+        if (parent.type === "category") return expanded.has(parentId);
+        if (parent.type === "subcategory") {
+          const categoryId = parentByChild.get(parent.id);
+          return expanded.has(categoryId) && expanded.has(parentId);
+        }
+      }
+      return false;
+    }
+
+    function isLinkVisible(link) {
+      return isVisible(link.source) && isVisible(link.target);
+    }
+
+    function collapseDescendants(id) {
+      for (const childId of childrenByParent.get(id) || []) {
+        expanded.delete(childId);
+        collapseDescendants(childId);
+      }
+    }
+
+    function toggleExpand(node) {
+      if (!hasChildren(node.id)) return;
+      if (expanded.has(node.id)) {
+        expanded.delete(node.id);
+        collapseDescendants(node.id);
+      } else {
+        expanded.add(node.id);
+      }
+      updateVisibility();
+    }
+
+    function truncateLabel(text, maxLen) {
+      if (text.length <= maxLen) return text;
+      return text.slice(0, maxLen - 1) + "…";
+    }
+
+    function nodeDisplayLabel(d) {
+      const label = truncateLabel(d.label, 28);
+      if ((d.type === "category" || d.type === "subcategory") && hasChildren(d.id)) {
+        return `${label} ${expanded.has(d.id) ? "▾" : "▸"}`;
+      }
+      return label;
+    }
+
+    function flagDisplayLabel(d) {
+      return truncateLabel(d.flag || d.label, 36);
+    }
+
+    function updateStats() {
+      const visible = allNodes.filter(isVisible);
+      const visibleLinks = allLinks.filter(isLinkVisible);
+      const flags = visible.filter(n => n.type === "flag").length;
+      statsEl.textContent = `${visible.length} visible · ${flags} flags · click flag for details`;
+    }
+
+    function updateVisibility() {
+      if (!nodeSel || !linkSel) return;
+
+      nodeSel.classed("collapsed", d => !isVisible(d));
+      linkSel.classed("collapsed", d => !isLinkVisible(d));
+
+      labelSel
+        .filter(d => d.type === "category" || d.type === "subcategory")
+        .text(nodeDisplayLabel);
+
+      nodeSel.classed("expanded", d => expanded.has(d.id));
+
+      const visibleNodes = allNodes.filter(isVisible);
+      const visibleLinks = allLinks.filter(isLinkVisible);
+
+      simulation.nodes(visibleNodes);
+      simulation.force("link").links(visibleLinks);
+      simulation.alpha(0.4).restart();
+
+      updateStats();
+    }
+
+    function getConnected(id) {
+      const visited = new Set([id]);
+      const queue = [id];
+      while (queue.length) {
+        const cur = queue.shift();
+        for (const next of adjacency.get(cur) || []) {
+          if (!visited.has(next)) {
+            visited.add(next);
+            queue.push(next);
+          }
+        }
+      }
+      return visited;
+    }
+
+    function highlightNode(d) {
+      if (!isVisible(d)) return;
+      if (d.type === "flag") {
+        nodeSel.classed("dimmed", n => !isVisible(n) || n.id !== d.id);
+        nodeSel.classed("highlight", n => n.id === d.id);
+        linkSel.classed("highlight", false).classed("dimmed", true);
+        return;
+      }
+      const connected = getConnected(d.id);
+      nodeSel.classed("dimmed", n => !isVisible(n) || !connected.has(n.id));
+      nodeSel.classed("highlight", n => n.id === d.id);
+      linkSel
+        .classed("highlight", l => isLinkVisible(l) && connected.has(l.source.id) && connected.has(l.target.id))
+        .classed("dimmed", l => !isLinkVisible(l) || !(connected.has(l.source.id) && connected.has(l.target.id)));
+    }
+
+    function clearHighlight() {
+      nodeSel.classed("dimmed highlight", false);
+      linkSel.classed("highlight dimmed", false);
+    }
+
+    function showTooltip(event, d) {
+      if (d.type === "flag") return;
+      const label = escapeHtml(d.label);
+      const type = escapeHtml(d.type);
+
+      tooltip
+        .classed("visible", true)
+        .classed("flag-only", false)
+        .style("left", `${event.clientX + 14}px`)
+        .style("top", `${event.clientY + 14}px`)
+        .html(`<div class="type">${type}</div>
+               <div class="label">${label}</div>
+               ${d.flag ? `<div class="flag">${escapeHtml(d.flag)}</div>` : ""}`);
+    }
+
+    function flagDetailUrl(d) {
+      const flagId = d.flagId || d.id;
+      return `jvm-flag.html?java=${encodeURIComponent(JAVA_VERSION)}&flag=${encodeURIComponent(flagId)}`;
+    }
+
+    function hideTooltip() {
+      tooltip.classed("visible flag-only", false);
+    }
+
+    function initGraph(data) {
+      errorEl.hidden = true;
+
+      const version = data.metadata?.version || JAVA_VERSION;
+      document.getElementById("title-version").textContent = `Java ${version}`;
+      document.title = `${data.metadata?.title || `Java ${version} JVM Flags`} — Graph`;
+
+      const width = window.innerWidth;
+      const height = window.innerHeight - 52;
+
+      const nodes = data.nodes.map(d => ({ ...d }));
+      nodeById = new Map(nodes.map(n => [n.id, n]));
+      const links = data.edges.map(e => ({
+        source: nodeById.get(e.source),
+        target: nodeById.get(e.target)
+      })).filter(l => l.source && l.target);
+
+      allNodes = nodes;
+      allLinks = links;
+      expanded = new Set();
+      adjacency = buildAdjacency(nodes, links);
+      buildTreeMaps(links);
+
+      graphWidth = width;
+      graphHeight = height;
+
+      svg.selectAll("*").remove();
+
+      container = svg
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", width)
+        .attr("height", height);
+
+      g = container.append("g");
+
+      zoomBehavior = d3.zoom()
+        .scaleExtent([0.15, 4])
+        .on("zoom", (event) => g.attr("transform", event.transform));
+
+      container.call(zoomBehavior);
+
+      linkSel = g.append("g")
+        .attr("class", "links")
+        .selectAll("line")
+        .data(links)
+        .join("line")
+        .attr("class", "link");
+
+      nodeSel = g.append("g")
+        .attr("class", "nodes")
+        .selectAll("g")
+        .data(nodes)
+        .join("g")
+        .attr("class", d => `node ${d.type}`)
+        .call(d3.drag()
+          .filter((event, d) => d.type !== "flag")
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended))
+        .on("pointerenter", (event, d) => {
+          highlightNode(d);
+          showTooltip(event, d);
+        })
+        .on("pointermove", (event) => {
+          tooltip
+            .style("left", `${event.clientX + 14}px`)
+            .style("top", `${event.clientY + 14}px`);
+        })
+        .on("pointerleave", () => {
+          clearHighlight();
+          hideTooltip();
+        })
+        .on("click", (event, d) => {
+          event.stopPropagation();
+          if (d.type === "category" || d.type === "subcategory") {
+            toggleExpand(d);
+            return;
+          }
+          if (d.type === "flag") {
+            if (d.flagId) {
+              window.location.href = flagDetailUrl(d);
+            }
+          }
+        });
+
+      nodeSel.append("circle")
+        .attr("r", radius)
+        .attr("fill", color);
+
+      nodeSel.filter(d => d.type === "flag")
+        .append("circle")
+        .attr("class", "hit-area")
+        .attr("r", 14);
+
+      labelSel = nodeSel.append("text")
+        .attr("dy", d => radius(d) + (d.type === "flag" ? 10 : 12))
+        .attr("text-anchor", "middle")
+        .text(d => d.type === "flag" ? flagDisplayLabel(d) : nodeDisplayLabel(d));
+
+      nodeSel.classed("expandable", d =>
+        (d.type === "category" || d.type === "subcategory") && hasChildren(d.id)
+      );
+
+      const initialNodes = nodes.filter(isVisible);
+      const initialLinks = links.filter(isLinkVisible);
+
+      simulation = d3.forceSimulation(initialNodes)
+        .force("link", d3.forceLink(initialLinks)
+          .id(d => d.id)
+          .distance(d => {
+            const st = d.source.type;
+            const tt = d.target.type;
+            if (st === "root" || tt === "root") return 90;
+            if (st === "category" || tt === "category") return 70;
+            if (st === "subcategory" || tt === "subcategory") return 50;
+            return 35;
+          })
+          .strength(0.85))
+        .force("charge", d3.forceManyBody()
+          .strength(d => d.type === "root" ? -800 : d.type === "flag" ? -40 : -200))
+        .force("center", d3.forceCenter(width / 2, height / 2))
+        .force("collision", d3.forceCollide().radius(d =>
+          d.type === "flag" ? radius(d) + 42 : radius(d) + 6
+        ))
+        .force("x", d3.forceX(width / 2).strength(0.03))
+        .force("y", d3.forceY(height / 2).strength(0.03))
+        .on("tick", ticked);
+
+      container.on("click", clearHighlight);
+
+      updateVisibility();
+
+      function ticked() {
+        linkSel
+          .attr("x1", d => isLinkVisible(d) ? d.source.x : 0)
+          .attr("y1", d => isLinkVisible(d) ? d.source.y : 0)
+          .attr("x2", d => isLinkVisible(d) ? d.target.x : 0)
+          .attr("y2", d => isLinkVisible(d) ? d.target.y : 0);
+
+        nodeSel.attr("transform", d =>
+          isVisible(d) && d.x != null ? `translate(${d.x},${d.y})` : null
+        );
+      }
+
+      function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+
+      function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+
+      searchInput.addEventListener("input", () => {
+        const q = searchInput.value.trim().toLowerCase();
+        if (!q) {
+          clearHighlight();
+          nodeSel.classed("dimmed", false);
+          updateVisibility();
+          return;
+        }
+        const matches = new Set(
+          allNodes
+            .filter(n =>
+              n.label.toLowerCase().includes(q) ||
+              (n.flag && n.flag.toLowerCase().includes(q)) ||
+              n.id.toLowerCase().includes(q)
+            )
+            .map(n => n.id)
+        );
+        for (const id of matches) {
+          let cur = id;
+          while (parentByChild.has(cur)) {
+            const parentId = parentByChild.get(cur);
+            expanded.add(parentId);
+            cur = parentId;
+          }
+        }
+        updateVisibility();
+        nodeSel.classed("dimmed", n => !matches.has(n.id) || !isVisible(n));
+        nodeSel.classed("highlight", n => matches.has(n.id) && isVisible(n));
+        linkSel.classed("dimmed", true).classed("highlight", false);
+      });
+
+      window.addEventListener("resize", () => {
+        graphWidth = window.innerWidth;
+        graphHeight = window.innerHeight - 52;
+        svg.attr("viewBox", [0, 0, graphWidth, graphHeight])
+          .attr("width", graphWidth)
+          .attr("height", graphHeight);
+        simulation.force("center", d3.forceCenter(graphWidth / 2, graphHeight / 2));
+        simulation.force("x", d3.forceX(graphWidth / 2).strength(0.03));
+        simulation.force("y", d3.forceY(graphHeight / 2).strength(0.03));
+        simulation.alpha(0.3).restart();
+      });
+    }
+
+    d3.json(DATA_URL)
+      .then(data => {
+        if (!data?.nodes?.length) throw new Error("Invalid graph data");
+        initGraph(data);
+      })
+      .catch(err => {
+        console.error(err);
+        showError(
+          `Could not load <code>${DATA_URL}</code> (Java ${JAVA_VERSION}).<br>` +
+          `Serve the <code>docs/</code> folder over HTTP (e.g. <code>python3 -m http.server 8080 --directory docs</code>)<br>` +
+          `then open <code>http://localhost:8080/java-version.html?java=${JAVA_VERSION}</code>`
+        );
+      });
+  </script>
+</body>
+</html>
