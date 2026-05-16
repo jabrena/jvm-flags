@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JVM Flags — JVM Flags Graph</title>
+  <title>JVM Flags</title>
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <style>
     :root {
@@ -320,14 +320,6 @@
       margin-top: 0.25rem;
     }
 
-    #detail .blurb {
-      margin-top: 0.6rem;
-      font-size: 0.92rem;
-      line-height: 1.5;
-      max-width: 40rem;
-      color: var(--text);
-    }
-
     #detail .hint {
       margin-top: 0.5rem;
       font-size: 0.8rem;
@@ -456,15 +448,10 @@
       <a class="btn-graph" href="quiz-game.html">JVM flags quiz →</a>
     </div>
     <p>
-      A JVM flag is a command-line option passed to the Java Virtual Machine that tunes memory, garbage collection,
-      diagnostics, and runtime behavior without changing your application code.
+      A JVM flag is a command-line option passed to the Java Virtual Machine that tunes runtime behavior without changing your application code.
     </p>
     <section class="header-section" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Timeline</h2>
-      <p>
-        From Java 1.0 (1996) through Java 26. Long-term support (LTS) releases are highlighted —
-        open any event to explore JVM flags for that version.
-      </p>
     </section>
   </header>
 
@@ -500,33 +487,33 @@
     const GRAPH_URL = "java-version.html";
 
     const events = [
-      { version: 1, label: "Java 1.0", date: "1996-01-23", blurb: "Oak becomes Java — first public release with applets and the JVM." },
-      { version: 1, label: "Java 1.1", date: "1997-02-19", blurb: "Inner classes, JDBC, and reflection land in the platform." },
-      { version: 2, label: "Java 1.2", date: "1998-12-08", blurb: "Swing, Collections, and the JIT compiler reshape client and server Java." },
-      { version: 3, label: "Java 1.3", date: "2000-05-08", blurb: "HotSpot becomes the default VM; JavaSound and RMI over IIOP added." },
-      { version: 4, label: "Java 1.4", date: "2002-02-06", blurb: "Assertions, regex, NIO, and logging APIs broaden the standard library." },
-      { version: 5, label: "Java 5", date: "2004-09-30", blurb: "Generics, annotations, enums, autoboxing, and varargs — a language inflection point." },
-      { version: 6, label: "Java 6", date: "2006-12-11", blurb: "Scripting, JDBC 4.0, and Web Service enhancements; widely deployed for years." },
-      { version: 7, label: "Java 7", date: "2011-07-28", blurb: "Try-with-resources, NIO.2, fork/join, and the diamond operator." },
-      { version: 8, label: "Java 8", date: "2014-03-18", lts: true, blurb: "Lambdas, streams, and java.time — the LTS baseline many enterprises still run." },
-      { version: 9, label: "Java 9", date: "2017-09-21", blurb: "Project Jigsaw: module system (JPMS), JShell, and G1 by default." },
-      { version: 10, label: "Java 10", date: "2018-03-20", blurb: "Local-variable type inference (var) for locals with inferred types." },
-      { version: 11, label: "Java 11", date: "2018-09-25", lts: true, blurb: "LTS with HTTP Client, nestmates, and flight recorder; six-month cadence begins." },
-      { version: 12, label: "Java 12", date: "2019-03-19", blurb: "Switch expressions (preview) and Shenandoah GC (experimental)." },
-      { version: 13, label: "Java 13", date: "2019-09-17", blurb: "Text blocks (preview) and reimplementation of legacy socket APIs." },
-      { version: 14, label: "Java 14", date: "2020-03-17", blurb: "Records and pattern matching (preview); helpful NullPointerExceptions." },
-      { version: 15, label: "Java 15", date: "2020-09-15", blurb: "Sealed classes (preview) and hidden classes for frameworks." },
-      { version: 16, label: "Java 16", date: "2021-03-16", blurb: "Records and pattern matching for instanceof become standard features." },
-      { version: 17, label: "Java 17", date: "2021-09-14", lts: true, blurb: "LTS with sealed classes, pattern matching for switch (preview), and foreign API (incubator)." },
-      { version: 18, label: "Java 18", date: "2022-03-22", blurb: "UTF-8 by default and simple web server for prototyping." },
-      { version: 19, label: "Java 19", date: "2022-09-20", blurb: "Virtual threads and structured concurrency (preview)." },
-      { version: 20, label: "Java 20", date: "2023-03-21", blurb: "Scoped values and record patterns (preview) refine concurrent design." },
-      { version: 21, label: "Java 21", date: "2023-09-19", lts: true, blurb: "LTS with virtual threads, sequenced collections, and generational ZGC." },
-      { version: 22, label: "Java 22", date: "2024-03-19", blurb: "Unnamed variables and string templates (preview) streamline boilerplate." },
-      { version: 23, label: "Java 23", date: "2024-09-17", blurb: "Primitive types in patterns (preview) and module import declarations." },
-      { version: 24, label: "Java 24", date: "2025-03-18", blurb: "Ahead-of-time class loading and flexible constructor bodies (preview)." },
-      { version: 25, label: "Java 25", date: "2025-09-16", lts: true, blurb: "Current LTS generation — structured concurrency, scoped values, and continued VM evolution." },
-      { version: 26, label: "Java 26", date: "2026-03-17", blurb: "Planned March 2026 feature release — end of the 1.0→26 span on this timeline." }
+      { version: 1, label: "Java 1.0", date: "1996-01-23" },
+      { version: 1, label: "Java 1.1", date: "1997-02-19" },
+      { version: 2, label: "Java 1.2", date: "1998-12-08" },
+      { version: 3, label: "Java 1.3", date: "2000-05-08" },
+      { version: 4, label: "Java 1.4", date: "2002-02-06" },
+      { version: 5, label: "Java 5", date: "2004-09-30" },
+      { version: 6, label: "Java 6", date: "2006-12-11" },
+      { version: 7, label: "Java 7", date: "2011-07-28" },
+      { version: 8, label: "Java 8", date: "2014-03-18", lts: true },
+      { version: 9, label: "Java 9", date: "2017-09-21" },
+      { version: 10, label: "Java 10", date: "2018-03-20" },
+      { version: 11, label: "Java 11", date: "2018-09-25", lts: true },
+      { version: 12, label: "Java 12", date: "2019-03-19" },
+      { version: 13, label: "Java 13", date: "2019-09-17" },
+      { version: 14, label: "Java 14", date: "2020-03-17" },
+      { version: 15, label: "Java 15", date: "2020-09-15" },
+      { version: 16, label: "Java 16", date: "2021-03-16" },
+      { version: 17, label: "Java 17", date: "2021-09-14", lts: true },
+      { version: 18, label: "Java 18", date: "2022-03-22" },
+      { version: 19, label: "Java 19", date: "2022-09-20" },
+      { version: 20, label: "Java 20", date: "2023-03-21" },
+      { version: 21, label: "Java 21", date: "2023-09-19", lts: true },
+      { version: 22, label: "Java 22", date: "2024-03-19" },
+      { version: 23, label: "Java 23", date: "2024-09-17" },
+      { version: 24, label: "Java 24", date: "2025-03-18" },
+      { version: 25, label: "Java 25", date: "2025-09-16", lts: true },
+      { version: 26, label: "Java 26", date: "2026-03-17" }
     ];
 
     events.forEach((e) => {
@@ -562,7 +549,6 @@
         <div>
           <h2>${ev.label}${lts ? '<span class="lts-tag">LTS</span>' : ""}</h2>
           <p class="meta">${formatDate(ev.parsed)}</p>
-          <p class="blurb">${ev.blurb}</p>
           ${hasGraph
             ? `<p class="hint">JVM flag graph data is available for this LTS release.</p>`
             : `<p class="hint">Flag graphs are maintained for LTS versions (8, 11, 17, 21, 25).</p>`}
