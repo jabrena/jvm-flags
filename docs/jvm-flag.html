@@ -155,6 +155,8 @@
     }
 
     .btn-copy {
+      display: inline-flex;
+      align-items: center;
       padding: 0.45rem 0.85rem;
       font: inherit;
       font-size: 0.75rem;
@@ -164,6 +166,7 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       cursor: pointer;
+      text-decoration: none;
       transition: border-color 0.15s, background 0.15s;
     }
 
@@ -322,6 +325,7 @@
         ? `<p class="description">${escapeHtml(flag.description)}</p>`
         : `<p class="description empty">No description available for this flag.</p>`;
       const prompt = buildSearchPrompt(flag, breadcrumb);
+      const backHref = `java-version.html?java=${encodeURIComponent(JAVA_VERSION)}`;
 
       document.getElementById("content").innerHTML = `
         ${breadcrumb ? `<p class="breadcrumb">${escapeHtml(breadcrumb)}</p>` : ""}
@@ -333,6 +337,7 @@
           <p class="research-hint">Copy this prompt into your preferred search or AI assistant to learn more about this flag.</p>
           <textarea id="search-prompt" class="research-prompt" rows="1" aria-label="Search prompt">${escapeHtml(prompt)}</textarea>
           <div class="research-actions">
+            <a class="btn-copy" href="${backHref}">Back</a>
             <button type="button" id="copy-prompt" class="btn-copy">Copy to clipboard</button>
             <span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
           </div>

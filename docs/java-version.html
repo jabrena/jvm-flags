@@ -71,28 +71,6 @@
       background: var(--bg);
     }
 
-    .search-wrap {
-      flex: 1;
-      min-width: 200px;
-      max-width: 360px;
-    }
-
-    .search-wrap input {
-      width: 100%;
-      padding: 0.45rem 0.75rem;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--bg);
-      color: var(--text);
-      font: inherit;
-      font-size: 0.8rem;
-    }
-
-    .search-wrap input:focus {
-      outline: none;
-      border-color: var(--category);
-    }
-
     .stats {
       font-size: 0.75rem;
       color: var(--muted);
@@ -254,9 +232,6 @@
   <header>
     <a href="index.html" class="back-link" aria-label="Back">← Back</a>
     <h1><span id="title-version">Java 25</span> JVM Flags</h1>
-    <div class="search-wrap">
-      <input type="search" id="search" placeholder="Search flags or categories…" autocomplete="off">
-    </div>
     <div class="stats" id="stats">Loading graph…</div>
     <div class="legend">
       <div class="legend-item"><span class="legend-dot" style="background:var(--root)"></span>Root</div>
@@ -308,7 +283,6 @@
     const tooltip = d3.select("#tooltip");
     const errorEl = document.getElementById("error");
     const statsEl = document.getElementById("stats");
-    const searchInput = document.getElementById("search");
 
     let simulation, g, linkSel, nodeSel, labelSel, zoomBehavior, container;
     let allNodes = [];
@@ -676,37 +650,6 @@
         event.subject.fx = null;
         event.subject.fy = null;
       }
-
-      searchInput.addEventListener("input", () => {
-        const q = searchInput.value.trim().toLowerCase();
-        if (!q) {
-          clearHighlight();
-          nodeSel.classed("dimmed", false);
-          updateVisibility();
-          return;
-        }
-        const matches = new Set(
-          allNodes
-            .filter(n =>
-              n.label.toLowerCase().includes(q) ||
-              (n.flag && n.flag.toLowerCase().includes(q)) ||
-              n.id.toLowerCase().includes(q)
-            )
-            .map(n => n.id)
-        );
-        for (const id of matches) {
-          let cur = id;
-          while (parentByChild.has(cur)) {
-            const parentId = parentByChild.get(cur);
-            expanded.add(parentId);
-            cur = parentId;
-          }
-        }
-        updateVisibility();
-        nodeSel.classed("dimmed", n => !matches.has(n.id) || !isVisible(n));
-        nodeSel.classed("highlight", n => matches.has(n.id) && isVisible(n));
-        linkSel.classed("dimmed", true).classed("highlight", false);
-      });
 
       window.addEventListener("resize", () => {
         graphWidth = window.innerWidth;
