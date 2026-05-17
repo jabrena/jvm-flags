@@ -50,6 +50,98 @@
 
     header h1 span { color: var(--root); }
 
+    .view-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .view-toggle input {
+      width: 0.9rem;
+      height: 0.9rem;
+      accent-color: var(--category);
+      cursor: pointer;
+    }
+
+    .view-toggle:hover { color: var(--text); }
+
+    body.table-view {
+      overflow: auto;
+    }
+
+    body.table-view #graph,
+    body.table-view .tooltip {
+      display: none;
+    }
+
+    .table-wrap {
+      display: none;
+      width: 100%;
+      height: calc(100vh - 52px);
+      overflow: auto;
+      padding: 0.75rem 1.25rem 2rem;
+    }
+
+    body.table-view .table-wrap {
+      display: block;
+    }
+
+    body.table-view .legend {
+      display: none;
+    }
+
+    .flags-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .flags-table th,
+    .flags-table td {
+      text-align: left;
+      padding: 0.45rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .flags-table th {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+      z-index: 1;
+    }
+
+    .flags-table tbody tr:hover {
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .flags-table td.category { color: var(--category); }
+    .flags-table td.subcategory { color: var(--subcategory); }
+
+    .flags-table a.flag-link {
+      color: var(--flag);
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .flags-table a.flag-link:hover {
+      text-decoration: underline;
+    }
+
+    .flags-table .empty-cell {
+      color: var(--muted);
+    }
+
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -232,6 +324,10 @@
   <header>
     <a href="index.html" class="back-link" aria-label="Back">← Back</a>
     <h1><span id="title-version">Java 25</span> JVM Flags</h1>
+    <label class="view-toggle" for="table-view">
+      <input type="checkbox" id="table-view" aria-controls="table-wrap flags-table">
+      Table
+    </label>
     <div class="stats" id="stats">Loading graph…</div>
     <div class="legend">
       <div class="legend-item"><span class="legend-dot" style="background:var(--root)"></span>Root</div>
@@ -244,6 +340,18 @@
   <div id="error" class="error" hidden></div>
   <svg id="graph"></svg>
   <div class="tooltip" id="tooltip"></div>
+  <div id="table-wrap" class="table-wrap" hidden>
+    <table id="flags-table" class="flags-table">
+      <thead>
+        <tr>
+          <th scope="col">Category</th>
+          <th scope="col" id="subcategory-col">Subcategory</th>
+          <th scope="col">Flag</th>
+        </tr>
+      </thead>
+      <tbody id="flags-table-body"></tbody>
+    </table>
+  </div>
 
   <script>
     const COLORS = {
@@ -283,8 +391,13 @@
     const tooltip = d3.select("#tooltip");
     const errorEl = document.getElementById("error");
     const statsEl = document.getElementById("stats");
+    const tableViewCb = document.getElementById("table-view");
+    const tableWrap = document.getElementById("table-wrap");
+    const tableBody = document.getElementById("flags-table-body");
+    const subcategoryCol = document.getElementById("subcategory-col");
 
     let simulation, g, linkSel, nodeSel, labelSel, zoomBehavior, container;
+    let cachedGraphData = null;
     let allNodes = [];
     let allLinks = [];
     let nodeById = new Map();
@@ -490,6 +603,94 @@
       tooltip.classed("visible flag-only", false);
     }
 
+    function buildParentMapFromEdges(edges) {
+      const parent = new Map();
+      for (const e of edges) {
+        parent.set(e.target, e.source);
+      }
+      return parent;
+    }
+
+    function buildFlagRows(nodes, edges) {
+      const nodesById = new Map(nodes.map(n => [n.id, n]));
+      const parentByTarget = buildParentMapFromEdges(edges);
+      const rows = [];
+
+      for (const node of nodes) {
+        if (node.type !== "flag") continue;
+
+        let category = "";
+        let subcategory = "";
+        let cur = parentByTarget.get(node.id);
+        while (cur) {
+          const parent = nodesById.get(cur);
+          if (!parent) break;
+          if (parent.type === "subcategory") subcategory = parent.label;
+          else if (parent.type === "category") category = parent.label;
+          cur = parentByTarget.get(cur);
+        }
+
+        rows.push({
+          category,
+          subcategory,
+          flag: node.flag || node.label,
+          flagId: node.flagId || node.id
+        });
+      }
+
+      rows.sort((a, b) => {
+        const c = a.category.localeCompare(b.category);
+        if (c !== 0) return c;
+        const s = a.subcategory.localeCompare(b.subcategory);
+        if (s !== 0) return s;
+        return a.flag.localeCompare(b.flag);
+      });
+
+      return rows;
+    }
+
+    function renderTable(data) {
+      const rows = buildFlagRows(data.nodes, data.edges);
+      const hasSubcategory = rows.some(r => r.subcategory);
+
+      subcategoryCol.hidden = !hasSubcategory;
+      tableBody.innerHTML = rows.map(r => {
+        const subCell = hasSubcategory
+          ? (r.subcategory
+              ? `<td class="subcategory">${escapeHtml(r.subcategory)}</td>`
+              : `<td class="empty-cell">—</td>`)
+          : "";
+        const href = flagDetailUrl({ flagId: r.flagId });
+        return `<tr>
+          <td class="category">${escapeHtml(r.category)}</td>
+          ${subCell}
+          <td><a class="flag-link" href="${escapeHtml(href)}">${escapeHtml(r.flag)}</a></td>
+        </tr>`;
+      }).join("");
+
+      if (tableViewCb.checked) {
+        statsEl.textContent = `${rows.length} flags · click a flag for details`;
+      }
+    }
+
+    function setTableView(enabled) {
+      document.body.classList.toggle("table-view", enabled);
+      tableWrap.hidden = !enabled;
+      hideTooltip();
+
+      if (enabled) {
+        if (cachedGraphData) {
+          renderTable(cachedGraphData);
+        }
+        if (simulation) simulation.stop();
+      } else {
+        updateStats();
+        if (simulation) simulation.alpha(0.1).restart();
+      }
+    }
+
+    tableViewCb.addEventListener("change", () => setTableView(tableViewCb.checked));
+
     function initGraph(data) {
       errorEl.hidden = true;
 
@@ -621,6 +822,9 @@
       container.on("click", clearHighlight);
 
       updateVisibility();
+
+      cachedGraphData = data;
+      renderTable(data);
 
       function ticked() {
         linkSel
