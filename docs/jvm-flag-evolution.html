@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>JVM Flag Evolution</title>
-  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="scripts/d3.v7.min.js"></script>
   <style>
     :root {
       --bg: #0f1419;
@@ -102,10 +102,15 @@
       background-position: right 0.55rem center;
     }
 
-    .group-by-control select:hover,
-    .group-by-control select:focus {
+    .group-by-control select:hover:not(:disabled),
+    .group-by-control select:focus:not(:disabled) {
       border-color: var(--accent);
       outline: none;
+    }
+
+    .group-by-control select:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
 
     .chart-wrap {
@@ -239,7 +244,7 @@
   </header>
   <main>
     <p id="intro">
-      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are HotSpot flags from <code>-XX:+PrintFlagsFinal</code> (one catalog entry per internal flag), grouped by the level you choose below.
+      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are HotSpot flags from <code>-XX:+PrintFlagsFinal</code> (one catalog entry per internal flag). Choose a grouping level, then pick a specific domain, category, or subcategory to zoom into the next level down.
     </p>
     <div class="group-by-control">
       <label for="group-by">Group by</label>
@@ -247,6 +252,10 @@
         <option value="domain" selected>Domain</option>
         <option value="category">Category</option>
         <option value="subcategory">Subcategories</option>
+      </select>
+      <label for="filter-focus" id="filter-focus-label">Domain</label>
+      <select id="filter-focus" aria-label="Focus on one group">
+        <option value="-" selected>-</option>
       </select>
     </div>
     <div class="chart-wrap" id="chart-wrap">
@@ -284,17 +293,20 @@
         label: "Domain",
         plural: "domains",
         nodeType: "domain",
-        order: DOMAIN_ORDER
+        order: DOMAIN_ORDER,
+        childLevel: "category"
       },
       category: {
         label: "Category",
         plural: "categories",
-        nodeType: "category"
+        nodeType: "category",
+        childLevel: "subcategory"
       },
       subcategory: {
         label: "Subcategories",
         plural: "subcategories",
-        nodeType: "subcategory"
+        nodeType: "subcategory",
+        childLevel: null
       }
     };
 
@@ -319,15 +331,74 @@
     const chartStatus = document.getElementById("chart-status");
     const stackLegend = document.getElementById("stack-legend");
     const legendNote = document.getElementById("legend-note");
+    const filterFocusSelect = document.getElementById("filter-focus");
+    const filterFocusLabel = document.getElementById("filter-focus-label");
     const groupBySelect = document.getElementById("group-by");
     const svg = d3.select("#chart");
     const tooltip = d3.select("#tooltip");
 
     let catalogsCache = null;
     let currentGroupBy = "domain";
+    let currentFocusFilter = "-";
     let colorForKey = () => "#64748b";
 
-    function countFlagsByLevel(catalog, nodeType) {
+    function collectLabelsAcrossCatalogs(catalogsByVersion, nodeType, orderedLabels) {
+      const labels = new Set();
+      for (const catalog of Object.values(catalogsByVersion)) {
+        for (const node of catalog.nodes) {
+          if (node.type === nodeType) labels.add(node.label);
+        }
+      }
+      if (orderedLabels) {
+        const result = orderedLabels.filter((l) => labels.has(l));
+        for (const l of labels) {
+          if (!result.includes(l)) result.push(l);
+        }
+        return result;
+      }
+      return [...labels].sort((a, b) => a.localeCompare(b));
+    }
+
+    function rebuildFocusSelect(resetToAll = false) {
+      const config = GROUP_LEVELS[currentGroupBy];
+      filterFocusLabel.textContent = config.label;
+      filterFocusSelect.setAttribute(
+        "aria-label",
+        `Focus on one ${config.label.toLowerCase()}`
+      );
+
+      const previous = resetToAll ? "-" : filterFocusSelect.value;
+      const labels = collectLabelsAcrossCatalogs(
+        catalogsCache,
+        config.nodeType,
+        config.order
+      );
+
+      filterFocusSelect.replaceChildren();
+      const allOpt = document.createElement("option");
+      allOpt.value = "-";
+      allOpt.textContent = "-";
+      filterFocusSelect.appendChild(allOpt);
+
+      for (const label of labels) {
+        const opt = document.createElement("option");
+        opt.value = label;
+        opt.textContent = label;
+        filterFocusSelect.appendChild(opt);
+      }
+
+      const next =
+        previous !== "-" && labels.includes(previous) ? previous : "-";
+      filterFocusSelect.value = next;
+      currentFocusFilter = next;
+    }
+
+    function effectiveGroupLevel(groupBy, focusFilter) {
+      if (focusFilter === "-") return groupBy;
+      return GROUP_LEVELS[groupBy].childLevel || groupBy;
+    }
+
+    function countFlagsByLevel(catalog, nodeType, ancestorFilter = null) {
       const byId = new Map(catalog.nodes.map((n) => [n.id, n]));
       const parentByChild = new Map();
       for (const edge of catalog.edges) {
@@ -343,7 +414,7 @@
           const node = byId.get(cur);
           if (!node) break;
           if (node.type === type) return node.label;
-          cur = parentByChild.get(cur);
+          cur = parentByChild.get(cur) ?? node.parent ?? null;
         }
         return null;
       }
@@ -351,6 +422,10 @@
       const counts = {};
       for (const node of catalog.nodes) {
         if (node.type !== "flag") continue;
+        if (ancestorFilter) {
+          const ancestor = ancestorLabel(node.id, ancestorFilter.type);
+          if (ancestor !== ancestorFilter.label) continue;
+        }
         const label = ancestorLabel(node.id, nodeType);
         if (!label) continue;
         counts[label] = (counts[label] || 0) + 1;
@@ -358,12 +433,21 @@
       return counts;
     }
 
-    function buildStackData(catalogsByVersion, level) {
+    function buildStackData(catalogsByVersion, level, groupBy, focusFilter) {
       const config = GROUP_LEVELS[level];
+      const ancestorFilter =
+        focusFilter === "-"
+          ? null
+          : { type: GROUP_LEVELS[groupBy].nodeType, label: focusFilter };
+
       const versions = CATALOG_VERSIONS.map((v) => ({
         version: v,
         label: `Java ${v}`,
-        groups: countFlagsByLevel(catalogsByVersion[v], config.nodeType)
+        groups: countFlagsByLevel(
+          catalogsByVersion[v],
+          config.nodeType,
+          ancestorFilter
+        )
       }));
 
       const keySet = new Set();
@@ -405,7 +489,7 @@
         return row;
       });
 
-      return { rows, keys, level };
+      return { rows, keys, level, groupBy, focusFilter };
     }
 
     function buildColorFn(keys, level) {
@@ -459,13 +543,19 @@
 
       chartStatus.style.display = "none";
       chartStatus.classList.remove("error");
-      const stackData = buildStackData(catalogsCache, currentGroupBy);
+      const level = effectiveGroupLevel(currentGroupBy, currentFocusFilter);
+      const stackData = buildStackData(
+        catalogsCache,
+        level,
+        currentGroupBy,
+        currentFocusFilter
+      );
       colorForKey = buildColorFn(stackData.keys, stackData.level);
       drawStackedChart(stackData, version);
     }
 
     function drawStackedChart(stackData, selectedVersion) {
-      const { rows, keys, level } = stackData;
+      const { rows, keys, level, groupBy, focusFilter } = stackData;
       if (!rows.length) return;
 
       chartStatus.style.display = "none";
@@ -475,6 +565,10 @@
       renderStackLegend(keys);
 
       const groupLabel = GROUP_LEVELS[level].label.toLowerCase();
+      const filterNote =
+        focusFilter !== "-"
+          ? `, ${GROUP_LEVELS[groupBy].label.toLowerCase()} ${focusFilter}`
+          : "";
 
       const margin = { top: 28, right: 20, bottom: 52, left: 52 };
       const innerWidth = Math.max(
@@ -494,7 +588,7 @@
         .attr("role", "img")
         .attr(
           "aria-label",
-          `Stacked bar chart of JVM flag counts per Java LTS release, grouped by ${groupLabel}`
+          `Stacked bar chart of JVM flag counts per Java LTS release, grouped by ${groupLabel}${filterNote}`
         )
         .append("g")
         .attr("transform", `translate(${margin.left},${margin.top})`);
@@ -549,7 +643,7 @@
         .attr("x", -innerHeight / 2)
         .attr("y", -40)
         .attr("text-anchor", "middle")
-        .text("Flags in catalog");
+        .text(focusFilter !== "-" ? "Flags in selection" : "Flags in catalog");
 
       const versionGroups = root
         .selectAll(".bar-group")
@@ -619,8 +713,12 @@
       const selected = rows.find((d) => d.version === selectedVersion);
       if (selected) {
         legendNote.hidden = false;
+        const scope =
+          focusFilter !== "-"
+            ? ` — <strong>${focusFilter}</strong> (${GROUP_LEVELS[groupBy].label.toLowerCase()})`
+            : "";
         legendNote.innerHTML =
-          `Viewing context: <strong>Java ${selectedVersion}</strong> ` +
+          `Viewing context: <strong>Java ${selectedVersion}</strong>${scope} ` +
           `(${selected.total.toLocaleString()} flags across ${keys.length} ${GROUP_LEVELS[level].plural}). ` +
           `<a href="java-version.html?java=${selectedVersion}">Open full flag graph →</a>`;
       }
@@ -630,6 +728,7 @@
       loadCatalogs()
         .then((catalogs) => {
           catalogsCache = catalogs;
+          rebuildFocusSelect(true);
           refreshChart();
         })
         .catch((err) => {
@@ -641,8 +740,14 @@
         });
     }
 
+    filterFocusSelect.addEventListener("change", () => {
+      currentFocusFilter = filterFocusSelect.value;
+      refreshChart();
+    });
+
     groupBySelect.addEventListener("change", () => {
       currentGroupBy = groupBySelect.value;
+      rebuildFocusSelect(true);
       refreshChart();
     });
 

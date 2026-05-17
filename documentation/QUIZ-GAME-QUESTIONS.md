@@ -24,7 +24,7 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
    | Type | Count |
    |------|-------|
    | `flagCount` | **1** (always) |
-   | Each of the other **5** types | **3 or 4** (base 2 each + 9 extra slots → four types at 4, one at 3 → 1 + 19 = 20) |
+   | Each of the other **4** types | **4 or 5** (base 2 each + 11 extra slots → three types at 5, one at 4 → 1 + 19 = 20) |
 2. **Slot order** — `buildBalancedQuizPlan()` shuffles the 20 type slots so questions are not grouped by type.
 3. **Per-slot generation** — For each slot, call the matching builder up to **50** times until a valid question passes dedup; if any slot fails, the deck is incomplete.
 4. **No duplicate slots in a deck** — Each accepted question must have a unique dedup key (see below). Collisions are discarded and the attempt does not count toward that slot.
@@ -39,7 +39,6 @@ A `Set` tracks keys for questions already in the current deck. Format: `` `${typ
 | `whichVersion` | Flag under test | *(empty)* | `whichVersion|UseG1GC|` |
 | `description` | Correct flag | LTS catalog used for sibling pool | `description|UseG1GC|25` |
 | `flagFromDescription` | Correct flag | LTS catalog used for sibling pool | `flagFromDescription|UseG1GC|25` |
-| `firstLts` | Flag under test | *(empty)* | `firstLts|UseG1GC|` |
 | `flagCount` | `_catalog` (synthetic) | Target LTS in the prompt | `flagCount|_catalog|17` |
 
 The same `flagId` may appear in **different** question types or **different** `scopeVersion` values (e.g. version check on Java 8 and description on Java 25). It cannot appear twice with the same type and scope (e.g. two “which LTS includes this flag?” questions for the same flag).
@@ -115,22 +114,7 @@ The same `flagId` may appear in **different** question types or **different** `s
 
 ---
 
-## Type 5: First LTS (`firstLts`)
-
-**UI label:** First LTS  
-**Prompt:** “In which LTS release did this flag **first** appear?”
-
-| Rule | Detail |
-|------|--------|
-| Flag pool | Any `flagId` present in at least one LTS catalog |
-| Correct answer | **Minimum** LTS version number where the flag exists |
-| Wrong answers | 3 other LTS version labels (may include versions where the flag also exists later) |
-| Options | Four `Java {n}` labels, shuffled |
-| Abort | `null` if no eligible flag |
-
----
-
-## Type 6: Catalog size (`flagCount`)
+## Type 5: Catalog size (`flagCount`)
 
 **UI label:** Catalog size  
 **Prompt:** “How many JVM flags are cataloged for **Java {version}** on this site?”
@@ -165,11 +149,10 @@ The same `flagId` may appear in **different** question types or **different** `s
 
 - **Description / flag name** questions share the same sibling-pool rules (≥ 4 flags, ≥ 4 distinct descriptions in the group).
 - **Which-version** accepts any LTS option where the flag is present; flags that appear in all five LTS catalogs never appear in this type.
-- **First LTS** has a single correct answer (earliest cataloged LTS); later releases where the flag also exists are plausible distractors.
 - **Version presence** “absent” uses a flag from *some* catalog that is missing in the asked version—not a synthetic flag name.
 - **Dedup** prevents repeating the same `(type, flagId, scopeVersion)` in one game; unrelated types or scopes for the same flag are still allowed.
 - **Catalog size** appears **once** per game by design; dedup also caps at one per LTS version (`flagCount|_catalog|{version}`).
-- **Balanced mix** — Every game includes exactly one catalog-size question; the other five types share the remaining 19 slots (four types at 4 questions, one at 3).
+- **Balanced mix** — Every game includes exactly one catalog-size question; the other four types share the remaining 19 slots (three types at 5 questions, one at 4).
 
 ## Source references
 
@@ -178,10 +161,9 @@ The same `flagId` may appear in **different** question types or **different** `s
 | `LTS_VERSIONS`, `TOTAL_QUESTIONS`, `PASS_PERCENT`, `WIN_THRESHOLD` | ~464–467 |
 | `TYPE_LABELS` | ~469–476 |
 | `parseGraph`, `buildFlagIndex` | ~489–552 |
-| `buildVersionPresenceQuestion` | ~554–583 |
-| `buildWhichVersionQuestion` | ~600–631 |
-| `pickEligibleSiblingGroup`, `buildDescriptionQuestion` | ~633–669 |
-| `buildFlagFromDescriptionQuestion` | ~671–699 |
-| `buildFirstLtsQuestion` | ~701–727 |
-| `buildFlagCountQuestion` | ~729–755 |
-| `buildBalancedQuizPlan`, `questionDedupKey`, `generateQuiz` | ~757–819 |
+| `buildVersionPresenceQuestion` | ~557–587 |
+| `buildWhichVersionQuestion` | ~604–634 |
+| `pickEligibleSiblingGroup`, `buildDescriptionQuestion` | ~636–673 |
+| `buildFlagFromDescriptionQuestion` | ~675–700 |
+| `buildFlagCountQuestion` | ~702–727 |
+| `buildBalancedQuizPlan`, `questionDedupKey`, `generateQuiz` | ~742–787 |

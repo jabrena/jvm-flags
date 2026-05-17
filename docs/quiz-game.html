@@ -471,7 +471,6 @@
       whichVersion: "LTS release",
       description: "Flag description",
       flagFromDescription: "Flag name",
-      firstLts: "First LTS",
       flagCount: "Catalog size"
     };
 
@@ -700,35 +699,6 @@
       };
     }
 
-    function buildFirstLtsQuestion(index) {
-      const entries = [...index.versionsForFlagId.entries()].filter(([, vers]) => {
-        const lts = [...vers].filter((v) => LTS_VERSIONS.includes(v));
-        return lts.length > 0;
-      });
-      if (!entries.length) return null;
-
-      const [flagId, versions] = pickRandom(entries);
-      const flag = index.byFlagId.get(flagId);
-      const ltsPresent = [...versions]
-        .filter((v) => LTS_VERSIONS.includes(v))
-        .sort((a, b) => a - b);
-      const firstLts = ltsPresent[0];
-      const wrongVersions = shuffle(LTS_VERSIONS.filter((v) => v !== firstLts)).slice(0, 3);
-      const options = shuffle([
-        `Java ${firstLts}`,
-        ...wrongVersions.map((v) => `Java ${v}`)
-      ]);
-
-      return {
-        type: "firstLts",
-        flagId,
-        prompt: "In which LTS release did this flag <strong>first</strong> appear?",
-        flag: flag.flag,
-        options,
-        correctIndex: options.indexOf(`Java ${firstLts}`)
-      };
-    }
-
     function buildFlagCountQuestion(index) {
       const version = pickRandom(LTS_VERSIONS);
       const flags = index.byVersion.get(version);
@@ -766,8 +736,7 @@
       "versionPresence",
       "whichVersion",
       "description",
-      "flagFromDescription",
-      "firstLts"
+      "flagFromDescription"
     ];
 
     function buildBalancedQuizPlan() {
@@ -793,7 +762,6 @@
         whichVersion: () => buildWhichVersionQuestion(index),
         description: () => buildDescriptionQuestion(index),
         flagFromDescription: () => buildFlagFromDescriptionQuestion(index),
-        firstLts: () => buildFirstLtsQuestion(index),
         flagCount: () => buildFlagCountQuestion(index)
       };
 
