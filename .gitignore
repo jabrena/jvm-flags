@@ -4,3 +4,4 @@ target
 *.log.*
 *.jfr
 .agents
+scripts
