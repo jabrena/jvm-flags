@@ -2108,7 +2108,10 @@
       "flag": "-XX:+EagerJVMCI",
       "description": "Initialize JVMCI eagerly instead of on first use.",
       "flagId": "d27f4d2d-cc38-5ea1-8d10-9751fb417899",
-      "testValue": "-XX:-EagerJVMCI"
+      "testValue": "-XX:-EagerJVMCI",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-eagerxruninit",
@@ -2171,7 +2174,10 @@
       "flag": "-XX:+EnableJVMCI",
       "description": "Enable JVM Compiler Interface (JVMCI) support.",
       "flagId": "1bc21b07-3af8-5698-8c3e-35fcbf872c43",
-      "testValue": "-XX:+EnableJVMCI"
+      "testValue": "-XX:+EnableJVMCI",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-enablejvmciproduct",
@@ -2180,7 +2186,10 @@
       "flag": "-XX:+EnableJVMCIProduct",
       "description": "Enable JVMCI product mode (built-in JVMCI libraries).",
       "flagId": "12e00ce1-174b-5049-87d7-5d514581a8fa",
-      "testValue": "-XX:+EnableJVMCIProduct"
+      "testValue": "-XX:+EnableJVMCIProduct",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-ergoheapsizelimit",
@@ -2642,7 +2651,10 @@
       "flag": "-XX:JVMCICompilerIdleDelay=<n>",
       "description": "Delay before shutting down an idle JVMCI compiler.",
       "flagId": "65934e25-9cfc-524b-b98d-5011c5f81b7b",
-      "testValue": "-XX:JVMCICompilerIdleDelay=1000"
+      "testValue": "-XX:JVMCICompilerIdleDelay=1000",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcicountersize",
@@ -2651,7 +2663,10 @@
       "flag": "-XX:JVMCICounterSize=<n>",
       "description": "Size of JVMCI performance counters.",
       "flagId": "5f607853-caed-590d-b1a9-b9d7bb4538aa",
-      "testValue": "-XX:JVMCICounterSize=0"
+      "testValue": "-XX:JVMCICounterSize=0",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcicountersexcludecompiler",
@@ -2660,7 +2675,10 @@
       "flag": "-XX:+JVMCICountersExcludeCompiler",
       "description": "Exclude JVMCI compiler from JVMCI counter updates.",
       "flagId": "5020c590-a9ba-56d4-aff9-69219ddafe85",
-      "testValue": "-XX:+JVMCICountersExcludeCompiler"
+      "testValue": "-XX:+JVMCICountersExcludeCompiler",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcieventloglevel",
@@ -2669,7 +2687,10 @@
       "flag": "-XX:JVMCIEventLogLevel=<n>",
       "description": "JVMCI event log verbosity level.",
       "flagId": "da2e8b9a-1b96-5204-a224-4cc89ce13c5f",
-      "testValue": "-XX:JVMCIEventLogLevel=1"
+      "testValue": "-XX:JVMCIEventLogLevel=1",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcilibdumpjniconfig",
@@ -2696,7 +2717,10 @@
       "flag": "-XX:JVMCINMethodSizeLimit=<n>",
       "description": "Maximum compiled method size for JVMCI nmethods.",
       "flagId": "d302f4eb-b25f-5feb-9ddc-e9292901bf77",
-      "testValue": "-XX:JVMCINMethodSizeLimit=655360"
+      "testValue": "-XX:JVMCINMethodSizeLimit=655360",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcinativelibraryerrorfile",
@@ -2714,7 +2738,10 @@
       "flag": "-XX:JVMCINativeLibraryThreadFraction=<n>",
       "description": "Fraction of compiler threads used for JVMCI native library runtime.",
       "flagId": "30fe5470-83da-55ce-b98b-a339068f9dea",
-      "testValue": "-XX:JVMCINativeLibraryThreadFraction=0.330000"
+      "testValue": "-XX:JVMCINativeLibraryThreadFraction=0.330000",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmciprintproperties",
@@ -2723,7 +2750,10 @@
       "flag": "-XX:+JVMCIPrintProperties",
       "description": "Print JVMCI-related system properties at startup.",
       "flagId": "21c32ff7-4c78-5732-9968-083cc9f85bc1",
-      "testValue": "-XX:-JVMCIPrintProperties"
+      "testValue": "-XX:-JVMCIPrintProperties",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcithreads",
@@ -2732,7 +2762,10 @@
       "flag": "-XX:JVMCIThreads=<n>",
       "description": "Number of threads dedicated to JVMCI.",
       "flagId": "06783251-3b48-51f5-b230-68f2c5d7fd2b",
-      "testValue": "-XX:JVMCIThreads=1"
+      "testValue": "-XX:JVMCIThreads=1",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcithreadspernativelibraryruntime",
@@ -2741,7 +2774,10 @@
       "flag": "-XX:JVMCIThreadsPerNativeLibraryRuntime=<n>",
       "description": "JVMCI threads allocated per native library runtime.",
       "flagId": "1c8658eb-b146-5723-8916-9316bd72703c",
-      "testValue": "-XX:JVMCIThreadsPerNativeLibraryRuntime=1"
+      "testValue": "-XX:JVMCIThreadsPerNativeLibraryRuntime=1",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-jvmcitracelevel",
@@ -2750,7 +2786,10 @@
       "flag": "-XX:JVMCITraceLevel=<n>",
       "description": "JVMCI trace verbosity level.",
       "flagId": "769ee383-1780-59f7-bb9a-9df59cb7afcc",
-      "testValue": "-XX:JVMCITraceLevel=0"
+      "testValue": "-XX:JVMCITraceLevel=0",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-javamonitorsinstacktrace",
@@ -4897,7 +4936,7 @@
       "flag": "-XX:UseBranchProtection=<value>",
       "description": "Branch protection mode for generated code (ARM).",
       "flagId": "21b1f90c-fa04-5275-bd5e-cb29630de7f0",
-      "testValue": "-XX:UseBranchProtection=none"
+      "testable": false
     },
     {
       "id": "flag-pending-usecmoveunconditionally",
@@ -4951,7 +4990,7 @@
       "flag": "-XX:+UseCryptoPmullForCRC32",
       "description": "Use ARM PMULL crypto instructions for CRC32.",
       "flagId": "3d15c2fe-36a9-5a59-9e7f-06e5577e0a75",
-      "testValue": "-XX:-UseCryptoPmullForCRC32"
+      "testable": false
     },
     {
       "id": "flag-pending-usedivmod",
@@ -5050,7 +5089,10 @@
       "flag": "-XX:+UseJVMCICompiler",
       "description": "Use the JVMCI compiler as the JVM compiler.",
       "flagId": "ac01a567-d048-5a90-9820-a9dc8ec27d5a",
-      "testValue": "-XX:+UseJVMCICompiler"
+      "testValue": "-XX:+UseJVMCICompiler",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-usejvmcinativelibrary",
@@ -5059,7 +5101,10 @@
       "flag": "-XX:+UseJVMCINativeLibrary",
       "description": "Load and use the JVMCI native compiler library.",
       "flagId": "f9e95f4f-ec17-571c-940d-4bc914857cb9",
-      "testValue": "-XX:+UseJVMCINativeLibrary"
+      "testValue": "-XX:+UseJVMCINativeLibrary",
+      "requires": [
+        "-XX:+UnlockExperimentalVMOptions"
+      ]
     },
     {
       "id": "flag-pending-usejumptables",
