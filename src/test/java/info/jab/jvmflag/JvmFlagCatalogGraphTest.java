@@ -36,4 +36,26 @@ class JvmFlagCatalogGraphTest {
                 .extracting(JvmFlagCatalogGraph.EmptyContainer::id)
                 .containsExactly("logging");
     }
+
+    @Test
+    void detectsOrphanFlag() throws Exception {
+        String json =
+                "{"
+                        + "\"nodes\":["
+                        + "{\"id\":\"root\",\"type\":\"root\",\"label\":\"Root\"},"
+                        + "{\"id\":\"heap\",\"type\":\"category\",\"label\":\"Heap\"},"
+                        + "{\"id\":\"flag-xms\",\"type\":\"flag\",\"label\":\"-Xms\",\"flag\":\"-Xms\"},"
+                        + "{\"id\":\"flag-orphan\",\"type\":\"flag\",\"label\":\"-orphan\",\"flag\":\"-orphan\"}"
+                        + "],"
+                        + "\"edges\":["
+                        + "{\"source\":\"root\",\"target\":\"heap\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-xms\"}"
+                        + "]}";
+
+        JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.fromRoot(MAPPER.readTree(json));
+
+        assertThat(graph.findOrphanFlags())
+                .extracting(JvmFlagCatalogGraph.OrphanFlag::id)
+                .containsExactly("flag-orphan");
+    }
 }

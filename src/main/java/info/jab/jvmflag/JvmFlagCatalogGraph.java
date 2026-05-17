@@ -19,10 +19,15 @@ public final class JvmFlagCatalogGraph {
 
     private final Map<String, JsonNode> nodesById;
     private final Map<String, List<String>> targetsBySource;
+    private final Map<String, List<String>> sourcesByTarget;
 
-    private JvmFlagCatalogGraph(Map<String, JsonNode> nodesById, Map<String, List<String>> targetsBySource) {
+    private JvmFlagCatalogGraph(
+            Map<String, JsonNode> nodesById,
+            Map<String, List<String>> targetsBySource,
+            Map<String, List<String>> sourcesByTarget) {
         this.nodesById = nodesById;
         this.targetsBySource = targetsBySource;
+        this.sourcesByTarget = sourcesByTarget;
     }
 
     public static JvmFlagCatalogGraph loadForJavaVersion(int feature) throws IOException {
@@ -43,13 +48,33 @@ public final class JvmFlagCatalogGraph {
         }
 
         Map<String, List<String>> targetsBySource = new HashMap<>();
+        Map<String, List<String>> sourcesByTarget = new HashMap<>();
         for (JsonNode edge : root.path("edges")) {
             String source = edge.path("source").asText();
             String target = edge.path("target").asText();
             targetsBySource.computeIfAbsent(source, ignored -> new ArrayList<>()).add(target);
+            sourcesByTarget.computeIfAbsent(target, ignored -> new ArrayList<>()).add(source);
         }
 
-        return new JvmFlagCatalogGraph(nodesById, targetsBySource);
+        return new JvmFlagCatalogGraph(nodesById, targetsBySource, sourcesByTarget);
+    }
+
+    /**
+     * Flag nodes with no incoming edge in {@code edges} (not linked to any category or subcategory).
+     */
+    public List<OrphanFlag> findOrphanFlags() {
+        List<OrphanFlag> orphans = new ArrayList<>();
+        for (JsonNode node : nodesById.values()) {
+            if (!"flag".equals(nodeType(node))) {
+                continue;
+            }
+            String id = node.path("id").asText();
+            if (!sourcesByTarget.containsKey(id)) {
+                orphans.add(new OrphanFlag(id, nodeLabel(node), textOrNull(node, "flag")));
+            }
+        }
+        orphans.sort((a, b) -> a.id().compareTo(b.id()));
+        return orphans;
     }
 
     /**
@@ -133,6 +158,37 @@ public final class JvmFlagCatalogGraph {
     private static String textOrNull(JsonNode node, String field) {
         JsonNode value = node.get(field);
         return value == null || value.isNull() ? null : value.asText();
+    }
+
+    public static final class OrphanFlag {
+
+        private final String id;
+        private final String label;
+        private final String flag;
+
+        OrphanFlag(String id, String label, String flag) {
+            this.id = id;
+            this.label = label;
+            this.flag = flag;
+        }
+
+        public String id() {
+            return id;
+        }
+
+        public String label() {
+            return label;
+        }
+
+        public String flag() {
+            return flag;
+        }
+
+        @Override
+        public String toString() {
+            String name = flag != null ? flag : label;
+            return name + " (" + id + ")";
+        }
     }
 
     public static final class EmptyContainer {

@@ -16,6 +16,78 @@
       "type": "category"
     },
     {
+      "id": "runtime-cli",
+      "label": "CLI & JVM Options",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-jni",
+      "label": "JNI",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-signals-os",
+      "label": "Signals & OS Integration",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-tracing",
+      "label": "Tracing & Profiling",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-fatal-error",
+      "label": "Fatal Error & VM Output",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-interpreter",
+      "label": "Interpreter",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-memory-model",
+      "label": "Memory Model & Barriers",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-object-init",
+      "label": "Object Initialization & Strings",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-contended",
+      "label": "Contended & Monitors",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-platform",
+      "label": "Platform & Hardware",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-symbols",
+      "label": "Symbols & Annotations",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "security-jvm",
+      "label": "JVM Security",
+      "type": "subcategory",
+      "parent": "security"
+    },
+    {
       "id": "heap",
       "label": "Heap",
       "type": "category"
@@ -24,6 +96,72 @@
       "id": "object-layout",
       "label": "Object Layout",
       "type": "category"
+    },
+    {
+      "id": "heap-size",
+      "label": "Heap Size",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-ram-sizing",
+      "label": "RAM-Based Sizing",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-young-gen",
+      "label": "Young Generation",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-survivor",
+      "label": "Survivor Spaces",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-tenuring",
+      "label": "Tenuring & Promotion",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-tenured-gen",
+      "label": "Tenured Generation",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-resize",
+      "label": "Heap Resize Heuristics",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-layout",
+      "label": "Heap Layout & Footprint",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-large-pages",
+      "label": "Large Pages",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-numa",
+      "label": "NUMA",
+      "type": "subcategory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-direct-memory",
+      "label": "Direct Memory",
+      "type": "subcategory",
+      "parent": "heap"
     },
     {
       "id": "metaspace",
@@ -64,6 +202,36 @@
       "id": "logging",
       "label": "Logging",
       "type": "category"
+    },
+    {
+      "id": "class-loader",
+      "label": "Class Loader Behavior",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-server-policy",
+      "label": "Server-Class Machine Policy",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-unloading",
+      "label": "Class Unloading",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-tracing",
+      "label": "Loading & Unloading Diagnostics",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-boot-loader",
+      "label": "Boot Class Loader",
+      "type": "subcategory",
+      "parent": "class-loading"
     },
     {
       "id": "diagnostics",
@@ -206,13 +374,13 @@
     },
     {
       "id": "class-cds",
-      "label": "CDS",
+      "label": "Class Data Sharing (CDS)",
       "type": "subcategory",
       "parent": "class-loading"
     },
     {
       "id": "class-verification",
-      "label": "Verification",
+      "label": "Verification & Bytecode",
       "type": "subcategory",
       "parent": "class-loading"
     },
@@ -6592,8 +6760,96 @@
       "target": "runtime"
     },
     {
+      "source": "runtime",
+      "target": "runtime-cli"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-jni"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-signals-os"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-tracing"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-fatal-error"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-interpreter"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-memory-model"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-object-init"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-contended"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-platform"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-symbols"
+    },
+    {
       "source": "root",
       "target": "heap"
+    },
+    {
+      "source": "heap",
+      "target": "heap-direct-memory"
+    },
+    {
+      "source": "heap",
+      "target": "heap-size"
+    },
+    {
+      "source": "heap",
+      "target": "heap-ram-sizing"
+    },
+    {
+      "source": "heap",
+      "target": "heap-young-gen"
+    },
+    {
+      "source": "heap",
+      "target": "heap-survivor"
+    },
+    {
+      "source": "heap",
+      "target": "heap-tenuring"
+    },
+    {
+      "source": "heap",
+      "target": "heap-tenured-gen"
+    },
+    {
+      "source": "heap",
+      "target": "heap-resize"
+    },
+    {
+      "source": "heap",
+      "target": "heap-layout"
+    },
+    {
+      "source": "heap",
+      "target": "heap-large-pages"
+    },
+    {
+      "source": "heap",
+      "target": "heap-numa"
     },
     {
       "source": "root",
@@ -6628,6 +6884,26 @@
       "target": "class-loading"
     },
     {
+      "source": "class-loading",
+      "target": "class-loader"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-server-policy"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-unloading"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-tracing"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-boot-loader"
+    },
+    {
       "source": "root",
       "target": "logging"
     },
@@ -6646,6 +6922,10 @@
     {
       "source": "root",
       "target": "security"
+    },
+    {
+      "source": "security",
+      "target": "security-jvm"
     },
     {
       "source": "root",
@@ -6756,59 +7036,59 @@
       "target": "diag-flight-recorder"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-version"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-showversion"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-help"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-x"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-printflagsfinal"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-unlockdiagnostic"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-unlockexperimental"
     },
     {
-      "source": "heap",
+      "source": "heap-size",
       "target": "flag-xms"
     },
     {
-      "source": "heap",
+      "source": "heap-size",
       "target": "flag-xmx"
     },
     {
-      "source": "heap",
+      "source": "heap-size",
       "target": "flag-initialheapsize"
     },
     {
-      "source": "heap",
+      "source": "heap-size",
       "target": "flag-maxheapsize"
     },
     {
-      "source": "heap",
+      "source": "heap-ram-sizing",
       "target": "flag-initialrampercentage"
     },
     {
-      "source": "heap",
+      "source": "heap-ram-sizing",
       "target": "flag-minrampercentage"
     },
     {
-      "source": "heap",
+      "source": "heap-ram-sizing",
       "target": "flag-maxrampercentage"
     },
     {
@@ -7212,7 +7492,7 @@
       "target": "flag-patch-module"
     },
     {
-      "source": "security",
+      "source": "security-jvm",
       "target": "flag-java-security-policy"
     },
     {
@@ -7264,15 +7544,15 @@
       "target": "flag-pending-adaptivesizethroughputpolicy"
     },
     {
-      "source": "runtime",
+      "source": "gc-default",
       "target": "flag-pending-adaptivetimeweight"
     },
     {
-      "source": "heap",
+      "source": "heap-size",
       "target": "flag-pending-aggressiveheap"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-aggressiveopts"
     },
     {
@@ -7284,7 +7564,7 @@
       "target": "flag-pending-alignvector"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-allocateheapat"
     },
     {
@@ -7312,19 +7592,19 @@
       "target": "flag-pending-allocateprefetchstyle"
     },
     {
-      "source": "runtime",
+      "source": "runtime-jni",
       "target": "flag-pending-allowjnienvproxy"
     },
     {
-      "source": "runtime",
+      "source": "class-verification",
       "target": "flag-pending-allownonvirtualcalls"
     },
     {
-      "source": "class-loading",
+      "source": "class-loader",
       "target": "flag-pending-allowparalleldefineclass"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-allowusersignalhandlers"
     },
     {
@@ -7332,7 +7612,7 @@
       "target": "flag-pending-allowvectorizeondemand"
     },
     {
-      "source": "class-loading",
+      "source": "class-server-policy",
       "target": "flag-pending-alwaysactasserverclassmachine"
     },
     {
@@ -7340,11 +7620,11 @@
       "target": "flag-pending-alwayscompileloopmethods"
     },
     {
-      "source": "class-loading",
+      "source": "class-loader",
       "target": "flag-pending-alwayslockclassloader"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-alwayspretouch"
     },
     {
@@ -7352,11 +7632,11 @@
       "target": "flag-pending-alwaysrestorefpu"
     },
     {
-      "source": "heap",
+      "source": "heap-tenuring",
       "target": "flag-pending-alwaystenure"
     },
     {
-      "source": "runtime",
+      "source": "jit-intrinsics",
       "target": "flag-pending-arraycopyloadstoremaxelem"
     },
     {
@@ -7364,15 +7644,15 @@
       "target": "flag-pending-assertonsuspendwaitfailure"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-assumemp"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-autoboxcachemax"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-avoidunalignedaccesses"
     },
     {
@@ -7380,7 +7660,7 @@
       "target": "flag-pending-bceatracelevel"
     },
     {
-      "source": "heap",
+      "source": "heap-layout",
       "target": "flag-pending-basefootprintestimate"
     },
     {
@@ -7420,7 +7700,7 @@
       "target": "flag-pending-blockzeroinglowlimit"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-branchonregister"
     },
     {
@@ -7464,7 +7744,7 @@
       "target": "flag-pending-cicompilercountpercpu"
     },
     {
-      "source": "runtime",
+      "source": "runtime-tracing",
       "target": "flag-pending-citime"
     },
     {
@@ -7736,19 +8016,19 @@
       "target": "flag-pending-cms_sweepweight"
     },
     {
-      "source": "class-loading",
+      "source": "class-cds",
       "target": "flag-pending-calculateclassfingerprint"
     },
     {
-      "source": "runtime",
+      "source": "runtime-jni",
       "target": "flag-pending-checkjnicalls"
     },
     {
-      "source": "class-loading",
+      "source": "class-unloading",
       "target": "flag-pending-classunloading"
     },
     {
-      "source": "class-loading",
+      "source": "class-unloading",
       "target": "flag-pending-classunloadingwithconcurrentmark"
     },
     {
@@ -7768,7 +8048,7 @@
       "target": "flag-pending-compactstrings"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-compilationpolicychoice"
     },
     {
@@ -7804,11 +8084,11 @@
       "target": "flag-pending-contendedpaddingwidth"
     },
     {
-      "source": "runtime",
+      "source": "diag-error-handling",
       "target": "flag-pending-createcoredumponcrash"
     },
     {
-      "source": "runtime",
+      "source": "runtime-jni",
       "target": "flag-pending-criticaljninatives"
     },
     {
@@ -7824,11 +8104,11 @@
       "target": "flag-pending-dtracemonitorprobes"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-debugging"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-deoptimizerandom"
     },
     {
@@ -7836,11 +8116,11 @@
       "target": "flag-pending-disableattachmechanism"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-displayvmoutputtostderr"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-displayvmoutputtostdout"
     },
     {
@@ -7848,7 +8128,7 @@
       "target": "flag-pending-doreservecopyinsuperword"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-dontcompilehugemethods"
     },
     {
@@ -7856,15 +8136,15 @@
       "target": "flag-pending-dontyieldalot"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-dumpreplaydataonerror"
     },
     {
-      "source": "runtime",
+      "source": "class-cds",
       "target": "flag-pending-dumpsharedspaces"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-eagerxruninit"
     },
     {
@@ -7880,15 +8160,15 @@
       "target": "flag-pending-eliminatenestedlocks"
     },
     {
-      "source": "runtime",
+      "source": "runtime-contended",
       "target": "flag-pending-enablecontended"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-enabledynamicagentloading"
     },
     {
-      "source": "heap",
+      "source": "heap-size",
       "target": "flag-pending-ergoheapsizelimit"
     },
     {
@@ -7900,7 +8180,7 @@
       "target": "flag-pending-errorfiletostdout"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-errorreportserver"
     },
     {
@@ -7912,7 +8192,7 @@
       "target": "flag-pending-estimateargescape"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-executingunittests"
     },
     {
@@ -7920,7 +8200,7 @@
       "target": "flag-pending-extendeddtraceprobes"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-extensiveerrorreports"
     },
     {
@@ -7940,7 +8220,7 @@
       "target": "flag-pending-flslargestblockcoalesceproximity"
     },
     {
-      "source": "runtime",
+      "source": "class-verification",
       "target": "flag-pending-failovertooldverifier"
     },
     {
@@ -7948,7 +8228,7 @@
       "target": "flag-pending-fieldsallocationstyle"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-filterspuriouswakeups"
     },
     {
@@ -7956,11 +8236,11 @@
       "target": "flag-pending-flightrecorder"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-forcenuma"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-forcetimehighresolution"
     },
     {
@@ -8064,7 +8344,7 @@
       "target": "flag-pending-gctimeratio"
     },
     {
-      "source": "runtime",
+      "source": "heap-layout",
       "target": "flag-pending-heapbaseminaddress"
     },
     {
@@ -8084,7 +8364,7 @@
       "target": "flag-pending-heapmaximumcompactioninterval"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-heapsearchsteps"
     },
     {
@@ -8092,15 +8372,15 @@
       "target": "flag-pending-heapsizepergcthread"
     },
     {
-      "source": "class-loading",
+      "source": "class-loader",
       "target": "flag-pending-ignoreemptyclasspaths"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-pending-ignoreunrecognizedvmoptions"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-increasefirsttiercompilethresholdat"
     },
     {
@@ -8108,19 +8388,19 @@
       "target": "flag-pending-incrementalinline"
     },
     {
-      "source": "class-loading",
+      "source": "class-boot-loader",
       "target": "flag-pending-initialbootclassloadermetaspacesize"
     },
     {
-      "source": "heap",
+      "source": "heap-ram-sizing",
       "target": "flag-pending-initialramfraction"
     },
     {
-      "source": "heap",
+      "source": "heap-survivor",
       "target": "flag-pending-initialsurvivorratio"
     },
     {
-      "source": "heap",
+      "source": "heap-tenuring",
       "target": "flag-pending-initialtenuringthreshold"
     },
     {
@@ -8136,7 +8416,7 @@
       "target": "flag-pending-inlinesynchronizedmethods"
     },
     {
-      "source": "runtime",
+      "source": "runtime-memory-model",
       "target": "flag-pending-insertmembarafterarraycopy"
     },
     {
@@ -8144,7 +8424,7 @@
       "target": "flag-pending-interiorentryalignment"
     },
     {
-      "source": "runtime",
+      "source": "runtime-interpreter",
       "target": "flag-pending-interpreterprofilepercentage"
     },
     {
@@ -8196,11 +8476,11 @@
       "target": "flag-pending-lirfilldelayslots"
     },
     {
-      "source": "heap",
+      "source": "heap-large-pages",
       "target": "flag-pending-largepageheapsizethreshold"
     },
     {
-      "source": "heap",
+      "source": "heap-large-pages",
       "target": "flag-pending-largepagesizeinbytes"
     },
     {
@@ -8264,7 +8544,7 @@
       "target": "flag-pending-maxbceaestimatesize"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-maxfdlimit"
     },
     {
@@ -8272,11 +8552,11 @@
       "target": "flag-pending-maxgcminorpausemillis"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-maxheapfreeratio"
     },
     {
-      "source": "runtime",
+      "source": "runtime-jni",
       "target": "flag-pending-maxjnilocalcapacity"
     },
     {
@@ -8292,7 +8572,7 @@
       "target": "flag-pending-maxjumptablesparseness"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-maxlabelrootdepth"
     },
     {
@@ -8304,7 +8584,7 @@
       "target": "flag-pending-maxmetaspaceexpansion"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-maxnewsize"
     },
     {
@@ -8312,15 +8592,15 @@
       "target": "flag-pending-maxnodelimit"
     },
     {
-      "source": "heap",
+      "source": "heap-ram-sizing",
       "target": "flag-pending-maxramfraction"
     },
     {
-      "source": "heap",
+      "source": "heap-tenuring",
       "target": "flag-pending-maxtenuringthreshold"
     },
     {
-      "source": "runtime",
+      "source": "jit-inlining",
       "target": "flag-pending-maxtrivialsize"
     },
     {
@@ -8328,15 +8608,15 @@
       "target": "flag-pending-maxvectorsize"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-methodflushing"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-minheapdeltabytes"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-minheapfreeratio"
     },
     {
@@ -8352,11 +8632,11 @@
       "target": "flag-pending-minmetaspaceexpansion"
     },
     {
-      "source": "heap",
+      "source": "heap-ram-sizing",
       "target": "flag-pending-minramfraction"
     },
     {
-      "source": "heap",
+      "source": "heap-survivor",
       "target": "flag-pending-minsurvivorratio"
     },
     {
@@ -8368,31 +8648,31 @@
       "target": "flag-pending-monitorinuselists"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-multiarrayexpandlimit"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-numachunkresizeweight"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-numainterleavegranularity"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-numapagescanrate"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-numaspaceresizerate"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-numastats"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-nearcpool"
     },
     {
@@ -8400,23 +8680,23 @@
       "target": "flag-pending-needsdeoptsuspend"
     },
     {
-      "source": "class-loading",
+      "source": "class-server-policy",
       "target": "flag-pending-neveractasserverclassmachine"
     },
     {
-      "source": "heap",
+      "source": "heap-tenuring",
       "target": "flag-pending-nevertenure"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-newratio"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-newsize"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-newsizethreadincrease"
     },
     {
@@ -8456,15 +8736,15 @@
       "target": "flag-pending-onstackreplacepercentage"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-optimizefill"
     },
     {
-      "source": "runtime",
+      "source": "jit-escape-analysis",
       "target": "flag-pending-optimizeptrcompare"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-optimizestringconcat"
     },
     {
@@ -8548,11 +8828,11 @@
       "target": "flag-pending-perbytecodetraplimit"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-permethodrecompilationcutoff"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-permethodtraplimit"
     },
     {
@@ -8588,11 +8868,11 @@
       "target": "flag-pending-perfmaxstringconstlength"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-pretouchparallelchunksize"
     },
     {
-      "source": "runtime",
+      "source": "jit-execution-modes",
       "target": "flag-pending-preferinterpreternativestubs"
     },
     {
@@ -8608,19 +8888,19 @@
       "target": "flag-pending-prefetchscanintervalinbytes"
     },
     {
-      "source": "runtime",
+      "source": "runtime-symbols",
       "target": "flag-pending-preserveallannotations"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-preserveframepointer"
     },
     {
-      "source": "runtime",
+      "source": "gc-allocation",
       "target": "flag-pending-pretenuresizethreshold"
     },
     {
-      "source": "class-loading",
+      "source": "class-tracing",
       "target": "flag-pending-printclasshistogram"
     },
     {
@@ -8632,7 +8912,7 @@
       "target": "flag-pending-printcodecacheoncompilation"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-pending-printcommandlineflags"
     },
     {
@@ -8648,7 +8928,7 @@
       "target": "flag-pending-printextendedthreadinfo"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-pending-printflagsinitial"
     },
     {
@@ -8700,7 +8980,7 @@
       "target": "flag-pending-printtieredevents"
     },
     {
-      "source": "runtime",
+      "source": "runtime-cli",
       "target": "flag-pending-printvmoptions"
     },
     {
@@ -8712,27 +8992,27 @@
       "target": "flag-pending-printwarnings"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-processdistributionstride"
     },
     {
-      "source": "runtime",
+      "source": "runtime-interpreter",
       "target": "flag-pending-profileinterpreter"
     },
     {
-      "source": "runtime",
+      "source": "runtime-tracing",
       "target": "flag-pending-profileintervals"
     },
     {
-      "source": "runtime",
+      "source": "runtime-tracing",
       "target": "flag-pending-profileintervalsticks"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-profilematuritypercentage"
     },
     {
-      "source": "runtime",
+      "source": "runtime-tracing",
       "target": "flag-pending-profilevm"
     },
     {
@@ -8744,7 +9024,7 @@
       "target": "flag-pending-profilerrecordpc"
     },
     {
-      "source": "runtime",
+      "source": "gc-default",
       "target": "flag-pending-promotedpadding"
     },
     {
@@ -8760,11 +9040,11 @@
       "target": "flag-pending-reassociateinvariants"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-reducebulkzeroing"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-reducefieldzeroing"
     },
     {
@@ -8772,7 +9052,7 @@
       "target": "flag-pending-reduceinitialcardmarks"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-reducesignalusage"
     },
     {
@@ -8780,15 +9060,15 @@
       "target": "flag-pending-refdiscoverypolicy"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-registerfinalizersatinit"
     },
     {
-      "source": "runtime",
+      "source": "class-verification",
       "target": "flag-pending-relaxaccesscontrolcheck"
     },
     {
-      "source": "runtime",
+      "source": "runtime-fatal-error",
       "target": "flag-pending-replaydatafile"
     },
     {
@@ -8808,11 +9088,11 @@
       "target": "flag-pending-resizetlab"
     },
     {
-      "source": "runtime",
+      "source": "runtime-jni",
       "target": "flag-pending-restoremxcsronjnicalls"
     },
     {
-      "source": "runtime",
+      "source": "runtime-contended",
       "target": "flag-pending-restrictcontended"
     },
     {
@@ -8824,7 +9104,7 @@
       "target": "flag-pending-rewritebytecodes"
     },
     {
-      "source": "runtime",
+      "source": "runtime-interpreter",
       "target": "flag-pending-rewritefrequentpairs"
     },
     {
@@ -8836,7 +9116,7 @@
       "target": "flag-pending-segmentedcodecache"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-selfdestructtimer"
     },
     {
@@ -8864,11 +9144,11 @@
       "target": "flag-pending-shenandoahsoftmaxheapsize"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-showmessageboxonerror"
     },
     {
-      "source": "runtime",
+      "source": "heap-resize",
       "target": "flag-pending-shrinkheapinsteps"
     },
     {
@@ -8908,11 +9188,11 @@
       "target": "flag-pending-startattachlistener"
     },
     {
-      "source": "runtime",
+      "source": "class-verification",
       "target": "flag-pending-stressldcrewrite"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-stringtablesize"
     },
     {
@@ -8924,15 +9204,15 @@
       "target": "flag-pending-superwordreductions"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-suppressfatalerrormessage"
     },
     {
-      "source": "heap",
+      "source": "heap-survivor",
       "target": "flag-pending-survivorpadding"
     },
     {
-      "source": "heap",
+      "source": "heap-survivor",
       "target": "flag-pending-survivorratio"
     },
     {
@@ -8964,19 +9244,19 @@
       "target": "flag-pending-targetplabwastepct"
     },
     {
-      "source": "heap",
+      "source": "heap-survivor",
       "target": "flag-pending-targetsurvivorratio"
     },
     {
-      "source": "heap",
+      "source": "heap-tenured-gen",
       "target": "flag-pending-tenuredgenerationsizeincrement"
     },
     {
-      "source": "heap",
+      "source": "heap-tenured-gen",
       "target": "flag-pending-tenuredgenerationsizesupplement"
     },
     {
-      "source": "heap",
+      "source": "heap-tenured-gen",
       "target": "flag-pending-tenuredgenerationsizesupplementdecay"
     },
     {
@@ -8992,7 +9272,7 @@
       "target": "flag-pending-threadpriorityverbose"
     },
     {
-      "source": "runtime",
+      "source": "gc-default",
       "target": "flag-pending-thresholdtolerance"
     },
     {
@@ -9128,11 +9408,11 @@
       "target": "flag-pending-tracetraps"
     },
     {
-      "source": "runtime",
+      "source": "runtime-object-init",
       "target": "flag-pending-trackedinitializationlimit"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-transmiterrorreport"
     },
     {
@@ -9164,11 +9444,11 @@
       "target": "flag-pending-typeprofilewidth"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-unguardonexecutionviolation"
     },
     {
-      "source": "runtime",
+      "source": "runtime-symbols",
       "target": "flag-pending-unlinksymbolsalot"
     },
     {
@@ -9176,15 +9456,15 @@
       "target": "flag-pending-useadaptivegcboundary"
     },
     {
-      "source": "runtime",
+      "source": "gc-default",
       "target": "flag-pending-useadaptivegenerationsizepolicyatmajorcollection"
     },
     {
-      "source": "runtime",
+      "source": "gc-default",
       "target": "flag-pending-useadaptivegenerationsizepolicyatminorcollection"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-useadaptivenumachunksizing"
     },
     {
@@ -9208,7 +9488,7 @@
       "target": "flag-pending-usebase64intrinsics"
     },
     {
-      "source": "runtime",
+      "source": "runtime-memory-model",
       "target": "flag-pending-usebarriersforvolatile"
     },
     {
@@ -9228,15 +9508,15 @@
       "target": "flag-pending-usebsdposixthreadcpuclocks"
     },
     {
-      "source": "runtime",
+      "source": "gc-cms",
       "target": "flag-pending-usecmsbestfit"
     },
     {
-      "source": "runtime",
+      "source": "gc-cms",
       "target": "flag-pending-usecmsinitiatingoccupancyonly"
     },
     {
-      "source": "runtime",
+      "source": "jit-intrinsics",
       "target": "flag-pending-usecmoveunconditionally"
     },
     {
@@ -9244,11 +9524,11 @@
       "target": "flag-pending-usecrc32"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-usecodeaging"
     },
     {
-      "source": "runtime",
+      "source": "jit-compilation",
       "target": "flag-pending-usecompiler"
     },
     {
@@ -9264,7 +9544,7 @@
       "target": "flag-pending-usecountedloopsafepoints"
     },
     {
-      "source": "runtime",
+      "source": "jit-tiered",
       "target": "flag-pending-usecounterdecay"
     },
     {
@@ -9280,7 +9560,7 @@
       "target": "flag-pending-usedynamicnumberofgcthreads"
     },
     {
-      "source": "runtime",
+      "source": "jit-intrinsics",
       "target": "flag-pending-usefma"
     },
     {
@@ -9288,7 +9568,7 @@
       "target": "flag-pending-usefpuforspilling"
     },
     {
-      "source": "runtime",
+      "source": "jit-intrinsics",
       "target": "flag-pending-usefastjniaccessors"
     },
     {
@@ -9300,11 +9580,11 @@
       "target": "flag-pending-usegctaskaffinity"
     },
     {
-      "source": "runtime",
+      "source": "runtime-contended",
       "target": "flag-pending-useheavymonitors"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-usehugetlbfs"
     },
     {
@@ -9312,7 +9592,7 @@
       "target": "flag-pending-useinlinecaches"
     },
     {
-      "source": "runtime",
+      "source": "jit-execution-modes",
       "target": "flag-pending-useinterpreter"
     },
     {
@@ -9324,11 +9604,11 @@
       "target": "flag-pending-uselse"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-uselwpsynchronization"
     },
     {
-      "source": "heap",
+      "source": "heap-large-pages",
       "target": "flag-pending-uselargepages"
     },
     {
@@ -9340,7 +9620,7 @@
       "target": "flag-pending-uselargepagesindividualallocation"
     },
     {
-      "source": "runtime",
+      "source": "runtime-jni",
       "target": "flag-pending-uselegacyjninameescaping"
     },
     {
@@ -9360,15 +9640,15 @@
       "target": "flag-pending-usemaximumcompactiononsystemgc"
     },
     {
-      "source": "runtime",
+      "source": "runtime-memory-model",
       "target": "flag-pending-usemembar"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-usenuma"
     },
     {
-      "source": "heap",
+      "source": "heap-numa",
       "target": "flag-pending-usenumainterleaving"
     },
     {
@@ -9376,7 +9656,7 @@
       "target": "flag-pending-useneon"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-useoserrorreporting"
     },
     {
@@ -9388,7 +9668,7 @@
       "target": "flag-pending-useonlyinlinedbimorphic"
     },
     {
-      "source": "runtime",
+      "source": "runtime-tracing",
       "target": "flag-pending-useoprofile"
     },
     {
@@ -9396,11 +9676,11 @@
       "target": "flag-pending-useoptobiasinlining"
     },
     {
-      "source": "heap",
+      "source": "heap-survivor",
       "target": "flag-pending-usepsadaptivesurvivorsizepolicy"
     },
     {
-      "source": "runtime",
+      "source": "runtime-tracing",
       "target": "flag-pending-useperfdata"
     },
     {
@@ -9412,11 +9692,11 @@
       "target": "flag-pending-useprofiledlooppredicate"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-userdpcforconstanttablebase"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-useshm"
     },
     {
@@ -9432,15 +9712,15 @@
       "target": "flag-pending-usesse"
     },
     {
-      "source": "runtime",
+      "source": "class-cds",
       "target": "flag-pending-usesharedspaces"
     },
     {
-      "source": "runtime",
+      "source": "runtime-signals-os",
       "target": "flag-pending-usesignalchaining"
     },
     {
-      "source": "runtime",
+      "source": "jit-intrinsics",
       "target": "flag-pending-usesimplearrayequals"
     },
     {
@@ -9460,7 +9740,7 @@
       "target": "flag-pending-usetypeprofile"
     },
     {
-      "source": "runtime",
+      "source": "jit-escape-analysis",
       "target": "flag-pending-usetypespeculation"
     },
     {
@@ -9468,7 +9748,7 @@
       "target": "flag-pending-usevectorcmov"
     },
     {
-      "source": "runtime",
+      "source": "runtime-platform",
       "target": "flag-pending-usexmmforarraycopy"
     },
     {
@@ -9488,7 +9768,7 @@
       "target": "flag-pending-valuemapmaxloopsize"
     },
     {
-      "source": "runtime",
+      "source": "jit-intrinsics",
       "target": "flag-pending-valuesearchlimit"
     },
     {
@@ -9500,15 +9780,15 @@
       "target": "flag-pending-verifysharedspaces"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-younggenerationsizeincrement"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-younggenerationsizesupplement"
     },
     {
-      "source": "heap",
+      "source": "heap-young-gen",
       "target": "flag-pending-younggenerationsizesupplementdecay"
     },
     {
@@ -9518,6 +9798,42 @@
     {
       "source": "gc-allocation",
       "target": "flag-pending-zerotlab"
+    },
+    {
+      "source": "heap-direct-memory",
+      "target": "flag-pending-maxdirectmemorysize"
+    },
+    {
+      "source": "heap-size",
+      "target": "flag-pending-maxram"
+    },
+    {
+      "source": "diag-error-handling",
+      "target": "flag-pending-errorlogtimeout"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-pending-g1concrefinementthreads"
+    },
+    {
+      "source": "gc-g1-tuning",
+      "target": "flag-pending-g1refprocdraininterval"
+    },
+    {
+      "source": "gc-logging-legacy",
+      "target": "flag-pending-gctasktimestampentries"
+    },
+    {
+      "source": "gc-serial",
+      "target": "flag-pending-marksweepalwayscompactcount"
+    },
+    {
+      "source": "gc-parallel",
+      "target": "flag-pending-pargcarrayscanchunk"
+    },
+    {
+      "source": "jit-compilation",
+      "target": "flag-pending-softwareprefetchhintdistance"
     }
   ]
 }
