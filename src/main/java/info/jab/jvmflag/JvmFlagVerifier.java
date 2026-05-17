@@ -84,23 +84,36 @@ public final class JvmFlagVerifier {
         Process process = new ProcessBuilder(command)
                 .redirectErrorStream(true)
                 .start();
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        Thread drain = new Thread(
+                () -> {
+                    try {
+                        copyUtf8(process.getInputStream(), captured);
+                    } catch (IOException ignored) {
+                        // Process may already be destroyed on timeout.
+                    }
+                },
+                "jvm-flag-verifier-drain");
+        drain.setDaemon(true);
+        drain.start();
+
         boolean finished = process.waitFor(timeout.toMillis(), TimeUnit.MILLISECONDS);
         if (!finished) {
             process.destroyForcibly();
+            drain.join(timeout.toMillis());
             throw new IllegalStateException("Timed out verifying JVM arguments: " + jvmArguments);
         }
-        String output = readUtf8(process.getInputStream());
+        drain.join(timeout.toMillis());
+        String output = captured.toString(StandardCharsets.UTF_8.name());
         return new Result(process.exitValue(), output);
     }
 
-    private static String readUtf8(InputStream input) throws IOException {
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+    private static void copyUtf8(InputStream input, ByteArrayOutputStream buffer) throws IOException {
         byte[] chunk = new byte[4096];
         int read;
         while ((read = input.read(chunk)) != -1) {
             buffer.write(chunk, 0, read);
         }
-        return buffer.toString(StandardCharsets.UTF_8.name());
     }
 
     private static String quoteIfNeeded(String argument) {

@@ -36,8 +36,12 @@ class JvmFlagTest {
 
     static Stream<Arguments> jvmFlags() {
         return entries.stream()
-                .filter(entry -> entry.testSpec().testable())
+                .filter(JvmFlagTest::shouldVerify)
                 .map(entry -> Arguments.of(entry.flag().flag(), entry));
+    }
+
+    private static boolean shouldVerify(JvmFlagEntry entry) {
+        return entry.testSpec().testable() || entry.flag().isPendingCategorization();
     }
 
     @ParameterizedTest(name = "{0}")
@@ -50,17 +54,19 @@ class JvmFlagTest {
         JvmFlagVerifier.Result result = JvmFlagVerifier.verify(jvmArguments);
 
         int featureVersion = JvmFlagCatalog.currentJavaFeatureVersion();
-        assertThat(result.output())
-                .as(
-                        "JVM output for %s with arguments %s (Java %s)",
-                        entry.flag().flag(),
-                        jvmArguments,
-                        featureVersion)
-                .doesNotContain("Unrecognized VM option")
-                .doesNotContain("Improperly specified VM option")
-                .doesNotContain("experimental and must be enabled via -XX:+UnlockExperimentalVMOptions")
-                .doesNotContain("diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions");
-        if (!entry.testSpec().acceptNonZeroExit()) {
+        if (requiresJvmOutputValidation(entry)) {
+            assertThat(result.output())
+                    .as(
+                            "JVM output for %s with arguments %s (Java %s)",
+                            entry.flag().flag(),
+                            jvmArguments,
+                            featureVersion)
+                    .doesNotContain("Unrecognized VM option")
+                    .doesNotContain("Improperly specified VM option")
+                    .doesNotContain("experimental and must be enabled via -XX:+UnlockExperimentalVMOptions")
+                    .doesNotContain("diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions");
+        }
+        if (requiresZeroExitCode(entry)) {
             assertThat(result.exitCode())
                     .as(
                             "exit code for %s with arguments %s (Java %s)\n%s",
@@ -70,6 +76,19 @@ class JvmFlagTest {
                             result.output())
                     .isZero();
         }
+    }
+
+    /**
+     * When {@code acceptNonZeroExit} is set (e.g. optional GC builds without Shenandoah), the JVM may
+     * reject the flag; skip output checks that require a successful parse.
+     */
+    private static boolean requiresJvmOutputValidation(JvmFlagEntry entry) {
+        return !entry.testSpec().acceptNonZeroExit();
+    }
+
+    /** Pending flags only need the JVM to accept the option; -version may still fail. */
+    private static boolean requiresZeroExitCode(JvmFlagEntry entry) {
+        return !entry.flag().isPendingCategorization() && !entry.testSpec().acceptNonZeroExit();
     }
 
     static boolean hasCatalogForCurrentJavaVersion() {

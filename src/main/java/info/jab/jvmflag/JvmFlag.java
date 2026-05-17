@@ -4,6 +4,10 @@ import java.util.Objects;
 
 public final class JvmFlag {
 
+    /** Catalog placeholder for flags imported from PrintFlagsFinal and not yet categorized. */
+    public static final String PENDING_CATEGORIZATION_DESCRIPTION =
+            "Present in Java 8 PrintFlagsFinal; categorization pending.";
+
     private final String id;
     private final String flag;
     private final String description;
@@ -24,6 +28,10 @@ public final class JvmFlag {
 
     public String description() {
         return description;
+    }
+
+    public boolean isPendingCategorization() {
+        return PENDING_CATEGORIZATION_DESCRIPTION.equals(description);
     }
 
     @Override
