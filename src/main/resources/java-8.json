@@ -450,7 +450,7 @@
     },
     {
       "id": "gc-logging",
-      "label": "Logging",
+      "label": "Logging GC",
       "type": "subcategory",
       "parent": "garbage-collection"
     },
@@ -1060,12 +1060,6 @@
     {
       "id": "gc-cms",
       "label": "CMS",
-      "type": "subcategory",
-      "parent": "garbage-collection"
-    },
-    {
-      "id": "gc-logging-legacy",
-      "label": "Legacy Logging",
       "type": "subcategory",
       "parent": "garbage-collection"
     },
@@ -7611,10 +7605,6 @@
       "target": "gc-cms"
     },
     {
-      "source": "garbage-collection",
-      "target": "gc-logging-legacy"
-    },
-    {
       "source": "gc-cms",
       "target": "flag-useconcmarksweepgc"
     },
@@ -9599,151 +9589,151 @@
       "target": "flag-pending-zerotlab"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-printgc"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-printgcdetails"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-printgctimestamps"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-gclogfilesize"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-gcpauseintervalmillis"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-gctasktimestampentries"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-numberofgclogfiles"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printadaptivesizepolicy"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printcmsinitiationstatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printcmsstatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printflscensus"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printflsstatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printgcapplicationconcurrenttime"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printgcapplicationstoppedtime"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printgccause"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printgcdatestamps"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printgcid"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printgctasktimestamps"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printheapatgc"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printheapatgcextended"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printheapatsigbreak"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printjnigcstalls"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printoldplab"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printplab"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printparalleloldgcphasetimes"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printpromotionfailure"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printreferencegc"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printsafepointstatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printsafepointstatisticscount"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printsafepointstatisticstimeout"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printstringdeduplicationstatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printstringtablestatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printtlab"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printtenuringdistribution"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-tracegen0time"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-tracegen1time"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-usegclogfilerotation"
     },
     {

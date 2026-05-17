@@ -239,7 +239,7 @@
     },
     {
       "id": "gc-logging",
-      "label": "Logging",
+      "label": "Logging GC",
       "parent": "garbage-collection"
     },
     {

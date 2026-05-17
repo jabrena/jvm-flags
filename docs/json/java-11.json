@@ -354,7 +354,7 @@
     },
     {
       "id": "gc-logging",
-      "label": "Logging",
+      "label": "Logging GC",
       "type": "subcategory",
       "parent": "garbage-collection"
     },
