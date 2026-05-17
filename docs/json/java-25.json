@@ -11,9 +11,40 @@
       "type": "root"
     },
     {
+      "id": "domain-memory",
+      "label": "Memory & layout",
+      "type": "domain"
+    },
+    {
+      "id": "domain-gc",
+      "label": "Garbage collection",
+      "type": "domain"
+    },
+    {
+      "id": "domain-execution",
+      "label": "Execution & code",
+      "type": "domain"
+    },
+    {
+      "id": "domain-classes",
+      "label": "Classes & modules",
+      "type": "domain"
+    },
+    {
+      "id": "domain-concurrency",
+      "label": "Concurrency",
+      "type": "domain"
+    },
+    {
+      "id": "domain-operations",
+      "label": "Operations & platform",
+      "type": "domain"
+    },
+    {
       "id": "runtime",
       "label": "Runtime",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-execution"
     },
     {
       "id": "runtime-cli",
@@ -84,12 +115,14 @@
     {
       "id": "heap",
       "label": "Heap",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-memory"
     },
     {
       "id": "object-layout",
       "label": "Object Layout",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-memory"
     },
     {
       "id": "heap-size",
@@ -160,42 +193,50 @@
     {
       "id": "metaspace",
       "label": "Metaspace",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-memory"
     },
     {
       "id": "stack",
       "label": "Stack",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-memory"
     },
     {
       "id": "garbage-collection",
       "label": "Garbage Collection",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-gc"
     },
     {
       "id": "jit-compiler",
       "label": "JIT Compiler",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-execution"
     },
     {
       "id": "code-cache",
       "label": "Code Cache",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-execution"
     },
     {
       "id": "threads-synchronization",
       "label": "Threads and Synchronization",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-concurrency"
     },
     {
       "id": "class-loading",
       "label": "Class Loading",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-classes"
     },
     {
       "id": "logging",
       "label": "Logging",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-operations"
     },
     {
       "id": "class-loader",
@@ -224,32 +265,38 @@
     {
       "id": "diagnostics",
       "label": "Diagnostics",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-operations"
     },
     {
       "id": "containers",
       "label": "Containers",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-operations"
     },
     {
       "id": "virtual-threads",
       "label": "Virtual Threads",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-concurrency"
     },
     {
       "id": "modules",
       "label": "Modules",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-classes"
     },
     {
       "id": "security",
       "label": "Security",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-operations"
     },
     {
       "id": "system-properties",
       "label": "System Properties",
-      "type": "category"
+      "type": "category",
+      "parent": "domain-operations"
     },
     {
       "id": "gc-default",
@@ -412,6 +459,66 @@
       "label": "Flight Recorder",
       "type": "subcategory",
       "parent": "diagnostics"
+    },
+    {
+      "id": "class-boot-loader",
+      "label": "Boot Class Loader",
+      "type": "subcategory",
+      "parent": "class-loading"
+    },
+    {
+      "id": "gc-cms",
+      "label": "CMS",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-gclocker",
+      "label": "GC Locker",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-legacy-sizing",
+      "label": "Legacy Heap Sizing",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-logging-legacy",
+      "label": "Legacy Logging",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "metaspace-large-pages",
+      "label": "Large Pages",
+      "type": "subcategory",
+      "parent": "metaspace"
+    },
+    {
+      "id": "metaspace-perm-legacy",
+      "label": "Permanent Generation (legacy)",
+      "type": "subcategory",
+      "parent": "metaspace"
+    },
+    {
+      "id": "metaspace-policy",
+      "label": "Reclaim Policy",
+      "type": "subcategory",
+      "parent": "metaspace"
+    },
+    {
+      "id": "runtime-symbols",
+      "label": "Symbols & Annotations",
+      "type": "subcategory",
+      "parent": "runtime"
+    },
+    {
+      "id": "sysprop-jvm",
+      "label": "JVM Properties",
+      "type": "subcategory",
+      "parent": "system-properties"
     },
     {
       "id": "flag-version",
@@ -5447,13 +5554,213 @@
       "description": "Zero out the newly created TLAB.",
       "flagId": "fac90d42-6ff8-5a6c-a82b-7b0334d5e10f",
       "testValue": "-XX:+ZeroTLAB"
+    },
+    {
+      "id": "object-layout-compression",
+      "label": "Compression",
+      "type": "subcategory",
+      "parent": "object-layout"
+    },
+    {
+      "id": "object-layout-alignment",
+      "label": "Alignment",
+      "type": "subcategory",
+      "parent": "object-layout"
+    },
+    {
+      "id": "metaspace-sizing",
+      "label": "Metaspace Sizing",
+      "type": "subcategory",
+      "parent": "metaspace"
+    },
+    {
+      "id": "stack-sizing",
+      "label": "Stack Sizing",
+      "type": "subcategory",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-fpu",
+      "label": "FPU",
+      "type": "subcategory",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-traces",
+      "label": "Stack Traces",
+      "type": "subcategory",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-general",
+      "label": "General Stack",
+      "type": "subcategory",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-osr",
+      "label": "On-Stack Replacement",
+      "type": "subcategory",
+      "parent": "stack"
+    },
+    {
+      "id": "code-cache-sizing",
+      "label": "Code Cache Sizing",
+      "type": "subcategory",
+      "parent": "code-cache"
+    },
+    {
+      "id": "code-cache-behavior",
+      "label": "Code Cache Behavior",
+      "type": "subcategory",
+      "parent": "code-cache"
+    },
+    {
+      "id": "containers-cpu",
+      "label": "CPU Limits",
+      "type": "subcategory",
+      "parent": "containers"
+    },
+    {
+      "id": "vt-scheduler",
+      "label": "Virtual Thread Scheduler",
+      "type": "subcategory",
+      "parent": "virtual-threads"
+    },
+    {
+      "id": "modules-path",
+      "label": "Module Path",
+      "type": "subcategory",
+      "parent": "modules"
+    },
+    {
+      "id": "modules-access",
+      "label": "Module Access",
+      "type": "subcategory",
+      "parent": "modules"
+    },
+    {
+      "id": "modules-general",
+      "label": "General Modules",
+      "type": "subcategory",
+      "parent": "modules"
+    },
+    {
+      "id": "sysprop-standard",
+      "label": "Standard Properties",
+      "type": "subcategory",
+      "parent": "system-properties"
+    },
+    {
+      "id": "gc-adaptive-policy",
+      "label": "Adaptive Size Policy",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-general",
+      "label": "General GC",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-overhead",
+      "label": "GC Overhead & Time Limits",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-full-gc",
+      "label": "Full GC Behavior",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-free-list",
+      "label": "Free List & Compaction",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-mark-stack",
+      "label": "Mark Stack",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-nmethod-sweep",
+      "label": "NMethod Sweep",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-card-table",
+      "label": "Card Table",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-references",
+      "label": "References",
+      "type": "subcategory",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "logging-async",
+      "label": "Async Logging",
+      "type": "subcategory",
+      "parent": "logging"
+    },
+    {
+      "id": "diag-dtrace",
+      "label": "DTrace",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-attach",
+      "label": "Attach & JMX",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-jfr",
+      "label": "Flight Recorder",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-perfdata",
+      "label": "PerfData",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-tracing",
+      "label": "Tracing & Diagnostics",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-general",
+      "label": "General Diagnostics",
+      "type": "subcategory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "sync-thread-priority",
+      "label": "Thread Priority",
+      "type": "subcategory",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "sync-thread-scheduling",
+      "label": "Thread Scheduling",
+      "type": "subcategory",
+      "parent": "threads-synchronization"
     }
   ],
   "edges": [
-    {
-      "source": "root",
-      "target": "runtime"
-    },
     {
       "source": "runtime",
       "target": "runtime-cli"
@@ -5493,10 +5800,6 @@
     {
       "source": "runtime",
       "target": "runtime-platform"
-    },
-    {
-      "source": "root",
-      "target": "heap"
     },
     {
       "source": "heap",
@@ -5543,38 +5846,6 @@
       "target": "heap-direct-memory"
     },
     {
-      "source": "root",
-      "target": "object-layout"
-    },
-    {
-      "source": "root",
-      "target": "metaspace"
-    },
-    {
-      "source": "root",
-      "target": "stack"
-    },
-    {
-      "source": "root",
-      "target": "garbage-collection"
-    },
-    {
-      "source": "root",
-      "target": "jit-compiler"
-    },
-    {
-      "source": "root",
-      "target": "code-cache"
-    },
-    {
-      "source": "root",
-      "target": "threads-synchronization"
-    },
-    {
-      "source": "root",
-      "target": "class-loading"
-    },
-    {
       "source": "class-loading",
       "target": "class-loader"
     },
@@ -5591,36 +5862,8 @@
       "target": "class-tracing"
     },
     {
-      "source": "root",
-      "target": "logging"
-    },
-    {
-      "source": "root",
-      "target": "diagnostics"
-    },
-    {
-      "source": "root",
-      "target": "containers"
-    },
-    {
-      "source": "root",
-      "target": "virtual-threads"
-    },
-    {
-      "source": "root",
-      "target": "modules"
-    },
-    {
-      "source": "root",
-      "target": "security"
-    },
-    {
       "source": "security",
       "target": "security-jvm"
-    },
-    {
-      "source": "root",
-      "target": "system-properties"
     },
     {
       "source": "garbage-collection",
@@ -5793,54 +6036,6 @@
     {
       "source": "heap-ram-sizing",
       "target": "flag-maxrampercentage"
-    },
-    {
-      "source": "object-layout",
-      "target": "flag-usecompressedoops"
-    },
-    {
-      "source": "object-layout",
-      "target": "flag-usecompressedclasspointers"
-    },
-    {
-      "source": "object-layout",
-      "target": "flag-usecompactobjectheaders"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-metaspacesize"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-maxmetaspacesize"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-compressedclassspacesize"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-minmetaspacefreeratio"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-maxmetaspacefreeratio"
-    },
-    {
-      "source": "stack",
-      "target": "flag-xss"
-    },
-    {
-      "source": "stack",
-      "target": "flag-threadstacksize"
-    },
-    {
-      "source": "stack",
-      "target": "flag-vmthreadstacksize"
-    },
-    {
-      "source": "stack",
-      "target": "flag-compilerthreadstacksize"
     },
     {
       "source": "gc-default",
@@ -6055,30 +6250,6 @@
       "target": "flag-usevectorizedmismatchintrinsic"
     },
     {
-      "source": "code-cache",
-      "target": "flag-initialcodecachesiz"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-reservedcodecachesiz"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-nonprofiledcodeheapsize"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-profiledcodeheapsize"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-nonnmethodcodeheapsize"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-usecodecacheflushing"
-    },
-    {
       "source": "sync-monitors",
       "target": "flag-monitordeflationmax"
     },
@@ -6195,56 +6366,8 @@
       "target": "flag-flightrecorderoptions"
     },
     {
-      "source": "containers",
-      "target": "flag-activeprocessorcount"
-    },
-    {
-      "source": "virtual-threads",
-      "target": "flag-vt-scheduler-parallelism"
-    },
-    {
-      "source": "virtual-threads",
-      "target": "flag-vt-scheduler-maxpoolsize"
-    },
-    {
-      "source": "modules",
-      "target": "flag-module-path"
-    },
-    {
-      "source": "modules",
-      "target": "flag-add-modules"
-    },
-    {
-      "source": "modules",
-      "target": "flag-add-exports"
-    },
-    {
-      "source": "modules",
-      "target": "flag-add-opens"
-    },
-    {
-      "source": "modules",
-      "target": "flag-limit-modules"
-    },
-    {
-      "source": "modules",
-      "target": "flag-patch-module"
-    },
-    {
       "source": "security-jvm",
       "target": "flag-java-security-policy"
-    },
-    {
-      "source": "system-properties",
-      "target": "flag-file-encoding"
-    },
-    {
-      "source": "system-properties",
-      "target": "flag-user-timezone"
-    },
-    {
-      "source": "system-properties",
-      "target": "flag-java-io-tmpdir"
     },
     {
       "source": "class-cds",
@@ -6265,30 +6388,6 @@
     {
       "source": "class-cds",
       "target": "flag-pending-aotmode"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-adaptivesizedecrementscalefactor"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-adaptivesizemajorgcdecaytimescale"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-adaptivesizepolicyinitializingsteps"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-adaptivesizepolicyoutputinterval"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-adaptivesizepolicyweight"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-adaptivesizethroughputpolicy"
     },
     {
       "source": "gc-default",
@@ -6359,20 +6458,12 @@
       "target": "flag-pending-alwayspretouch"
     },
     {
-      "source": "stack",
-      "target": "flag-pending-alwaysrestorefpu"
-    },
-    {
       "source": "heap-tenuring",
       "target": "flag-pending-alwaystenure"
     },
     {
       "source": "jit-intrinsics",
       "target": "flag-pending-arraycopyloadstoremaxelem"
-    },
-    {
-      "source": "logging",
-      "target": "flag-pending-asynclogbuffersize"
     },
     {
       "source": "runtime-object-init",
@@ -6479,14 +6570,6 @@
       "target": "flag-pending-clipinlining"
     },
     {
-      "source": "code-cache",
-      "target": "flag-pending-codecacheexpansionsize"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-compactstrings"
-    },
-    {
       "source": "jit-tiered",
       "target": "flag-pending-compilationmode"
     },
@@ -6521,22 +6604,6 @@
     {
       "source": "diag-error-handling",
       "target": "flag-pending-createcoredumponcrash"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-dtraceallocprobes"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-dtracemethodprobes"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-dtracemonitorprobes"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-disableattachmechanism"
     },
     {
       "source": "runtime-fatal-error",
@@ -6615,10 +6682,6 @@
       "target": "flag-pending-extrasharedclasslistfile"
     },
     {
-      "source": "diagnostics",
-      "target": "flag-pending-flightrecorder"
-    },
-    {
       "source": "runtime-signals-os",
       "target": "flag-pending-forcetimehighresolution"
     },
@@ -6675,56 +6738,20 @@
       "target": "flag-pending-g1useadaptiveihop"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-gccardsizeinbytes"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-gcdrainstacktargetsize"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-gcheapfreelimit"
-    },
-    {
       "source": "gc-logging",
       "target": "flag-pending-gcpauseintervalmillis"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-gctimelimit"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-gctimeratio"
     },
     {
       "source": "heap-layout",
       "target": "flag-pending-heapbaseminaddress"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-heapdumpafterfullgc"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-heapdumpbeforefullgc"
-    },
-    {
       "source": "diag-heap-dumps",
       "target": "flag-pending-heapdumpgziplevel"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-heapmaximumcompactioninterval"
-    },
-    {
       "source": "heap-resize",
       "target": "flag-pending-heapsearchsteps"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-heapsizepergcthread"
     },
     {
       "source": "class-loader",
@@ -6769,50 +6796,6 @@
     {
       "source": "runtime-interpreter",
       "target": "flag-pending-interpreterprofilepercentage"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-javamonitorsinstacktrace"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority10_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority1_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority2_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority3_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority4_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority5_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority6_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority7_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority8_to_ospriority"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-javapriority9_to_ospriority"
     },
     {
       "source": "heap-large-pages",
@@ -6867,18 +6850,6 @@
       "target": "flag-pending-loopunswitching"
     },
     {
-      "source": "diagnostics",
-      "target": "flag-pending-managementserver"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-markstacksize"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-markstacksizemax"
-    },
-    {
       "source": "gc-serial",
       "target": "flag-pending-marksweepalwayscompactcount"
     },
@@ -6911,10 +6882,6 @@
       "target": "flag-pending-maxjnilocalcapacity"
     },
     {
-      "source": "stack",
-      "target": "flag-pending-maxjavastacktracedepth"
-    },
-    {
       "source": "jit-compilation",
       "target": "flag-pending-maxjumptablesize"
     },
@@ -6929,10 +6896,6 @@
     {
       "source": "jit-compilation",
       "target": "flag-pending-maxlooppad"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-pending-maxmetaspaceexpansion"
     },
     {
       "source": "heap-young-gen",
@@ -6973,10 +6936,6 @@
     {
       "source": "jit-compilation",
       "target": "flag-pending-minjumptablesize"
-    },
-    {
-      "source": "metaspace",
-      "target": "flag-pending-minmetaspaceexpansion"
     },
     {
       "source": "heap-survivor",
@@ -7023,10 +6982,6 @@
       "target": "flag-pending-newsizethreadincrease"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-nmethodsweepactivity"
-    },
-    {
       "source": "jit-compilation",
       "target": "flag-pending-nodelimitfudgefactor"
     },
@@ -7035,16 +6990,8 @@
       "target": "flag-pending-numberofloopinstrtoalign"
     },
     {
-      "source": "object-layout",
-      "target": "flag-pending-objectalignmentinbytes"
-    },
-    {
       "source": "gc-allocation",
       "target": "flag-pending-oldplabsize"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-omitstacktraceinfastthrow"
     },
     {
       "source": "jit-compilation",
@@ -7135,34 +7082,6 @@
       "target": "flag-pending-permethodtraplimit"
     },
     {
-      "source": "diagnostics",
-      "target": "flag-pending-perfallowatexitregistration"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-perfbypassfilesystemcheck"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-perfdatamemorysize"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-perfdatasavefile"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-perfdatasavetofile"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-perfdisablesharedmem"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-perfmaxstringconstlength"
-    },
-    {
       "source": "heap-resize",
       "target": "flag-pending-pretouchparallelchunksize"
     },
@@ -7207,20 +7126,8 @@
       "target": "flag-pending-printcompilation"
     },
     {
-      "source": "diagnostics",
-      "target": "flag-pending-printconcurrentlocks"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-printextendedthreadinfo"
-    },
-    {
       "source": "runtime-cli",
       "target": "flag-pending-printflagsinitial"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-printflagsranges"
     },
     {
       "source": "gc-logging",
@@ -7241,10 +7148,6 @@
     {
       "source": "gc-logging",
       "target": "flag-pending-printstringtablestatistics"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-printtieredevents"
     },
     {
       "source": "runtime-cli",
@@ -7295,10 +7198,6 @@
       "target": "flag-pending-reducefieldzeroing"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-reduceinitialcardmarks"
-    },
-    {
       "source": "runtime-signals-os",
       "target": "flag-pending-reducesignalusage"
     },
@@ -7327,20 +7226,12 @@
       "target": "flag-pending-restrictcontended"
     },
     {
-      "source": "stack",
-      "target": "flag-pending-restrictreservedstack"
-    },
-    {
       "source": "class-verification",
       "target": "flag-pending-rewritebytecodes"
     },
     {
       "source": "runtime-interpreter",
       "target": "flag-pending-rewritefrequentpairs"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-pending-segmentedcodecache"
     },
     {
       "source": "runtime-signals-os",
@@ -7379,44 +7270,12 @@
       "target": "flag-pending-shrinkheapinsteps"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-softreflrupolicymspermb"
-    },
-    {
       "source": "jit-compilation",
       "target": "flag-pending-softwareprefetchhintdistance"
     },
     {
       "source": "jit-compilation",
       "target": "flag-pending-splitifblocks"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-stackredpages"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-stackreservedpages"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-stackshadowpages"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-stacktraceinthrowable"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-stackyellowpages"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-startaggressivesweepingat"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-startattachlistener"
     },
     {
       "source": "runtime-object-init",
@@ -7441,10 +7300,6 @@
     {
       "source": "heap-survivor",
       "target": "flag-pending-survivorratio"
-    },
-    {
-      "source": "code-cache",
-      "target": "flag-pending-sweeperthreshold"
     },
     {
       "source": "gc-allocation",
@@ -7477,14 +7332,6 @@
     {
       "source": "heap-tenured-gen",
       "target": "flag-pending-tenuredgenerationsizesupplementdecay"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-threadprioritypolicy"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-threadpriorityverbose"
     },
     {
       "source": "gc-default",
@@ -7591,14 +7438,6 @@
       "target": "flag-pending-tieredrateupdatemintime"
     },
     {
-      "source": "diagnostics",
-      "target": "flag-pending-tracejvmti"
-    },
-    {
-      "source": "diagnostics",
-      "target": "flag-pending-tracetraps"
-    },
-    {
       "source": "runtime-object-init",
       "target": "flag-pending-trackedinitializationlimit"
     },
@@ -7655,22 +7494,6 @@
       "target": "flag-pending-useadaptivenumachunksizing"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-useadaptivesizedecaymajorgccost"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-useadaptivesizepolicy"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-useadaptivesizepolicyfootprintgoal"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-useadaptivesizepolicywithsystemgc"
-    },
-    {
       "source": "jit-intrinsics",
       "target": "flag-pending-usebase64intrinsics"
     },
@@ -7695,10 +7518,6 @@
       "target": "flag-pending-usecompiler"
     },
     {
-      "source": "garbage-collection",
-      "target": "flag-pending-usecondcardmark"
-    },
-    {
       "source": "jit-compilation",
       "target": "flag-pending-usecountedloopsafepoints"
     },
@@ -7707,36 +7526,16 @@
       "target": "flag-pending-usecrc32"
     },
     {
-      "source": "jit-compiler",
-      "target": "flag-pending-usecryptopmullforcrc32"
-    },
-    {
       "source": "jit-intrinsics",
       "target": "flag-pending-usedivmod"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-usedynamicnumberofcompilerthreads"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-usedynamicnumberofgcthreads"
     },
     {
       "source": "jit-intrinsics",
       "target": "flag-pending-usefma"
     },
     {
-      "source": "stack",
-      "target": "flag-pending-usefpuforspilling"
-    },
-    {
       "source": "jit-intrinsics",
       "target": "flag-pending-usefastjniaccessors"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "flag-pending-usegcoverheadlimit"
     },
     {
       "source": "jit-inlining",
@@ -7785,10 +7584,6 @@
     {
       "source": "heap-numa",
       "target": "flag-pending-usenumainterleaving"
-    },
-    {
-      "source": "stack",
-      "target": "flag-pending-useonstackreplacement"
     },
     {
       "source": "jit-inlining",
@@ -7849,10 +7644,6 @@
     {
       "source": "runtime-memory-model",
       "target": "flag-pending-usesystemmemorybarrier"
-    },
-    {
-      "source": "threads-synchronization",
-      "target": "flag-pending-usethreadpriorities"
     },
     {
       "source": "jit-compilation",
@@ -7949,6 +7740,726 @@
     {
       "source": "gc-allocation",
       "target": "flag-pending-zerotlab"
+    },
+    {
+      "source": "object-layout",
+      "target": "object-layout-compression"
+    },
+    {
+      "source": "object-layout-compression",
+      "target": "flag-usecompressedoops"
+    },
+    {
+      "source": "object-layout-compression",
+      "target": "flag-usecompressedclasspointers"
+    },
+    {
+      "source": "object-layout-compression",
+      "target": "flag-usecompactobjectheaders"
+    },
+    {
+      "source": "object-layout",
+      "target": "object-layout-alignment"
+    },
+    {
+      "source": "object-layout-alignment",
+      "target": "flag-pending-objectalignmentinbytes"
+    },
+    {
+      "source": "metaspace",
+      "target": "metaspace-sizing"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-metaspacesize"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-maxmetaspacesize"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-compressedclassspacesize"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-minmetaspacefreeratio"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-maxmetaspacefreeratio"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-pending-maxmetaspaceexpansion"
+    },
+    {
+      "source": "metaspace-sizing",
+      "target": "flag-pending-minmetaspaceexpansion"
+    },
+    {
+      "source": "stack",
+      "target": "stack-sizing"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-xss"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-threadstacksize"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-vmthreadstacksize"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-compilerthreadstacksize"
+    },
+    {
+      "source": "stack",
+      "target": "stack-fpu"
+    },
+    {
+      "source": "stack-fpu",
+      "target": "flag-pending-alwaysrestorefpu"
+    },
+    {
+      "source": "stack",
+      "target": "stack-traces"
+    },
+    {
+      "source": "stack-traces",
+      "target": "flag-pending-javamonitorsinstacktrace"
+    },
+    {
+      "source": "stack-traces",
+      "target": "flag-pending-maxjavastacktracedepth"
+    },
+    {
+      "source": "stack-traces",
+      "target": "flag-pending-omitstacktraceinfastthrow"
+    },
+    {
+      "source": "stack",
+      "target": "stack-general"
+    },
+    {
+      "source": "stack-general",
+      "target": "flag-pending-restrictreservedstack"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-pending-stackredpages"
+    },
+    {
+      "source": "stack-general",
+      "target": "flag-pending-stackreservedpages"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-pending-stackshadowpages"
+    },
+    {
+      "source": "stack-traces",
+      "target": "flag-pending-stacktraceinthrowable"
+    },
+    {
+      "source": "stack-sizing",
+      "target": "flag-pending-stackyellowpages"
+    },
+    {
+      "source": "stack-fpu",
+      "target": "flag-pending-usefpuforspilling"
+    },
+    {
+      "source": "stack",
+      "target": "stack-osr"
+    },
+    {
+      "source": "stack-osr",
+      "target": "flag-pending-useonstackreplacement"
+    },
+    {
+      "source": "code-cache",
+      "target": "code-cache-sizing"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-initialcodecachesiz"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-reservedcodecachesiz"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-nonprofiledcodeheapsize"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-profiledcodeheapsize"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-nonnmethodcodeheapsize"
+    },
+    {
+      "source": "code-cache",
+      "target": "code-cache-behavior"
+    },
+    {
+      "source": "code-cache-behavior",
+      "target": "flag-usecodecacheflushing"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-pending-codecacheexpansionsize"
+    },
+    {
+      "source": "code-cache-behavior",
+      "target": "flag-pending-segmentedcodecache"
+    },
+    {
+      "source": "code-cache-sizing",
+      "target": "flag-pending-sweeperthreshold"
+    },
+    {
+      "source": "containers",
+      "target": "containers-cpu"
+    },
+    {
+      "source": "containers-cpu",
+      "target": "flag-activeprocessorcount"
+    },
+    {
+      "source": "virtual-threads",
+      "target": "vt-scheduler"
+    },
+    {
+      "source": "vt-scheduler",
+      "target": "flag-vt-scheduler-parallelism"
+    },
+    {
+      "source": "vt-scheduler",
+      "target": "flag-vt-scheduler-maxpoolsize"
+    },
+    {
+      "source": "modules",
+      "target": "modules-path"
+    },
+    {
+      "source": "modules-path",
+      "target": "flag-module-path"
+    },
+    {
+      "source": "modules",
+      "target": "modules-access"
+    },
+    {
+      "source": "modules-access",
+      "target": "flag-add-modules"
+    },
+    {
+      "source": "modules-access",
+      "target": "flag-add-exports"
+    },
+    {
+      "source": "modules-access",
+      "target": "flag-add-opens"
+    },
+    {
+      "source": "modules-access",
+      "target": "flag-limit-modules"
+    },
+    {
+      "source": "modules",
+      "target": "modules-general"
+    },
+    {
+      "source": "modules-general",
+      "target": "flag-patch-module"
+    },
+    {
+      "source": "system-properties",
+      "target": "sysprop-standard"
+    },
+    {
+      "source": "sysprop-standard",
+      "target": "flag-file-encoding"
+    },
+    {
+      "source": "sysprop-standard",
+      "target": "flag-user-timezone"
+    },
+    {
+      "source": "sysprop-standard",
+      "target": "flag-java-io-tmpdir"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-adaptive-policy"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-adaptivesizedecrementscalefactor"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-adaptivesizemajorgcdecaytimescale"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-adaptivesizepolicyinitializingsteps"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-adaptivesizepolicyoutputinterval"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-adaptivesizepolicyweight"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-adaptivesizethroughputpolicy"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-general"
+    },
+    {
+      "source": "gc-general",
+      "target": "flag-pending-compactstrings"
+    },
+    {
+      "source": "gc-general",
+      "target": "flag-pending-gccardsizeinbytes"
+    },
+    {
+      "source": "gc-threads",
+      "target": "flag-pending-gcdrainstacktargetsize"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-overhead"
+    },
+    {
+      "source": "gc-overhead",
+      "target": "flag-pending-gcheapfreelimit"
+    },
+    {
+      "source": "gc-overhead",
+      "target": "flag-pending-gctimelimit"
+    },
+    {
+      "source": "gc-overhead",
+      "target": "flag-pending-gctimeratio"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-full-gc"
+    },
+    {
+      "source": "gc-full-gc",
+      "target": "flag-pending-heapdumpafterfullgc"
+    },
+    {
+      "source": "gc-full-gc",
+      "target": "flag-pending-heapdumpbeforefullgc"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-free-list"
+    },
+    {
+      "source": "gc-free-list",
+      "target": "flag-pending-heapmaximumcompactioninterval"
+    },
+    {
+      "source": "gc-threads",
+      "target": "flag-pending-heapsizepergcthread"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-mark-stack"
+    },
+    {
+      "source": "gc-mark-stack",
+      "target": "flag-pending-markstacksize"
+    },
+    {
+      "source": "gc-mark-stack",
+      "target": "flag-pending-markstacksizemax"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-nmethod-sweep"
+    },
+    {
+      "source": "gc-nmethod-sweep",
+      "target": "flag-pending-nmethodsweepactivity"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-card-table"
+    },
+    {
+      "source": "gc-card-table",
+      "target": "flag-pending-reduceinitialcardmarks"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-references"
+    },
+    {
+      "source": "gc-references",
+      "target": "flag-pending-softreflrupolicymspermb"
+    },
+    {
+      "source": "gc-general",
+      "target": "flag-pending-startaggressivesweepingat"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-useadaptivesizedecaymajorgccost"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-useadaptivesizepolicy"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-useadaptivesizepolicyfootprintgoal"
+    },
+    {
+      "source": "gc-adaptive-policy",
+      "target": "flag-pending-useadaptivesizepolicywithsystemgc"
+    },
+    {
+      "source": "gc-card-table",
+      "target": "flag-pending-usecondcardmark"
+    },
+    {
+      "source": "gc-threads",
+      "target": "flag-pending-usedynamicnumberofgcthreads"
+    },
+    {
+      "source": "gc-overhead",
+      "target": "flag-pending-usegcoverheadlimit"
+    },
+    {
+      "source": "logging",
+      "target": "logging-async"
+    },
+    {
+      "source": "logging-async",
+      "target": "flag-pending-asynclogbuffersize"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-dtrace"
+    },
+    {
+      "source": "diag-dtrace",
+      "target": "flag-pending-dtraceallocprobes"
+    },
+    {
+      "source": "diag-dtrace",
+      "target": "flag-pending-dtracemethodprobes"
+    },
+    {
+      "source": "diag-dtrace",
+      "target": "flag-pending-dtracemonitorprobes"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-attach"
+    },
+    {
+      "source": "diag-attach",
+      "target": "flag-pending-disableattachmechanism"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-jfr"
+    },
+    {
+      "source": "diag-jfr",
+      "target": "flag-pending-flightrecorder"
+    },
+    {
+      "source": "diag-attach",
+      "target": "flag-pending-managementserver"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-perfdata"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfallowatexitregistration"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfbypassfilesystemcheck"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfdatamemorysize"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfdatasavefile"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfdatasavetofile"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfdisablesharedmem"
+    },
+    {
+      "source": "diag-perfdata",
+      "target": "flag-pending-perfmaxstringconstlength"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-tracing"
+    },
+    {
+      "source": "diag-tracing",
+      "target": "flag-pending-printconcurrentlocks"
+    },
+    {
+      "source": "diagnostics",
+      "target": "diag-general"
+    },
+    {
+      "source": "diag-general",
+      "target": "flag-pending-printextendedthreadinfo"
+    },
+    {
+      "source": "diag-general",
+      "target": "flag-pending-printflagsranges"
+    },
+    {
+      "source": "diag-tracing",
+      "target": "flag-pending-printtieredevents"
+    },
+    {
+      "source": "diag-attach",
+      "target": "flag-pending-startattachlistener"
+    },
+    {
+      "source": "diag-tracing",
+      "target": "flag-pending-tracejvmti"
+    },
+    {
+      "source": "diag-tracing",
+      "target": "flag-pending-tracetraps"
+    },
+    {
+      "source": "threads-synchronization",
+      "target": "sync-thread-priority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority10_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority1_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority2_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority3_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority4_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority5_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority6_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority7_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority8_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-javapriority9_to_ospriority"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-threadprioritypolicy"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-threadpriorityverbose"
+    },
+    {
+      "source": "threads-synchronization",
+      "target": "sync-thread-scheduling"
+    },
+    {
+      "source": "sync-thread-scheduling",
+      "target": "flag-pending-usedynamicnumberofcompilerthreads"
+    },
+    {
+      "source": "sync-thread-priority",
+      "target": "flag-pending-usethreadpriorities"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-pending-usecryptopmullforcrc32"
+    },
+    {
+      "source": "class-loading",
+      "target": "class-boot-loader"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-cms"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-gclocker"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-legacy-sizing"
+    },
+    {
+      "source": "garbage-collection",
+      "target": "gc-logging-legacy"
+    },
+    {
+      "source": "metaspace",
+      "target": "metaspace-large-pages"
+    },
+    {
+      "source": "metaspace",
+      "target": "metaspace-perm-legacy"
+    },
+    {
+      "source": "metaspace",
+      "target": "metaspace-policy"
+    },
+    {
+      "source": "runtime",
+      "target": "runtime-symbols"
+    },
+    {
+      "source": "system-properties",
+      "target": "sysprop-jvm"
+    },
+    {
+      "source": "root",
+      "target": "domain-memory"
+    },
+    {
+      "source": "root",
+      "target": "domain-gc"
+    },
+    {
+      "source": "root",
+      "target": "domain-execution"
+    },
+    {
+      "source": "root",
+      "target": "domain-classes"
+    },
+    {
+      "source": "root",
+      "target": "domain-concurrency"
+    },
+    {
+      "source": "root",
+      "target": "domain-operations"
+    },
+    {
+      "source": "domain-classes",
+      "target": "class-loading"
+    },
+    {
+      "source": "domain-execution",
+      "target": "code-cache"
+    },
+    {
+      "source": "domain-operations",
+      "target": "containers"
+    },
+    {
+      "source": "domain-operations",
+      "target": "diagnostics"
+    },
+    {
+      "source": "domain-gc",
+      "target": "garbage-collection"
+    },
+    {
+      "source": "domain-memory",
+      "target": "heap"
+    },
+    {
+      "source": "domain-execution",
+      "target": "jit-compiler"
+    },
+    {
+      "source": "domain-operations",
+      "target": "logging"
+    },
+    {
+      "source": "domain-memory",
+      "target": "metaspace"
+    },
+    {
+      "source": "domain-classes",
+      "target": "modules"
+    },
+    {
+      "source": "domain-memory",
+      "target": "object-layout"
+    },
+    {
+      "source": "domain-execution",
+      "target": "runtime"
+    },
+    {
+      "source": "domain-operations",
+      "target": "security"
+    },
+    {
+      "source": "domain-memory",
+      "target": "stack"
+    },
+    {
+      "source": "domain-operations",
+      "target": "system-properties"
+    },
+    {
+      "source": "domain-concurrency",
+      "target": "threads-synchronization"
+    },
+    {
+      "source": "domain-concurrency",
+      "target": "virtual-threads"
     }
   ]
 }

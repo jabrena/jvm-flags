@@ -58,4 +58,52 @@ class JvmFlagCatalogGraphTest {
                 .extracting(JvmFlagCatalogGraph.OrphanFlag::id)
                 .containsExactly("flag-orphan");
     }
+
+    @Test
+    void detectsCategoryWithoutDomain() throws Exception {
+        String json =
+                "{"
+                        + "\"nodes\":["
+                        + "{\"id\":\"root\",\"type\":\"root\",\"label\":\"Root\"},"
+                        + "{\"id\":\"domain-memory\",\"type\":\"domain\",\"label\":\"Memory\"},"
+                        + "{\"id\":\"heap\",\"type\":\"category\",\"label\":\"Heap\"},"
+                        + "{\"id\":\"logging\",\"type\":\"category\",\"label\":\"Logging\",\"parent\":\"domain-memory\"}"
+                        + "],"
+                        + "\"edges\":["
+                        + "{\"source\":\"root\",\"target\":\"domain-memory\"},"
+                        + "{\"source\":\"domain-memory\",\"target\":\"logging\"}"
+                        + "]}";
+
+        JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.fromRoot(MAPPER.readTree(json));
+
+        assertThat(graph.findCategoriesWithoutDomain())
+                .extracting(JvmFlagCatalogGraph.OrphanCategory::id)
+                .containsExactly("heap");
+    }
+
+    @Test
+    void detectsCategoryWithDirectFlag() throws Exception {
+        String json =
+                "{"
+                        + "\"nodes\":["
+                        + "{\"id\":\"root\",\"type\":\"root\",\"label\":\"Root\"},"
+                        + "{\"id\":\"heap\",\"type\":\"category\",\"label\":\"Heap\"},"
+                        + "{\"id\":\"heap-size\",\"type\":\"subcategory\",\"label\":\"Heap Size\",\"parent\":\"heap\"},"
+                        + "{\"id\":\"flag-xms\",\"type\":\"flag\",\"label\":\"-Xms\",\"flag\":\"-Xms\"},"
+                        + "{\"id\":\"flag-xmx\",\"type\":\"flag\",\"label\":\"-Xmx\",\"flag\":\"-Xmx\"}"
+                        + "],"
+                        + "\"edges\":["
+                        + "{\"source\":\"root\",\"target\":\"heap\"},"
+                        + "{\"source\":\"heap\",\"target\":\"heap-size\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-xms\"},"
+                        + "{\"source\":\"heap-size\",\"target\":\"flag-xmx\"}"
+                        + "]}";
+
+        JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.fromRoot(MAPPER.readTree(json));
+
+        assertThat(graph.findCategoriesWithDirectFlags())
+                .extracting(JvmFlagCatalogGraph.CategoryWithDirectFlags::id)
+                .containsExactly("heap");
+        assertThat(graph.findCategoriesWithDirectFlags().get(0).directFlagCount()).isEqualTo(1);
+    }
 }

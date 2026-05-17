@@ -13,6 +13,7 @@
       --text: #e7ecf3;
       --muted: #8b9cb3;
       --root: #f59e0b;
+      --domain: #ec4899;
       --category: #3b82f6;
       --subcategory: #a78bfa;
       --flag: #34d399;
@@ -70,6 +71,28 @@
 
     .view-toggle:hover { color: var(--text); }
 
+    .tree-controls {
+      display: inline-flex;
+      gap: 0.35rem;
+    }
+
+    .tree-controls button {
+      font: inherit;
+      font-size: 0.7rem;
+      padding: 0.35rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--muted);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .tree-controls button:hover {
+      color: var(--text);
+      border-color: var(--domain);
+    }
+
     body.table-view {
       overflow: auto;
     }
@@ -91,7 +114,8 @@
       display: block;
     }
 
-    body.table-view .legend {
+    body.table-view .legend,
+    body.table-view .tree-controls {
       display: none;
     }
 
@@ -125,6 +149,7 @@
       background: rgba(59, 130, 246, 0.08);
     }
 
+    .flags-table td.domain { color: var(--domain); }
     .flags-table td.category { color: var(--category); }
     .flags-table td.subcategory { color: var(--subcategory); }
 
@@ -186,6 +211,11 @@
       border-radius: 50%;
     }
 
+    .legend-hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
     #graph {
       width: 100%;
       height: calc(100vh - 52px);
@@ -214,9 +244,12 @@
 
     .node.dimmed { opacity: 0.15; }
 
+    .node.domain,
     .node.category,
     .node.subcategory,
     .node.flag { cursor: pointer; }
+
+    .node.domain text { font-size: 11px; font-weight: 600; }
 
     .node.collapsed {
       opacity: 0;
@@ -332,9 +365,11 @@
     <div class="stats" id="stats">Loading graph…</div>
     <div class="legend">
       <div class="legend-item"><span class="legend-dot" style="background:var(--root)"></span>Root</div>
+      <div class="legend-item"><span class="legend-dot" style="background:var(--domain)"></span>Domain</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--category)"></span>Category</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--subcategory)"></span>Subcategory</div>
       <div class="legend-item"><span class="legend-dot" style="background:var(--flag)"></span>Flag</div>
+      <span class="legend-hint">· click to expand each level</span>
     </div>
   </header>
 
@@ -345,6 +380,7 @@
     <table id="flags-table" class="flags-table">
       <thead>
         <tr>
+          <th scope="col" id="domain-col">Domain</th>
           <th scope="col">Category</th>
           <th scope="col" id="subcategory-col">Subcategory</th>
           <th scope="col">Flag</th>
@@ -357,6 +393,7 @@
   <script>
     const COLORS = {
       root: "#f59e0b",
+      domain: "#ec4899",
       category: "#3b82f6",
       subcategory: "#a78bfa",
       flag: "#34d399"
@@ -364,7 +401,8 @@
 
     const RADII = {
       root: 18,
-      category: 12,
+      domain: 14,
+      category: 11,
       subcategory: 8,
       flag: 4
     };
@@ -395,8 +433,8 @@
     const tableViewCb = document.getElementById("table-view");
     const tableWrap = document.getElementById("table-wrap");
     const tableBody = document.getElementById("flags-table-body");
+    const domainCol = document.getElementById("domain-col");
     const subcategoryCol = document.getElementById("subcategory-col");
-
     let simulation, g, linkSel, nodeSel, labelSel, zoomBehavior, container;
     let cachedGraphData = null;
     let allNodes = [];
@@ -459,19 +497,22 @@
     }
 
     function isVisible(node) {
-      if (node.type === "root" || node.type === "category") return true;
-      const parentId = parentByChild.get(node.id);
-      if (!parentId) return false;
-      const parent = nodeById.get(parentId);
+      if (node.type === "root" || node.type === "domain") return true;
+      if (node.type === "category") {
+        const domainId = node.parent || parentByChild.get(node.id);
+        return domainId != null && expanded.has(domainId);
+      }
       if (node.type === "subcategory") {
-        return expanded.has(parentId);
+        const categoryId = node.parent || parentByChild.get(node.id);
+        if (categoryId == null || !expanded.has(categoryId)) return false;
+        const category = nodeById.get(categoryId);
+        return category != null && isVisible(category);
       }
       if (node.type === "flag") {
-        if (parent.type === "category") return expanded.has(parentId);
-        if (parent.type === "subcategory") {
-          const categoryId = parentByChild.get(parent.id);
-          return expanded.has(categoryId) && expanded.has(parentId);
-        }
+        const subId = parentByChild.get(node.id);
+        if (subId == null || !expanded.has(subId)) return false;
+        const sub = nodeById.get(subId);
+        return sub != null && isVisible(sub);
       }
       return false;
     }
@@ -505,7 +546,7 @@
 
     function nodeDisplayLabel(d) {
       const label = truncateLabel(d.label, 28);
-      if ((d.type === "category" || d.type === "subcategory") && hasChildren(d.id)) {
+      if ((d.type === "domain" || d.type === "category" || d.type === "subcategory") && hasChildren(d.id)) {
         return `${label} ${expanded.has(d.id) ? "▾" : "▸"}`;
       }
       return label;
@@ -516,10 +557,17 @@
     }
 
     function updateStats() {
-      const visible = allNodes.filter(isVisible);
-      const visibleLinks = allLinks.filter(isLinkVisible);
-      const flags = visible.filter(n => n.type === "flag").length;
-      statsEl.textContent = `${visible.length} visible · ${flags} flags · click flag for details`;
+      if (tableViewCb.checked) return;
+      const domains = allNodes.filter(n => n.type === "domain").length;
+      const categories = allNodes.filter(n => n.type === "category" && isVisible(n)).length;
+      const subcategories = allNodes.filter(n => n.type === "subcategory" && isVisible(n)).length;
+      const flags = allNodes.filter(n => n.type === "flag" && isVisible(n)).length;
+      const parts = [`${domains} domains`];
+      if (categories > 0) parts.push(`${categories} categories`);
+      if (subcategories > 0) parts.push(`${subcategories} subcategories`);
+      if (flags > 0) parts.push(`${flags} flags`);
+      parts.push("click to expand");
+      statsEl.textContent = parts.join(" · ");
     }
 
     function updateVisibility() {
@@ -529,7 +577,7 @@
       linkSel.classed("collapsed", d => !isLinkVisible(d));
 
       labelSel
-        .filter(d => d.type === "category" || d.type === "subcategory")
+        .filter(d => d.type === "domain" || d.type === "category" || d.type === "subcategory")
         .text(nodeDisplayLabel);
 
       nodeSel.classed("expanded", d => expanded.has(d.id));
@@ -612,6 +660,73 @@
       return parent;
     }
 
+    /** Drop domains/categories/subcategories with no flags on this Java version. */
+    function pruneEmptyContainers(data) {
+      const nodesById = new Map(data.nodes.map(n => [n.id, n]));
+      const flagCountBySource = new Map();
+
+      for (const e of data.edges) {
+        const source = nodesById.get(e.source);
+        const target = nodesById.get(e.target);
+        if (!source || !target || target.type !== "flag") continue;
+        if (source.type === "subcategory" || source.type === "category") {
+          flagCountBySource.set(e.source, (flagCountBySource.get(e.source) || 0) + 1);
+        }
+      }
+
+      const activeSubcategories = new Set(
+        data.nodes
+          .filter(n => n.type === "subcategory" && (flagCountBySource.get(n.id) || 0) > 0)
+          .map(n => n.id)
+      );
+
+      const activeCategories = new Set(
+        data.nodes
+          .filter(n => {
+            if (n.type !== "category") return false;
+            if ((flagCountBySource.get(n.id) || 0) > 0) return true;
+            return data.edges.some(
+              e => e.source === n.id && activeSubcategories.has(e.target)
+            );
+          })
+          .map(n => n.id)
+      );
+
+      const activeDomains = new Set(
+        data.nodes
+          .filter(n => {
+            if (n.type !== "domain") return false;
+            return data.edges.some(
+              e => e.source === n.id && activeCategories.has(e.target)
+            );
+          })
+          .map(n => n.id)
+      );
+
+      const keepIds = new Set(["root", ...activeDomains, ...activeCategories, ...activeSubcategories]);
+      for (const n of data.nodes) {
+        if (n.type === "flag") keepIds.add(n.id);
+      }
+
+      return {
+        ...data,
+        nodes: data.nodes.filter(n => keepIds.has(n.id)),
+        edges: data.edges.filter(e => keepIds.has(e.source) && keepIds.has(e.target))
+      };
+    }
+
+
+    /** Graph view: full hierarchy; visibility controlled by expand/collapse. */
+    function graphStructure(data) {
+      const graphTypes = new Set(["root", "domain", "category", "subcategory", "flag"]);
+      const nodes = data.nodes.filter(n => graphTypes.has(n.type));
+      const nodeIds = new Set(nodes.map(n => n.id));
+      const edges = data.edges.filter(
+        e => nodeIds.has(e.source) && nodeIds.has(e.target)
+      );
+      return { nodes, edges };
+    }
+
     function buildFlagRows(nodes, edges) {
       const nodesById = new Map(nodes.map(n => [n.id, n]));
       const parentByTarget = buildParentMapFromEdges(edges);
@@ -620,6 +735,7 @@
       for (const node of nodes) {
         if (node.type !== "flag") continue;
 
+        let domain = "";
         let category = "";
         let subcategory = "";
         let cur = parentByTarget.get(node.id);
@@ -628,10 +744,12 @@
           if (!parent) break;
           if (parent.type === "subcategory") subcategory = parent.label;
           else if (parent.type === "category") category = parent.label;
+          else if (parent.type === "domain") domain = parent.label;
           cur = parentByTarget.get(cur);
         }
 
         rows.push({
+          domain,
           category,
           subcategory,
           flag: node.flag || node.label,
@@ -640,6 +758,8 @@
       }
 
       rows.sort((a, b) => {
+        const d = a.domain.localeCompare(b.domain);
+        if (d !== 0) return d;
         const c = a.category.localeCompare(b.category);
         if (c !== 0) return c;
         const s = a.subcategory.localeCompare(b.subcategory);
@@ -652,10 +772,15 @@
 
     function renderTable(data) {
       const rows = buildFlagRows(data.nodes, data.edges);
+      const hasDomain = rows.some(r => r.domain);
       const hasSubcategory = rows.some(r => r.subcategory);
 
+      domainCol.hidden = !hasDomain;
       subcategoryCol.hidden = !hasSubcategory;
       tableBody.innerHTML = rows.map(r => {
+        const domainCell = hasDomain
+          ? `<td class="domain">${escapeHtml(r.domain)}</td>`
+          : "";
         const subCell = hasSubcategory
           ? (r.subcategory
               ? `<td class="subcategory">${escapeHtml(r.subcategory)}</td>`
@@ -663,6 +788,7 @@
           : "";
         const href = flagDetailUrl({ flagId: r.flagId });
         return `<tr>
+          ${domainCell}
           <td class="category">${escapeHtml(r.category)}</td>
           ${subCell}
           <td><a class="flag-link" href="${escapeHtml(href)}">${escapeHtml(r.flag)}</a></td>
@@ -690,21 +816,27 @@
       }
     }
 
+
+
     tableViewCb.addEventListener("change", () => setTableView(tableViewCb.checked));
 
     function initGraph(data) {
       errorEl.hidden = true;
 
-      const version = data.metadata?.version || JAVA_VERSION;
+      const fullData = pruneEmptyContainers(data);
+      cachedGraphData = fullData;
+
+      const version = fullData.metadata?.version || JAVA_VERSION;
       document.getElementById("title-version").textContent = `Java ${version}`;
-      document.title = `${data.metadata?.title || `Java ${version} JVM Flags`} — Graph`;
+      document.title = `${fullData.metadata?.title || `Java ${version} JVM Flags`} — Graph`;
 
       const width = window.innerWidth;
       const height = window.innerHeight - 52;
 
-      const nodes = data.nodes.map(d => ({ ...d }));
+      const graphData = graphStructure(fullData);
+      const nodes = graphData.nodes.map(d => ({ ...d }));
       nodeById = new Map(nodes.map(n => [n.id, n]));
-      const links = data.edges.map(e => ({
+      const links = graphData.edges.map(e => ({
         source: nodeById.get(e.source),
         target: nodeById.get(e.target)
       })).filter(l => l.source && l.target);
@@ -766,14 +898,12 @@
         })
         .on("click", (event, d) => {
           event.stopPropagation();
-          if (d.type === "category" || d.type === "subcategory") {
+          if (d.type === "domain" || d.type === "category" || d.type === "subcategory") {
             toggleExpand(d);
             return;
           }
-          if (d.type === "flag") {
-            if (d.flagId) {
-              window.location.href = flagDetailUrl(d);
-            }
+          if (d.type === "flag" && (d.flagId || d.id)) {
+            window.location.href = flagDetailUrl(d);
           }
         });
 
@@ -792,7 +922,7 @@
         .text(d => d.type === "flag" ? flagDisplayLabel(d) : nodeDisplayLabel(d));
 
       nodeSel.classed("expandable", d =>
-        (d.type === "category" || d.type === "subcategory") && hasChildren(d.id)
+        (d.type === "domain" || d.type === "category" || d.type === "subcategory") && hasChildren(d.id)
       );
 
       const initialNodes = nodes.filter(isVisible);
@@ -804,14 +934,20 @@
           .distance(d => {
             const st = d.source.type;
             const tt = d.target.type;
-            if (st === "root" || tt === "root") return 90;
-            if (st === "category" || tt === "category") return 70;
-            if (st === "subcategory" || tt === "subcategory") return 50;
+            if (st === "root" || tt === "root") return 100;
+            if (st === "domain" || tt === "domain") return 85;
+            if (st === "category" || tt === "category") return 65;
+            if (st === "subcategory" || tt === "subcategory") return 48;
             return 35;
           })
           .strength(0.85))
         .force("charge", d3.forceManyBody()
-          .strength(d => d.type === "root" ? -800 : d.type === "flag" ? -40 : -200))
+          .strength(d => {
+          if (d.type === "root") return -900;
+          if (d.type === "flag") return -40;
+          if (d.type === "domain") return -320;
+          return -200;
+        }))
         .force("center", d3.forceCenter(width / 2, height / 2))
         .force("collision", d3.forceCollide().radius(d =>
           d.type === "flag" ? radius(d) + 42 : radius(d) + 6
@@ -823,9 +959,7 @@
       container.on("click", clearHighlight);
 
       updateVisibility();
-
-      cachedGraphData = data;
-      renderTable(data);
+      renderTable(fullData);
 
       function ticked() {
         linkSel

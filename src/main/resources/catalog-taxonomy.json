@@ -1,0 +1,631 @@
+{
+  "categories": [
+    {
+      "id": "class-loading",
+      "label": "Class Loading",
+      "parent": "domain-classes"
+    },
+    {
+      "id": "code-cache",
+      "label": "Code Cache",
+      "parent": "domain-execution"
+    },
+    {
+      "id": "containers",
+      "label": "Containers",
+      "parent": "domain-operations"
+    },
+    {
+      "id": "diagnostics",
+      "label": "Diagnostics",
+      "parent": "domain-operations"
+    },
+    {
+      "id": "garbage-collection",
+      "label": "Garbage Collection",
+      "parent": "domain-gc"
+    },
+    {
+      "id": "heap",
+      "label": "Heap",
+      "parent": "domain-memory"
+    },
+    {
+      "id": "jit-compiler",
+      "label": "JIT Compiler",
+      "parent": "domain-execution"
+    },
+    {
+      "id": "logging",
+      "label": "Logging",
+      "parent": "domain-operations"
+    },
+    {
+      "id": "metaspace",
+      "label": "Metaspace",
+      "parent": "domain-memory"
+    },
+    {
+      "id": "modules",
+      "label": "Modules",
+      "parent": "domain-classes"
+    },
+    {
+      "id": "object-layout",
+      "label": "Object Layout",
+      "parent": "domain-memory"
+    },
+    {
+      "id": "runtime",
+      "label": "Runtime",
+      "parent": "domain-execution"
+    },
+    {
+      "id": "security",
+      "label": "Security",
+      "parent": "domain-operations"
+    },
+    {
+      "id": "stack",
+      "label": "Stack",
+      "parent": "domain-memory"
+    },
+    {
+      "id": "system-properties",
+      "label": "System Properties",
+      "parent": "domain-operations"
+    },
+    {
+      "id": "threads-synchronization",
+      "label": "Threads and Synchronization",
+      "parent": "domain-concurrency"
+    },
+    {
+      "id": "virtual-threads",
+      "label": "Virtual Threads",
+      "parent": "domain-concurrency"
+    }
+  ],
+  "subcategories": [
+    {
+      "id": "class-boot-loader",
+      "label": "Boot Class Loader",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-cds",
+      "label": "Class Data Sharing (CDS)",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-loader",
+      "label": "Class Loader Behavior",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-server-policy",
+      "label": "Server-Class Machine Policy",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-tracing",
+      "label": "Loading & Unloading Diagnostics",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-unloading",
+      "label": "Class Unloading",
+      "parent": "class-loading"
+    },
+    {
+      "id": "class-verification",
+      "label": "Verification & Bytecode",
+      "parent": "class-loading"
+    },
+    {
+      "id": "code-cache-behavior",
+      "label": "Code Cache Behavior",
+      "parent": "code-cache"
+    },
+    {
+      "id": "code-cache-sizing",
+      "label": "Code Cache Sizing",
+      "parent": "code-cache"
+    },
+    {
+      "id": "containers-cpu",
+      "label": "CPU Limits",
+      "parent": "containers"
+    },
+    {
+      "id": "diag-attach",
+      "label": "Attach & JMX",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-dtrace",
+      "label": "DTrace",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-error-handling",
+      "label": "Error Handling",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-flight-recorder",
+      "label": "Flight Recorder",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-general",
+      "label": "General Diagnostics",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-heap-dumps",
+      "label": "Heap Dumps",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-jfr",
+      "label": "Flight Recorder",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-native-memory",
+      "label": "Native Memory",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-perfdata",
+      "label": "PerfData",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "diag-tracing",
+      "label": "Tracing & Diagnostics",
+      "parent": "diagnostics"
+    },
+    {
+      "id": "gc-adaptive-policy",
+      "label": "Adaptive Size Policy",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-allocation",
+      "label": "Allocation",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-card-table",
+      "label": "Card Table",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-cms",
+      "label": "CMS",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-default",
+      "label": "Default",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-epsilon",
+      "label": "EpsilonGC",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-explicit",
+      "label": "Explicit GC",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-free-list",
+      "label": "Free List & Compaction",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-full-gc",
+      "label": "Full GC Behavior",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-g1-tuning",
+      "label": "G1 Tuning",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-gclocker",
+      "label": "GC Locker",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-general",
+      "label": "General GC",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-legacy-sizing",
+      "label": "Legacy Heap Sizing",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-logging",
+      "label": "Logging",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-logging-legacy",
+      "label": "Legacy Logging",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-mark-stack",
+      "label": "Mark Stack",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-nmethod-sweep",
+      "label": "NMethod Sweep",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-overhead",
+      "label": "GC Overhead & Time Limits",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-parallel",
+      "label": "ParallelGC",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-references",
+      "label": "References",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-serial",
+      "label": "SerialGC",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-shenandoah",
+      "label": "Shenandoah",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-string-dedup",
+      "label": "String Deduplication",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-threads",
+      "label": "GC Threads",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "gc-zgc",
+      "label": "ZGC",
+      "parent": "garbage-collection"
+    },
+    {
+      "id": "heap-direct-memory",
+      "label": "Direct Memory",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-large-pages",
+      "label": "Large Pages",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-layout",
+      "label": "Heap Layout & Footprint",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-numa",
+      "label": "NUMA",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-ram-sizing",
+      "label": "RAM-Based Sizing",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-resize",
+      "label": "Heap Resize Heuristics",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-size",
+      "label": "Heap Size",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-survivor",
+      "label": "Survivor Spaces",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-tenured-gen",
+      "label": "Tenured Generation",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-tenuring",
+      "label": "Tenuring & Promotion",
+      "parent": "heap"
+    },
+    {
+      "id": "heap-young-gen",
+      "label": "Young Generation",
+      "parent": "heap"
+    },
+    {
+      "id": "jit-compilation",
+      "label": "Compilation",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-escape-analysis",
+      "label": "Escape Analysis",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-execution-modes",
+      "label": "Execution Modes",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-inlining",
+      "label": "Inlining",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-intrinsics",
+      "label": "Intrinsics",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "jit-tiered",
+      "label": "Tiered Compilation",
+      "parent": "jit-compiler"
+    },
+    {
+      "id": "logging-async",
+      "label": "Async Logging",
+      "parent": "logging"
+    },
+    {
+      "id": "logging-unified",
+      "label": "Unified Logging",
+      "parent": "logging"
+    },
+    {
+      "id": "metaspace-large-pages",
+      "label": "Large Pages",
+      "parent": "metaspace"
+    },
+    {
+      "id": "metaspace-perm-legacy",
+      "label": "Permanent Generation (legacy)",
+      "parent": "metaspace"
+    },
+    {
+      "id": "metaspace-policy",
+      "label": "Reclaim Policy",
+      "parent": "metaspace"
+    },
+    {
+      "id": "metaspace-sizing",
+      "label": "Metaspace Sizing",
+      "parent": "metaspace"
+    },
+    {
+      "id": "modules-access",
+      "label": "Module Access",
+      "parent": "modules"
+    },
+    {
+      "id": "modules-general",
+      "label": "General Modules",
+      "parent": "modules"
+    },
+    {
+      "id": "modules-path",
+      "label": "Module Path",
+      "parent": "modules"
+    },
+    {
+      "id": "object-layout-alignment",
+      "label": "Alignment",
+      "parent": "object-layout"
+    },
+    {
+      "id": "object-layout-compression",
+      "label": "Compression",
+      "parent": "object-layout"
+    },
+    {
+      "id": "runtime-cli",
+      "label": "CLI & JVM Options",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-contended",
+      "label": "Contended & Monitors",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-fatal-error",
+      "label": "Fatal Error & VM Output",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-interpreter",
+      "label": "Interpreter",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-jni",
+      "label": "JNI",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-memory-model",
+      "label": "Memory Model & Barriers",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-object-init",
+      "label": "Object Initialization & Strings",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-platform",
+      "label": "Platform & Hardware",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-signals-os",
+      "label": "Signals & OS Integration",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-symbols",
+      "label": "Symbols & Annotations",
+      "parent": "runtime"
+    },
+    {
+      "id": "runtime-tracing",
+      "label": "Tracing & Profiling",
+      "parent": "runtime"
+    },
+    {
+      "id": "security-jvm",
+      "label": "JVM Security",
+      "parent": "security"
+    },
+    {
+      "id": "stack-fpu",
+      "label": "FPU",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-general",
+      "label": "General Stack",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-osr",
+      "label": "On-Stack Replacement",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-sizing",
+      "label": "Stack Sizing",
+      "parent": "stack"
+    },
+    {
+      "id": "stack-traces",
+      "label": "Stack Traces",
+      "parent": "stack"
+    },
+    {
+      "id": "sync-monitors",
+      "label": "Monitors",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "sync-safepoints",
+      "label": "Safepoints",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "sync-thread-priority",
+      "label": "Thread Priority",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "sync-thread-scheduling",
+      "label": "Thread Scheduling",
+      "parent": "threads-synchronization"
+    },
+    {
+      "id": "sysprop-jvm",
+      "label": "JVM Properties",
+      "parent": "system-properties"
+    },
+    {
+      "id": "sysprop-standard",
+      "label": "Standard Properties",
+      "parent": "system-properties"
+    },
+    {
+      "id": "vt-scheduler",
+      "label": "Virtual Thread Scheduler",
+      "parent": "virtual-threads"
+    }
+  ],
+  "domains": [
+    {
+      "id": "domain-memory",
+      "label": "Memory & layout",
+      "categories": [
+        "heap",
+        "metaspace",
+        "object-layout",
+        "stack"
+      ]
+    },
+    {
+      "id": "domain-gc",
+      "label": "Garbage collection",
+      "categories": [
+        "garbage-collection"
+      ]
+    },
+    {
+      "id": "domain-execution",
+      "label": "Execution & code",
+      "categories": [
+        "jit-compiler",
+        "code-cache",
+        "runtime"
+      ]
+    },
+    {
+      "id": "domain-classes",
+      "label": "Classes & modules",
+      "categories": [
+        "class-loading",
+        "modules"
+      ]
+    },
+    {
+      "id": "domain-concurrency",
+      "label": "Concurrency",
+      "categories": [
+        "threads-synchronization",
+        "virtual-threads"
+      ]
+    },
+    {
+      "id": "domain-operations",
+      "label": "Operations & platform",
+      "categories": [
+        "diagnostics",
+        "logging",
+        "containers",
+        "system-properties",
+        "security"
+      ]
+    }
+  ]
+}

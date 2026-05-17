@@ -7,18 +7,18 @@ import java.io.IOException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class JvmFlagCatalogStructureTest {
+class JvmFlagCatalogOrphanCategoriesTest {
 
     @ParameterizedTest(name = "java-{0}.json")
     @ValueSource(ints = {8, 11, 17, 21, 25})
-    void catalogHasNoEmptyLeafCategories(int featureVersion) throws IOException {
+    void catalogHasNoCategoryWithoutDomain(int featureVersion) throws IOException {
         assumeTrue(JvmFlagCatalog.hasCatalogForJavaVersion(featureVersion));
 
         JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.loadForJavaVersion(featureVersion);
 
-        assertThat(graph.findEmptyLeafCategories())
+        assertThat(graph.findCategoriesWithoutDomain())
                 .as(
-                        "java-%s.json must not contain categories with no subcategories and no flags",
+                        "java-%s.json must link every category to a domain (edge and parent field)",
                         featureVersion)
                 .isEmpty();
     }
