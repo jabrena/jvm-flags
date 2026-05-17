@@ -249,7 +249,7 @@
       "flag": "-XX:+PrintFlagsFinal",
       "description": "Prints the final values of all VM flags after argument parsing and exits.",
       "flagId": "ffec9684-d685-586c-a10b-143f041357e2",
-      "testValue": "-XX:+PrintFlagsFinal"
+      "testable": false
     },
     {
       "id": "flag-unlockdiagnostic",

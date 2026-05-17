@@ -49,15 +49,25 @@ class JvmFlagTest {
         log.info("Verifying flag '{}' with command: {}", entry.flag().flag(), JvmFlagVerifier.formatCommand(command));
         JvmFlagVerifier.Result result = JvmFlagVerifier.verify(jvmArguments);
 
+        int featureVersion = JvmFlagCatalog.currentJavaFeatureVersion();
         assertThat(result.output())
-                .as("JVM output for %s with arguments %s", entry.flag().flag(), jvmArguments)
+                .as(
+                        "JVM output for %s with arguments %s (Java %s)",
+                        entry.flag().flag(),
+                        jvmArguments,
+                        featureVersion)
                 .doesNotContain("Unrecognized VM option")
                 .doesNotContain("Improperly specified VM option")
                 .doesNotContain("experimental and must be enabled via -XX:+UnlockExperimentalVMOptions")
                 .doesNotContain("diagnostic and must be enabled via -XX:+UnlockDiagnosticVMOptions");
         if (!entry.testSpec().acceptNonZeroExit()) {
             assertThat(result.exitCode())
-                    .as("exit code for %s with arguments %s\n%s", entry.flag().flag(), jvmArguments, result.output())
+                    .as(
+                            "exit code for %s with arguments %s (Java %s)\n%s",
+                            entry.flag().flag(),
+                            jvmArguments,
+                            featureVersion,
+                            result.output())
                     .isZero();
         }
     }
