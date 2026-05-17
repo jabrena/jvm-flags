@@ -45,7 +45,7 @@
 
     .header-title-row h1 {
       margin: 0;
-      font-size: 1.15rem;
+      font-size: 1.45rem;
       font-weight: 600;
       letter-spacing: -0.02em;
     }
@@ -299,7 +299,16 @@
       gap: 1rem;
     }
 
+    .detail-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: flex-start;
+      gap: 0.35rem 1rem;
+    }
+
     #detail h2 {
+      margin: 0;
       font-size: 1.1rem;
       font-weight: 600;
     }
@@ -319,9 +328,11 @@
     }
 
     #detail .meta {
+      margin: 0;
       font-size: 0.85rem;
       color: var(--muted);
-      margin-top: 0.25rem;
+      text-align: left;
+      flex-shrink: 0;
     }
 
     #detail .hint {
@@ -413,7 +424,7 @@
       }
 
       .header-title-row h1 {
-        font-size: 1.35rem;
+        font-size: 1.65rem;
       }
 
       .header-title-row .btn-graph {
@@ -473,6 +484,7 @@
     }
 
   </style>
+  <link rel="icon" type="image/png" href="images/java-icon.png">
 </head>
 <body>
   <header>
@@ -482,10 +494,13 @@
     </div>
     <div class="header-separator" aria-hidden="true"></div>
     <p>
-      A JVM flag is a command-line option passed to the Java Virtual Machine that tunes runtime behavior without changing your application code.
+      Learn and explore the JVM flags for each Java version running on a HotSpot JVM.
     </p>
     <section class="header-section" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Timeline</h2>
+      <p>
+        Navigate in the timeline to explore the different JVM releases.
+      </p>
     </section>
   </header>
 
@@ -592,8 +607,10 @@
       const hasGraph = LTS_VERSIONS.has(ev.version);
       detailEl.innerHTML = `
         <div>
-          <h2>${ev.label}${lts ? '<span class="lts-tag">LTS</span>' : ""}</h2>
-          <p class="meta">${formatDate(ev.parsed)}</p>
+          <div class="detail-header">
+            <h2>${ev.label}${lts ? '<span class="lts-tag">LTS</span>' : ""}</h2>
+            <p class="meta">${formatDate(ev.parsed)}</p>
+          </div>
           ${hasGraph
             ? `<p class="hint">JVM flag graph data is available for this LTS release.</p>`
             : `<p class="hint">Flag graphs are maintained for LTS versions (8, 11, 17, 21, 25).</p>`}

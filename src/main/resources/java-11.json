@@ -2047,7 +2047,7 @@
       "flag": "-XX:CMSInitiatingOccupancyFraction=<n>",
       "flagId": "4b3a48c8-8833-5644-bdcc-3afecf98131c",
       "testValue": "-XX:CMSInitiatingOccupancyFraction=5",
-      "description": "Occupancy percentage of the old generation at which CMS starts a collection cycle."
+      "description": "Sets the occupancy fraction that triggers a CMS collection cycle."
     },
     {
       "id": "flag-pending-cmsistoofullpercentage",
@@ -2198,7 +2198,7 @@
       "label": "-XX:CMSPrecleanDenominator=<n>",
       "type": "flag",
       "flag": "-XX:CMSPrecleanDenominator=<n>",
-      "description": "CMSPrecleanNumerator:CMSPrecleanDenominator yields convergence ratio.",
+      "description": "CMS preclean convergence ratio denominator.",
       "flagId": "4b06690f-b5c4-5863-9353-33ad634915e3",
       "testValue": "-XX:CMSPrecleanDenominator=3"
     },
@@ -2216,7 +2216,7 @@
       "label": "-XX:CMSPrecleanNumerator=<n>",
       "type": "flag",
       "flag": "-XX:CMSPrecleanNumerator=<n>",
-      "description": "CMSPrecleanNumerator:CMSPrecleanDenominator yields convergence ratio.",
+      "description": "CMS preclean convergence ratio numerator.",
       "flagId": "8f3ba8b0-a365-5c28-b64d-4edab44d170a",
       "testValue": "-XX:CMSPrecleanNumerator=2"
     },
@@ -3444,7 +3444,7 @@
       "label": "-XX:JavaPriority10_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority10_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 10 to the corresponding OS priority.",
       "flagId": "32d1b416-f466-52a7-910a-4b4163ee80c3",
       "testValue": "-XX:JavaPriority10_To_OSPriority=5"
     },
@@ -3453,7 +3453,7 @@
       "label": "-XX:JavaPriority1_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority1_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 1 to the corresponding OS priority.",
       "flagId": "7ff3d43e-3ed5-5b20-84cc-3839f9985e41",
       "testValue": "-XX:JavaPriority1_To_OSPriority=5"
     },
@@ -3462,7 +3462,7 @@
       "label": "-XX:JavaPriority2_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority2_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 2 to the corresponding OS priority.",
       "flagId": "5dde0388-5523-5c59-b146-6278b8a96ff9",
       "testValue": "-XX:JavaPriority2_To_OSPriority=5"
     },
@@ -3471,7 +3471,7 @@
       "label": "-XX:JavaPriority3_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority3_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 3 to the corresponding OS priority.",
       "flagId": "a4501abc-c2d0-5a22-9a7f-c3ded665d8db",
       "testValue": "-XX:JavaPriority3_To_OSPriority=5"
     },
@@ -3480,7 +3480,7 @@
       "label": "-XX:JavaPriority4_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority4_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 4 to the corresponding OS priority.",
       "flagId": "042235fa-94d3-5692-871e-dd77407aab56",
       "testValue": "-XX:JavaPriority4_To_OSPriority=5"
     },
@@ -3489,7 +3489,7 @@
       "label": "-XX:JavaPriority5_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority5_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 5 to the corresponding OS priority.",
       "flagId": "e2bd51c0-0aab-53ad-8e2e-0083337362af",
       "testValue": "-XX:JavaPriority5_To_OSPriority=5"
     },
@@ -3498,7 +3498,7 @@
       "label": "-XX:JavaPriority6_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority6_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 6 to the corresponding OS priority.",
       "flagId": "7ba3e436-bd7f-5e16-b849-f4b9f8bdbbfd",
       "testValue": "-XX:JavaPriority6_To_OSPriority=5"
     },
@@ -3507,7 +3507,7 @@
       "label": "-XX:JavaPriority7_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority7_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 7 to the corresponding OS priority.",
       "flagId": "58794929-a689-5edb-bd47-012e9d506117",
       "testValue": "-XX:JavaPriority7_To_OSPriority=5"
     },
@@ -3516,7 +3516,7 @@
       "label": "-XX:JavaPriority8_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority8_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 8 to the corresponding OS priority.",
       "flagId": "8cbf953d-37fa-51d1-b14a-12e91063f0c6",
       "testValue": "-XX:JavaPriority8_To_OSPriority=5"
     },
@@ -3525,7 +3525,7 @@
       "label": "-XX:JavaPriority9_To_OSPriority=<n>",
       "type": "flag",
       "flag": "-XX:JavaPriority9_To_OSPriority=<n>",
-      "description": "Map Java priorities to OS priorities.",
+      "description": "Maps Java thread priority 9 to the corresponding OS priority.",
       "flagId": "e17f3a27-1d30-5c5e-a3c4-a9613fdafc79",
       "testValue": "-XX:JavaPriority9_To_OSPriority=5"
     },
@@ -4590,7 +4590,7 @@
       "flag": "-XX:+PrintGCDetails",
       "flagId": "06519055-1af8-539f-9b53-ae9f6798c719",
       "testValue": "-XX:+PrintGCDetails",
-      "description": "Prints detailed information about each garbage collection event."
+      "description": "Prints detailed information for each garbage collection event."
     },
     {
       "id": "flag-pending-printheapatsigbreak",
@@ -5346,7 +5346,7 @@
       "label": "-XX:Tier0BackedgeNotifyFreqLog=<n>",
       "type": "flag",
       "flag": "-XX:Tier0BackedgeNotifyFreqLog=<n>",
-      "description": "Interpreter (tier 0) invocation notification frequency.",
+      "description": "Log-frequency threshold for backedge branches at tier 0 (compiler notification).",
       "flagId": "2a0729e9-2f0b-584f-ab01-ab982ab33cb0",
       "testValue": "-XX:Tier0BackedgeNotifyFreqLog=10"
     },
@@ -5355,7 +5355,7 @@
       "label": "-XX:Tier0InvokeNotifyFreqLog=<n>",
       "type": "flag",
       "flag": "-XX:Tier0InvokeNotifyFreqLog=<n>",
-      "description": "Interpreter (tier 0) invocation notification frequency.",
+      "description": "Log-frequency threshold for method invocations at tier 0 (compiler notification).",
       "flagId": "3ff15e71-c903-5f81-a9ca-4931c56f6134",
       "testValue": "-XX:Tier0InvokeNotifyFreqLog=7"
     },
@@ -5391,7 +5391,7 @@
       "label": "-XX:Tier2BackedgeNotifyFreqLog=<n>",
       "type": "flag",
       "flag": "-XX:Tier2BackedgeNotifyFreqLog=<n>",
-      "description": "C1 without MDO (tier 2) invocation notification frequency.",
+      "description": "Log-frequency threshold for backedge branches at tier 2 (compiler notification).",
       "flagId": "ec20306b-32d9-5790-ae28-90326d0e55b7",
       "testValue": "-XX:Tier2BackedgeNotifyFreqLog=14"
     },
@@ -5409,7 +5409,7 @@
       "label": "-XX:Tier2InvokeNotifyFreqLog=<n>",
       "type": "flag",
       "flag": "-XX:Tier2InvokeNotifyFreqLog=<n>",
-      "description": "C1 without MDO (tier 2) invocation notification frequency.",
+      "description": "Log-frequency threshold for method invocations at tier 2 (compiler notification).",
       "flagId": "5bb18602-e2a6-5ce7-9986-0ea02bda2899",
       "testValue": "-XX:Tier2InvokeNotifyFreqLog=11"
     },
@@ -5463,7 +5463,7 @@
       "label": "-XX:Tier3BackedgeNotifyFreqLog=<n>",
       "type": "flag",
       "flag": "-XX:Tier3BackedgeNotifyFreqLog=<n>",
-      "description": "C1 with MDO profiling (tier 3) invocation notification frequency.",
+      "description": "Log-frequency threshold for backedge branches at tier 3 (compiler notification).",
       "flagId": "506ca336-1c0f-5dd1-aa1f-fa3792626a41",
       "testValue": "-XX:Tier3BackedgeNotifyFreqLog=13"
     },
@@ -5499,7 +5499,7 @@
       "label": "-XX:Tier3InvocationThreshold=<n>",
       "type": "flag",
       "flag": "-XX:Tier3InvocationThreshold=<n>",
-      "description": "Compile if number of method invocations crosses this threshold.",
+      "description": "Compile at tier 3 when method invocations cross this threshold.",
       "flagId": "11914b61-b25d-53ff-9398-d06de2371eae",
       "testValue": "-XX:Tier3InvocationThreshold=200"
     },
@@ -5508,7 +5508,7 @@
       "label": "-XX:Tier3InvokeNotifyFreqLog=<n>",
       "type": "flag",
       "flag": "-XX:Tier3InvokeNotifyFreqLog=<n>",
-      "description": "C1 with MDO profiling (tier 3) invocation notification frequency.",
+      "description": "Log-frequency threshold for method invocations at tier 3 (compiler notification).",
       "flagId": "cf7a41d5-59df-5652-8d7c-2ce1101ba18b",
       "testValue": "-XX:Tier3InvokeNotifyFreqLog=10"
     },
@@ -5553,7 +5553,7 @@
       "label": "-XX:Tier4InvocationThreshold=<n>",
       "type": "flag",
       "flag": "-XX:Tier4InvocationThreshold=<n>",
-      "description": "Compile if number of method invocations crosses this threshold.",
+      "description": "Compile at tier 4 when method invocations cross this threshold.",
       "flagId": "b965be57-35c0-5481-939e-9962ba9de46f",
       "testValue": "-XX:Tier4InvocationThreshold=5000"
     },
@@ -5929,7 +5929,7 @@
       "flag": "-XX:+UseConcMarkSweepGC",
       "flagId": "87c46ded-f7e4-50d6-9ba6-7be97196d8fa",
       "testValue": "-XX:+UseConcMarkSweepGC",
-      "description": "Enables the mostly concurrent CMS collector for the old generation (deprecated in later JDKs)."
+      "description": "Uses the Concurrent Mark Sweep (CMS) garbage collector."
     },
     {
       "id": "flag-pending-usecondcardmark",

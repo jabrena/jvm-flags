@@ -443,6 +443,7 @@
       }
     }
   </style>
+  <link rel="icon" type="image/png" href="images/java-icon.png">
 </head>
 <body>
   <header>
@@ -573,6 +574,8 @@
       const options = shuffle(["Yes", "No"]);
       return {
         type: "versionPresence",
+        flagId: flag.flagId,
+        scopeVersion: version,
         prompt: `Is this flag available in <strong>Java ${version}</strong>?`,
         flag: flag.flag,
         options,
@@ -580,50 +583,71 @@
       };
     }
 
+    function parseJavaVersionOption(option) {
+      const match = /^Java (\d+)$/.exec(option);
+      return match ? Number(match[1]) : null;
+    }
+
+    function isWhichVersionCorrect(q, selectedIndex) {
+      const version = parseJavaVersionOption(q.options[selectedIndex]);
+      return version != null && q.correctVersions.includes(version);
+    }
+
+    function formatWhichVersionCorrectAnswer(correctVersions) {
+      const labels = correctVersions.map((v) => `Java ${v}`);
+      return labels.length === 1 ? labels[0] : `Any of: ${labels.join(", ")}`;
+    }
+
     function buildWhichVersionQuestion(index) {
       const entries = [...index.versionsForFlagId.entries()].filter(([, vers]) => {
         const lts = [...vers].filter((v) => LTS_VERSIONS.includes(v));
-        return lts.length > 0;
+        return lts.length > 0 && lts.length < LTS_VERSIONS.length;
       });
       if (!entries.length) return null;
 
       const [flagId, versions] = pickRandom(entries);
       const flag = index.byFlagId.get(flagId);
       const ltsPresent = [...versions].filter((v) => LTS_VERSIONS.includes(v));
-      const correctVersion = pickRandom(ltsPresent);
+      const ltsAbsent = LTS_VERSIONS.filter((v) => !versions.has(v));
 
-      let wrong = shuffle(LTS_VERSIONS.filter((v) => !versions.has(v)));
-      if (wrong.length < 3) {
-        const extra = shuffle(
-          LTS_VERSIONS.filter((v) => v !== correctVersion && !wrong.includes(v))
-        );
-        wrong = [...wrong, ...extra];
-      }
-      wrong = wrong.slice(0, 3);
-
+      const wrongVersions = shuffle(ltsAbsent).slice(0, 3);
+      const presentCount = Math.min(ltsPresent.length, 4 - wrongVersions.length);
+      const presentVersions = shuffle(ltsPresent).slice(0, presentCount);
       const options = shuffle([
-        `Java ${correctVersion}`,
-        ...wrong.map((v) => `Java ${v}`)
+        ...presentVersions.map((v) => `Java ${v}`),
+        ...wrongVersions.map((v) => `Java ${v}`)
       ]);
+
+      if (options.length < 2) return null;
 
       return {
         type: "whichVersion",
-        prompt: "Which <strong>LTS release</strong> includes this flag?",
+        flagId,
+        correctVersions: ltsPresent,
+        prompt: "Name <strong>one</strong> LTS release that includes this flag.",
         flag: flag.flag,
-        options,
-        correctIndex: options.indexOf(`Java ${correctVersion}`)
+        options
       };
     }
 
     function buildDescriptionQuestion(index) {
       const version = pickRandom(LTS_VERSIONS);
       const groups = index.parentGroupsByVersion.get(version);
-      const eligible = [...groups.values()].filter((g) => g.length >= 4);
+      const eligible = [...groups.values()].filter((g) => {
+        if (g.length < 4) return false;
+        return new Set(g.map((f) => f.description)).size >= 4;
+      });
       if (!eligible.length) return null;
 
       const siblings = pickRandom(eligible);
       const correct = pickRandom(siblings);
       const distractors = shuffle(siblings.filter((f) => f !== correct)).slice(0, 3);
+
+      const optionTexts = [
+        correct.description,
+        ...distractors.map((f) => f.description)
+      ];
+      if (new Set(optionTexts).size < 4) return null;
 
       const options = shuffle([
         { text: correct.description, correct: true },
@@ -632,11 +656,18 @@
 
       return {
         type: "description",
+        flagId: correct.flagId,
+        scopeVersion: version,
         prompt: "Which description matches this JVM flag?",
         flag: correct.flag,
         options: options.map((o) => o.text),
         correctIndex: options.findIndex((o) => o.correct)
       };
+    }
+
+    function questionDedupKey(q) {
+      const scope = q.scopeVersion != null ? String(q.scopeVersion) : "";
+      return `${q.type}|${q.flagId}|${scope}`;
     }
 
     function generateQuiz(index) {
@@ -647,11 +678,16 @@
       ];
 
       const questions = [];
+      const usedKeys = new Set();
       let attempts = 0;
       while (questions.length < TOTAL_QUESTIONS && attempts < 300) {
         attempts++;
         const q = pickRandom(generators)();
-        if (q) questions.push(q);
+        if (!q) continue;
+        const key = questionDedupKey(q);
+        if (usedKeys.has(key)) continue;
+        usedKeys.add(key);
+        questions.push(q);
       }
       return questions;
     }
@@ -738,15 +774,23 @@
         this.answered = true;
 
         const q = this.questions[this.current];
-        const correct = selectedIndex === q.correctIndex;
+        const correct =
+          q.type === "whichVersion"
+            ? isWhichVersionCorrect(q, selectedIndex)
+            : selectedIndex === q.correctIndex;
         if (correct) this.score++;
+
+        const correctAnswer =
+          q.type === "whichVersion"
+            ? formatWhichVersionCorrectAnswer(q.correctVersions)
+            : q.options[q.correctIndex];
 
         this.results.push({
           correct,
           questionNumber: this.current + 1,
           question: q,
           userAnswer: q.options[selectedIndex],
-          correctAnswer: q.options[q.correctIndex]
+          correctAnswer
         });
 
         this.current++;

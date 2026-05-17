@@ -26,6 +26,19 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
    - `buildDescriptionQuestion`
 2. **Repeat until 10 valid questions** or **300 attempts** (failed generators return `null` and are skipped).
 3. **No guarantee of type mix** — Types are random per slot, not balanced (e.g. not forced 3/3/4).
+4. **No duplicate slots in a deck** — Each accepted question must have a unique dedup key (see below). Collisions are discarded and the attempt does not count toward the 10 questions.
+
+### Dedup keys (`questionDedupKey`)
+
+A `Set` tracks keys for questions already in the current deck. Format: `` `${type}|${flagId}|${scope}` ``.
+
+| Type | `flagId` | `scopeVersion` | Example key |
+|------|----------|----------------|-------------|
+| `versionPresence` | Flag under test | Target LTS in the prompt | `versionPresence|UseG1GC|17` |
+| `whichVersion` | Flag under test | *(empty)* | `whichVersion|UseG1GC|` |
+| `description` | Correct flag | LTS catalog used for sibling pool | `description|UseG1GC|25` |
+
+The same `flagId` may appear in **different** question types or **different** `scopeVersion` values (e.g. version check on Java 8 and description on Java 25). It cannot appear twice with the same type and scope (e.g. two “which LTS includes this flag?” questions for the same flag).
 
 ---
 
@@ -48,16 +61,17 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
 ## Type 2: LTS release (`whichVersion`)
 
 **UI label:** LTS release  
-**Prompt:** “Which **LTS release** includes this flag?”
+**Prompt:** “Name **one** LTS release that includes this flag.”
 
 | Rule | Detail |
 |------|--------|
-| Flag pool | Only `flagId`s that appear in **at least one** LTS version |
-| Correct answer | Random **one** LTS version where that `flagId` exists (not necessarily the only one) |
-| Wrong answers | Up to 3 LTS versions where the flag is **not** present |
-| Fallback for wrong options | If fewer than 3 absent LTS versions, fill from other LTS versions (excluding correct and already chosen wrong) |
-| Options | Four labels: `Java {n}` — correct + 3 wrong, all shuffled |
-| Abort | `null` if no eligible `flagId` |
+| Flag pool | `flagId`s present in **at least one** LTS and **absent from at least one** LTS (flags in all five catalogs are skipped) |
+| Correct answer | **Any** LTS version where that `flagId` exists; grading checks the selected option against `correctVersions` |
+| Wrong answers | Up to 3 LTS versions where the flag is **not** present (never other versions that also include the flag) |
+| Present options | Up to `4 − wrong count` LTS versions where the flag exists (shuffled into the option list) |
+| Options | Up to four labels: `Java {n}` — mix of present + absent versions, all shuffled |
+| Review text | One label if unique; otherwise `Any of: Java 8, Java 11, …` |
+| Abort | `null` if no eligible `flagId`, or fewer than two options |
 
 ---
 
@@ -69,12 +83,13 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
 | Rule | Detail |
 |------|--------|
 | Scope version | Random LTS |
-| Sibling pool | Parent group must have **≥ 4 flags** in that version |
+| Sibling pool | Parent group must have **≥ 4 flags** in that version **and** **≥ 4 distinct** `description` values among those flags |
 | Correct flag | Random flag from that group |
 | Distractors | 3 other flags from the **same parent group** (siblings) |
 | Options | Four descriptions (1 correct + 3 distractors), shuffled |
+| Unique options | All four option texts must be **distinct**; discard if any duplicate (e.g. siblings sharing “Map Java priorities to OS priorities.”) |
 | Display | Shows the **correct** flag’s `flag` string |
-| Abort | `null` if no group with ≥ 4 members in that version |
+| Abort | `null` if no eligible group, or if the four chosen descriptions are not all unique |
 
 ---
 
@@ -93,9 +108,10 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
 
 ## Practical implications
 
-- **Description questions** only use flags that share a category with at least three other flags in that JDK.
-- **Which-version** can mark an LTS as correct even if the flag also exists in other LTS releases (any qualifying LTS is valid).
+- **Description questions** only use flags that share a category with at least three other flags in that JDK, and only when at least four **different** descriptions exist in that sibling pool (avoids unanswerable prompts such as `-XX:JavaPriority3_To_OSPriority=<n>` with four identical choices).
+- **Which-version** accepts any LTS option where the flag is present; flags that appear in all five LTS catalogs never appear in this type.
 - **Version presence** “absent” uses a flag from *some* catalog that is missing in the asked version—not a synthetic flag name.
+- **Dedup** prevents repeating the same `(type, flagId, scopeVersion)` in one game; unrelated types or scopes for the same flag are still allowed.
 
 ## Source references
 
@@ -106,4 +122,5 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
 | `buildVersionPresenceQuestion` | ~553–581 |
 | `buildWhichVersionQuestion` | ~583–616 |
 | `buildDescriptionQuestion` | ~618–640 |
-| `generateQuiz` | ~642–657 |
+| `questionDedupKey` | ~642–645 |
+| `generateQuiz` | ~647–668 |

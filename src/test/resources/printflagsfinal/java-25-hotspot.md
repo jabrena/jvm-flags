@@ -330,7 +330,7 @@ ccstrlist OnOutOfMemoryError                       =                            
    double SelfDestructTimer                        = 0.000000                                  {product} {default}
     ccstr SharedArchiveConfigFile                  =                                           {product} {default}
     ccstr SharedArchiveFile                        =                                           {product} {default}
-   size_t SharedBaseAddress                        = 2181843386368                             {product} {default}
+   size_t SharedBaseAddress                        = 70364449210368                            {product} {default}
     ccstr SharedClassListFile                      =                                           {product} {default}
      uint SharedSymbolTableBucketSize              = 4                                         {product} {default}
     ccstr ShenandoahGCHeuristics                   = adaptive                                  {product} {default}
@@ -504,3 +504,21 @@ ccstrlist OnOutOfMemoryError                       =                            
     uintx ZUncommitDelay                           = 300                                       {product} {default}
    double ZYoungCompactionLimit                    = 25.000000                                 {product} {default}
      bool ZeroTLAB                                 = false                                     {product} {default}
+Usage: java [java options...] <application> [application arguments...]
+
+Where <application> is one of:
+  <mainclass>                to execute the main method of a compiled main class
+  -jar <jarfile>.jar         to execute the main class of a JAR archive
+  -m <module>[/<mainclass>]  to execute the main class of a module
+  <sourcefile>.java          to compile and execute a source-file program
+
+Where key java options include:
+  --class-path <class path>
+    where <class path> is a list of directories and JAR archives to search for class files, separated by ":"
+  --module-path <module path>
+    where <module path> is a list of directories and JAR archives to search for modules, separated by ":"
+  -version
+    to print product version to the error stream and exit
+
+For additional help on usage:           java --help
+For an interactive Java environment:    jshell

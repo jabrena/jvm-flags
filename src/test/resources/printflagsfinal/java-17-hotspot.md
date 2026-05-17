@@ -9,6 +9,7 @@
     uintx AdaptiveSizeThroughPutPolicy             = 0                                         {product} {default}
     uintx AdaptiveTimeWeight                       = 25                                        {product} {default}
      bool AggressiveHeap                           = false                                     {product} {default}
+     intx AliasLevel                               = 3                                      {C2 product} {default}
      bool AlignVector                              = false                                  {C2 product} {default}
     ccstr AllocateHeapAt                           =                                           {product} {default}
      intx AllocateInstancePrefetchLines            = 1                                         {product} {default}
@@ -23,18 +24,22 @@
      bool AllowVectorizeOnDemand                   = true                                   {C2 product} {default}
      bool AlwaysActAsServerClassMachine            = false                                     {product} {default}
      bool AlwaysCompileLoopMethods                 = false                                     {product} {default}
+     bool AlwaysLockClassLoader                    = false                                     {product} {default}
      bool AlwaysPreTouch                           = false                                     {product} {default}
      bool AlwaysRestoreFPU                         = false                                     {product} {default}
      bool AlwaysTenure                             = false                                     {product} {default}
-    ccstr ArchiveClassesAtExit                     =                                     {JVMCI product} {default}
-     intx ArrayCopyLoadStoreMaxElem                = 8                                         {product} {default}
+    ccstr ArchiveClassesAtExit                     =                                           {product} {default}
+     intx ArrayCopyLoadStoreMaxElem                = 8                                      {C2 product} {default}
    size_t AsyncLogBufferSize                       = 2097152                                   {product} {default}
      intx AutoBoxCacheMax                          = 128                                    {C2 product} {default}
-     bool AutoCreateSharedArchive                  = false                               {JVMCI product} {default}
      bool AvoidUnalignedAccesses                   = false                                {ARCH product} {default}
      intx BCEATraceLevel                           = 0                                         {product} {default}
      bool BackgroundCompilation                    = true                                   {pd product} {default}
    size_t BaseFootPrintEstimate                    = 268435456                                 {product} {default}
+     intx BiasedLockingBulkRebiasThreshold         = 20                                        {product} {default}
+     intx BiasedLockingBulkRevokeThreshold         = 40                                        {product} {default}
+     intx BiasedLockingDecayTime                   = 25000                                     {product} {default}
+     intx BiasedLockingStartupDelay                = 0                                         {product} {default}
      bool BlockLayoutByFrequency                   = true                                   {C2 product} {default}
      intx BlockLayoutMinDiamondPercentage          = 20                                     {C2 product} {default}
      bool BlockLayoutRotateLoops                   = true                                   {C2 product} {default}
@@ -44,13 +49,13 @@
      intx C1MaxInlineSize                          = 35                                     {C1 product} {default}
      intx C1MaxRecursiveInlineLevel                = 1                                      {C1 product} {default}
      intx C1MaxTrivialSize                         = 6                                      {C1 product} {default}
-     bool C1OptimizeVirtualCallProfiling           = true                                   {C2 product} {default}
-     bool C1ProfileBranches                        = true                                   {C2 product} {default}
-     bool C1ProfileCalls                           = true                                   {C2 product} {default}
-     bool C1ProfileCheckcasts                      = true                                   {C2 product} {default}
-     bool C1ProfileInlinedCalls                    = true                                   {C2 product} {default}
-     bool C1ProfileVirtualCalls                    = true                                   {C2 product} {default}
-     bool C1UpdateMethodData                       = true                                   {C2 product} {default}
+     bool C1OptimizeVirtualCallProfiling           = true                                   {C1 product} {default}
+     bool C1ProfileBranches                        = true                                   {C1 product} {default}
+     bool C1ProfileCalls                           = true                                   {C1 product} {default}
+     bool C1ProfileCheckcasts                      = true                                   {C1 product} {default}
+     bool C1ProfileInlinedCalls                    = true                                   {C1 product} {default}
+     bool C1ProfileVirtualCalls                    = true                                   {C1 product} {default}
+     bool C1UpdateMethodData                       = true                                   {C1 product} {default}
      intx CICompilerCount                          = 4                                         {product} {ergonomic}
      bool CICompilerCountPerCPU                    = true                                      {product} {default}
      bool CITime                                   = false                                     {product} {default}
@@ -66,14 +71,15 @@ ccstrlist CompileCommand                           =                            
 ccstrlist CompileOnly                              =                                           {product} {default}
      intx CompileThreshold                         = 10000                                  {pd product} {default}
    double CompileThresholdScaling                  = 1.000000                                  {product} {default}
-      int CompilerThreadPriority                   = -1                                        {product} {default}
-     intx CompilerThreadStackSize                  = 4096                                   {pd product} {default}
+     intx CompilerThreadPriority                   = -1                                        {product} {default}
+     intx CompilerThreadStackSize                  = 2048                                   {pd product} {default}
    size_t CompressedClassSpaceSize                 = 1073741824                                {product} {default}
      uint ConcGCThreads                            = 2                                         {product} {ergonomic}
      intx ConditionalMoveLimit                     = 3                                   {C2 pd product} {default}
      intx ContendedPaddingWidth                    = 128                                       {product} {default}
      bool CrashOnOutOfMemoryError                  = false                                     {product} {default}
      bool CreateCoredumpOnCrash                    = true                                      {product} {default}
+     bool CriticalJNINatives                       = false                                     {product} {default}
      bool DTraceAllocProbes                        = false                                     {product} {default}
      bool DTraceMethodProbes                       = false                                     {product} {default}
      bool DTraceMonitorProbes                      = false                                     {product} {default}
@@ -85,9 +91,10 @@ ccstrlist CompileOnly                              =                            
      bool DoReserveCopyInSuperWord                 = true                                   {C2 product} {default}
      bool DontCompileHugeMethods                   = true                                      {product} {default}
      bool DontYieldALot                            = false                                  {pd product} {default}
-    ccstr DumpLoadedClassList                      =                                     {JVMCI product} {default}
+    ccstr DumpLoadedClassList                      =                                           {product} {default}
      bool DumpReplayDataOnError                    = true                                      {product} {default}
-     bool EagerJVMCI                               = false                                  {C1 product} {default}
+     bool DumpSharedSpaces                         = false                                     {product} {default}
+     bool DynamicDumpSharedSpaces                  = false                                     {product} {default}
      bool EagerXrunInit                            = false                                     {product} {default}
      intx EliminateAllocationArraySizeLimit        = 64                                     {C2 product} {default}
      bool EliminateAllocations                     = true                                   {C2 product} {default}
@@ -96,8 +103,6 @@ ccstrlist CompileOnly                              =                            
      bool EliminateNestedLocks                     = true                                   {C2 product} {default}
      bool EnableContended                          = true                                      {product} {default}
      bool EnableDynamicAgentLoading                = true                                      {product} {default}
-     bool EnableJVMCI                              = true                                {JVMCI product} {default}
-     bool EnableJVMCIProduct                       = true                                {JVMCI product} {jimage}
    size_t ErgoHeapSizeLimit                        = 0                                         {product} {default}
     ccstr ErrorFile                                =                                           {product} {default}
      bool ErrorFileToStderr                        = false                                     {product} {default}
@@ -108,14 +113,23 @@ ccstrlist CompileOnly                              =                            
      bool ExecutingUnitTests                       = false                                     {product} {default}
      bool ExitOnOutOfMemoryError                   = false                                     {product} {default}
      bool ExplicitGCInvokesConcurrent              = false                                     {product} {default}
+     bool ExtendedDTraceProbes                     = false                                     {product} {default}
      bool ExtensiveErrorReports                    = false                                     {product} {default}
-    ccstr ExtraSharedClassListFile                 =                                     {JVMCI product} {default}
+    ccstr ExtraSharedClassListFile                 =                                           {product} {default}
+     bool FilterSpuriousWakeups                    = true                                      {product} {default}
      bool FlightRecorder                           = false                                     {product} {default}
     ccstr FlightRecorderOptions                    =                                           {product} {default}
      bool ForceTimeHighResolution                  = false                                     {product} {default}
      intx FreqInlineSize                           = 325                                 {C2 pd product} {default}
    double G1ConcMarkStepDurationMillis             = 10.000000                                 {product} {default}
+    uintx G1ConcRSHotCardLimit                     = 4                                         {product} {default}
+   size_t G1ConcRSLogCacheSize                     = 10                                        {product} {default}
+   size_t G1ConcRefinementGreenZone                = 0                                         {product} {default}
+   size_t G1ConcRefinementRedZone                  = 0                                         {product} {default}
+    uintx G1ConcRefinementServiceIntervalMillis    = 300                                       {product} {default}
      uint G1ConcRefinementThreads                  = 8                                         {product} {ergonomic}
+   size_t G1ConcRefinementThresholdStep            = 2                                         {product} {default}
+   size_t G1ConcRefinementYellowZone               = 0                                         {product} {default}
     uintx G1ConfidencePercent                      = 50                                        {product} {default}
    size_t G1HeapRegionSize                         = 2097152                                   {product} {ergonomic}
     uintx G1HeapWastePercent                       = 5                                         {product} {default}
@@ -123,14 +137,16 @@ ccstrlist CompileOnly                              =                            
     uintx G1PeriodicGCInterval                     = 0                                      {manageable} {default}
      bool G1PeriodicGCInvokesConcurrent            = true                                      {product} {default}
    double G1PeriodicGCSystemLoadThreshold          = 0.000000                               {manageable} {default}
+     intx G1RSetRegionEntries                      = 512                                       {product} {default}
+     intx G1RSetSparseRegionEntries                = 16                                        {product} {default}
      intx G1RSetUpdatingPauseTimePercent           = 10                                        {product} {default}
      uint G1RefProcDrainInterval                   = 1000                                      {product} {default}
     uintx G1ReservePercent                         = 10                                        {product} {default}
     uintx G1SATBBufferEnqueueingThresholdPercent   = 60                                        {product} {default}
    size_t G1SATBBufferSize                         = 1024                                      {product} {default}
    size_t G1UpdateBufferSize                       = 256                                       {product} {default}
+     bool G1UseAdaptiveConcRefinement              = true                                      {product} {default}
      bool G1UseAdaptiveIHOP                        = true                                      {product} {default}
-     uint GCCardSizeInBytes                        = 512                                       {product} {default}
     uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
     uintx GCHeapFreeLimit                          = 2                                         {product} {default}
     uintx GCLockerEdenExpansionPercent             = 5                                         {product} {default}
@@ -160,42 +176,29 @@ ccstrlist CompileOnly                              =                            
     uintx InitiatingHeapOccupancyPercent           = 45                                        {product} {default}
      bool Inline                                   = true                                      {product} {default}
     ccstr InlineDataFile                           =                                           {product} {default}
-     intx InlineSmallCode                          = 1000                                {C2 pd product} {default}
+     intx InlineSmallCode                          = 2500                                {C2 pd product} {default}
      bool InlineSynchronizedMethods                = true                                   {C1 product} {default}
      intx InteriorEntryAlignment                   = 16                                  {C2 pd product} {default}
      intx InterpreterProfilePercentage             = 33                                        {product} {default}
-     uint JVMCICompilerIdleDelay                   = 1000                                {JVMCI product} {default}
-     intx JVMCICounterSize                         = 0                                      {C1 product} {default}
-     bool JVMCICountersExcludeCompiler             = true                                   {C1 product} {default}
-     intx JVMCIEventLogLevel                       = 1                                      {C1 product} {default}
-    ccstr JVMCILibDumpJNIConfig                    =                                        {C1 product} {default}
-    ccstr JVMCILibPath                             =                                        {C1 product} {default}
-     intx JVMCINMethodSizeLimit                    = 655360                                 {C1 product} {default}
-    ccstr JVMCINativeLibraryErrorFile              =                                        {C1 product} {default}
-   double JVMCINativeLibraryThreadFraction         = 0.330000                               {C1 product} {default}
-     bool JVMCIPrintProperties                     = false                               {JVMCI product} {default}
-     intx JVMCIThreads                             = 1                                      {C1 product} {default}
-     uint JVMCIThreadsPerNativeLibraryRuntime      = 1                                   {JVMCI product} {default}
-     intx JVMCITraceLevel                          = 0                                      {C1 product} {default}
      bool JavaMonitorsInStackTrace                 = true                                      {product} {default}
-      int JavaPriority10_To_OSPriority             = -1                                        {product} {default}
-      int JavaPriority1_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority2_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority3_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority4_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority5_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority6_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority7_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority8_To_OSPriority              = -1                                        {product} {default}
-      int JavaPriority9_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority10_To_OSPriority             = -1                                        {product} {default}
+     intx JavaPriority1_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority2_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority3_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority4_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority5_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority6_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority7_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority8_To_OSPriority              = -1                                        {product} {default}
+     intx JavaPriority9_To_OSPriority              = -1                                        {product} {default}
    size_t LargePageHeapSizeThreshold               = 134217728                                 {product} {default}
    size_t LargePageSizeInBytes                     = 0                                         {product} {default}
      intx LiveNodeCountInliningCutoff              = 40000                                  {C2 product} {default}
      intx LoopMaxUnroll                            = 16                                     {C2 product} {default}
      intx LoopOptsCount                            = 43                                     {C2 product} {default}
      intx LoopPercentProfileLimit                  = 10                                  {C2 pd product} {default}
-    uintx LoopStripMiningIter                      = 1000                                      {product} {default}
-    uintx LoopStripMiningIterShortLoop             = 100                                       {product} {default}
+    uintx LoopStripMiningIter                      = 1000                                   {C2 product} {default}
+    uintx LoopStripMiningIterShortLoop             = 100                                    {C2 product} {default}
      intx LoopUnrollLimit                          = 60                                  {C2 pd product} {default}
      intx LoopUnrollMin                            = 4                                      {C2 product} {default}
      bool LoopUnswitching                          = true                                   {C2 product} {default}
@@ -232,11 +235,13 @@ ccstrlist CompileOnly                              =                            
     uintx MaxTenuringThreshold                     = 15                                        {product} {default}
      intx MaxTrivialSize                           = 6                                      {C2 product} {default}
      intx MaxVectorSize                            = 16                                     {C2 product} {default}
+    ccstr MetaspaceReclaimPolicy                   = balanced                                  {product} {default}
    size_t MetaspaceSize                            = 22020096                                  {product} {default}
      bool MethodFlushing                           = true                                      {product} {default}
    size_t MinHeapDeltaBytes                        = 2097152                                   {product} {ergonomic}
     uintx MinHeapFreeRatio                         = 40                                     {manageable} {default}
    size_t MinHeapSize                              = 8388608                                   {product} {ergonomic}
+     intx MinInliningThreshold                     = 250                                       {product} {default}
      intx MinJumpTableSize                         = 10                                  {C2 pd product} {default}
    size_t MinMetaspaceExpansion                    = 327680                                    {product} {default}
     uintx MinMetaspaceFreeRatio                    = 40                                        {product} {default}
@@ -257,12 +262,12 @@ ccstrlist CompileOnly                              =                            
     uintx NewRatio                                 = 2                                         {product} {default}
    size_t NewSize                                  = 1363144                                   {product} {default}
    size_t NewSizeThreadIncrease                    = 5320                                   {pd product} {default}
-     intx NmethodSweepActivity                     = 4                                         {product} {default}
+     intx NmethodSweepActivity                     = 10                                        {product} {default}
      intx NodeLimitFudgeFactor                     = 2000                                   {C2 product} {default}
-    uintx NonNMethodCodeHeapSize                   = 6979684                                {pd product} {ergonomic}
-    uintx NonProfiledCodeHeapSize                  = 122339278                              {pd product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 5839564                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122909338                              {pd product} {ergonomic}
      intx NumberOfLoopInstrToAlign                 = 4                                      {C2 product} {default}
-      int ObjectAlignmentInBytes                   = 8                              {product lp64_product} {default}
+     intx ObjectAlignmentInBytes                   = 8                              {product lp64_product} {default}
    size_t OldPLABSize                              = 1024                                      {product} {default}
    size_t OldSize                                  = 5452592                                   {product} {default}
      bool OmitStackTraceInFastThrow                = true                                      {product} {default}
@@ -295,15 +300,16 @@ ccstrlist OnOutOfMemoryError                       =                            
      intx PerMethodTrapLimit                       = 100                                       {product} {default}
      bool PerfAllowAtExitRegistration              = false                                     {product} {default}
      bool PerfBypassFileSystemCheck                = false                                     {product} {default}
-      int PerfDataMemorySize                       = 32768                                     {product} {default}
+     intx PerfDataMemorySize                       = 32768                                     {product} {default}
      intx PerfDataSamplingInterval                 = 50                                        {product} {default}
     ccstr PerfDataSaveFile                         =                                           {product} {default}
      bool PerfDataSaveToFile                       = false                                     {product} {default}
      bool PerfDisableSharedMem                     = false                                     {product} {default}
-      int PerfMaxStringConstLength                 = 1024                                      {product} {default}
+     intx PerfMaxStringConstLength                 = 1024                                      {product} {default}
    size_t PreTouchParallelChunkSize                = 1073741824                             {pd product} {default}
      bool PreferInterpreterNativeStubs             = false                                  {pd product} {default}
      intx PrefetchCopyIntervalInBytes              = 384                                       {product} {default}
+     intx PrefetchFieldsAhead                      = -1                                        {product} {default}
      intx PrefetchScanIntervalInBytes              = 384                                       {product} {default}
      bool PreserveAllAnnotations                   = false                                     {product} {default}
      bool PreserveFramePointer                     = false                                  {pd product} {default}
@@ -321,7 +327,8 @@ ccstrlist OnOutOfMemoryError                       =                            
      bool PrintGC                                  = false                                     {product} {default}
      bool PrintGCDetails                           = false                                     {product} {default}
      bool PrintHeapAtSIGBREAK                      = true                                      {product} {default}
-     bool PrintSharedArchiveAndExit                = false                               {JVMCI product} {default}
+     bool PrintSharedArchiveAndExit                = false                                     {product} {default}
+     bool PrintSharedDictionary                    = false                                     {product} {default}
      bool PrintStringTableStatistics               = false                                     {product} {default}
      bool PrintTieredEvents                        = false                                     {product} {default}
      bool PrintVMOptions                           = false                                     {product} {default}
@@ -329,19 +336,21 @@ ccstrlist OnOutOfMemoryError                       =                            
     uintx ProcessDistributionStride                = 4                                         {product} {default}
      bool ProfileInterpreter                       = true                                   {pd product} {default}
      intx ProfileMaturityPercentage                = 20                                        {product} {default}
-    uintx ProfiledCodeHeapSize                     = 122339278                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122909338                              {pd product} {ergonomic}
     uintx PromotedPadding                          = 3                                         {product} {default}
     uintx QueuedAllocationWarningCount             = 0                                         {product} {default}
      bool RangeCheckElimination                    = true                                      {product} {default}
      bool ReassociateInvariants                    = true                                   {C2 product} {default}
-     bool RecordDynamicDumpInfo                    = false                               {JVMCI product} {default}
+     bool RecordDynamicDumpInfo                    = false                                     {product} {default}
      bool ReduceBulkZeroing                        = true                                   {C2 product} {default}
      bool ReduceFieldZeroing                       = true                                   {C2 product} {default}
      bool ReduceInitialCardMarks                   = true                                   {C2 product} {default}
      bool ReduceSignalUsage                        = false                                     {product} {default}
+     intx RefDiscoveryPolicy                       = 0                                         {product} {default}
      bool RegisterFinalizersAtInit                 = true                                      {product} {default}
      bool RelaxAccessControlCheck                  = false                                     {product} {default}
     ccstr ReplayDataFile                           =                                           {product} {default}
+     bool RequireSharedSpaces                      = false                                     {product} {default}
     uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
      bool ResizePLAB                               = true                                      {product} {default}
      bool ResizeTLAB                               = true                                      {product} {default}
@@ -354,12 +363,14 @@ ccstrlist OnOutOfMemoryError                       =                            
      intx SafepointTimeoutDelay                    = 10000                                     {product} {default}
      bool ScavengeBeforeFullGC                     = false                                     {product} {default}
      bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
-   double SelfDestructTimer                        = 0.000000                                  {product} {default}
-    ccstr SharedArchiveConfigFile                  =                                     {JVMCI product} {default}
-    ccstr SharedArchiveFile                        =                                     {JVMCI product} {default}
-   size_t SharedBaseAddress                        = 1065151889408                       {JVMCI product} {default}
-    ccstr SharedClassListFile                      =                                     {JVMCI product} {default}
-     uint SharedSymbolTableBucketSize              = 4                                   {JVMCI product} {default}
+     intx SelfDestructTimer                        = 0                                         {product} {default}
+    ccstr SharedArchiveConfigFile                  =                                           {product} {default}
+    ccstr SharedArchiveFile                        =                                           {product} {default}
+   size_t SharedBaseAddress                        = 549755813888                              {product} {default}
+    ccstr SharedClassListFile                      =                                           {product} {default}
+    uintx SharedSymbolTableBucketSize              = 4                                         {product} {default}
+    ccstr ShenandoahGCHeuristics                   = adaptive                                  {product} {default}
+    ccstr ShenandoahGCMode                         = satb                                      {product} {default}
      bool ShowCodeDetailsInExceptionMessages       = true                                   {manageable} {default}
      bool ShowMessageBoxOnError                    = false                                     {product} {default}
      bool ShrinkHeapInSteps                        = true                                      {product} {default}
@@ -382,7 +393,7 @@ ccstrlist OnOutOfMemoryError                       =                            
      bool SuppressFatalErrorMessage                = false                                     {product} {default}
     uintx SurvivorPadding                          = 3                                         {product} {default}
     uintx SurvivorRatio                            = 8                                         {product} {default}
-   double SweeperThreshold                         = 15.000000                                 {product} {default}
+   double SweeperThreshold                         = 0.500000                                  {product} {default}
     uintx TLABAllocationWeight                     = 35                                        {product} {default}
     uintx TLABRefillWasteFraction                  = 64                                        {product} {default}
    size_t TLABSize                                 = 0                                         {product} {default}
@@ -394,7 +405,7 @@ ccstrlist OnOutOfMemoryError                       =                            
     uintx TenuredGenerationSizeIncrement           = 20                                        {product} {default}
     uintx TenuredGenerationSizeSupplement          = 80                                        {product} {default}
     uintx TenuredGenerationSizeSupplementDecay     = 2                                         {product} {default}
-      int ThreadPriorityPolicy                     = 1                                         {product} {jimage}
+     intx ThreadPriorityPolicy                     = 0                                         {product} {default}
      bool ThreadPriorityVerbose                    = false                                     {product} {default}
      intx ThreadStackSize                          = 2048                                   {pd product} {default}
     uintx ThresholdTolerance                       = 10                                        {product} {default}
@@ -430,14 +441,15 @@ ccstrlist OnOutOfMemoryError                       =                            
      bool TraceTraps                               = false                                {ARCH product} {default}
      intx TrackedInitializationLimit               = 50                                     {C2 product} {default}
      bool TrapBasedNullChecks                      = false                                  {pd product} {default}
-     bool TrapBasedRangeChecks                     = false                                  {pd product} {default}
+     bool TrapBasedRangeChecks                     = false                               {C2 pd product} {default}
+     uint TrimNativeHeapInterval                   = 0                                         {product} {default}
      intx TypeProfileArgsLimit                     = 2                                         {product} {default}
-     uint TypeProfileLevel                         = 0                                      {pd product} {default}
+    uintx TypeProfileLevel                         = 111                                    {pd product} {default}
      intx TypeProfileMajorReceiverPercent          = 90                                     {C2 product} {default}
      intx TypeProfileParmsLimit                    = 2                                         {product} {default}
-     intx TypeProfileWidth                         = 8                                         {product} {default}
-      int UnguardOnExecutionViolation              = 0                                         {product} {default}
-     bool UseAES                                   = true                                      {product} {default}
+     intx TypeProfileWidth                         = 2                                         {product} {default}
+     intx UnguardOnExecutionViolation              = 0                                         {product} {default}
+     bool UseAES                                   = false                                     {product} {default}
      bool UseAdaptiveGenerationSizePolicyAtMajorCollection  = true                             {product} {default}
      bool UseAdaptiveGenerationSizePolicyAtMinorCollection  = true                             {product} {default}
      bool UseAdaptiveNUMAChunkSizing               = true                                      {product} {default}
@@ -446,19 +458,19 @@ ccstrlist OnOutOfMemoryError                       =                            
      bool UseAdaptiveSizePolicyFootprintGoal       = true                                      {product} {default}
      bool UseAdaptiveSizePolicyWithSystemGC        = false                                     {product} {default}
      bool UseBASE64Intrinsics                      = true                                      {product} {default}
+     bool UseBiasedLocking                         = false                                     {product} {default}
      bool UseBimorphicInlining                     = true                                   {C2 product} {default}
      bool UseBlockZeroing                          = true                                 {ARCH product} {default}
-    ccstr UseBranchProtection                      = none                                 {ARCH product} {default}
      bool UseCMoveUnconditionally                  = false                                  {C2 product} {default}
      bool UseCRC32                                 = true                                 {ARCH product} {default}
+     bool UseCodeAging                             = true                                      {product} {default}
      bool UseCodeCacheFlushing                     = true                                      {product} {default}
      bool UseCompiler                              = true                                      {product} {default}
-     bool UseCompressedClassPointers               = true                           {product lp64_product} {default}
+     bool UseCompressedClassPointers               = true                           {product lp64_product} {ergonomic}
      bool UseCompressedOops                        = true                           {product lp64_product} {ergonomic}
      bool UseCondCardMark                          = false                                     {product} {default}
      bool UseCountedLoopSafepoints                 = true                                   {C2 product} {default}
      bool UseCounterDecay                          = true                                      {product} {default}
-     bool UseCryptoPmullForCRC32                   = false                                {ARCH product} {default}
      bool UseDivMod                                = true                                   {C2 product} {default}
      bool UseDynamicNumberOfCompilerThreads        = true                                      {product} {default}
      bool UseDynamicNumberOfGCThreads              = true                                      {product} {default}
@@ -468,10 +480,9 @@ ccstrlist OnOutOfMemoryError                       =                            
      bool UseFastJNIAccessors                      = true                                      {product} {default}
      bool UseG1GC                                  = true                                      {product} {ergonomic}
      bool UseGCOverheadLimit                       = true                                      {product} {default}
+     bool UseHeavyMonitors                         = false                                     {product} {default}
      bool UseInlineCaches                          = true                                      {product} {default}
      bool UseInterpreter                           = true                                      {product} {default}
-     bool UseJVMCICompiler                         = true                                {JVMCI product} {default}
-     bool UseJVMCINativeLibrary                    = true                                   {C1 product} {default}
      bool UseJumpTables                            = true                                   {C2 product} {default}
      bool UseLSE                                   = true                                 {ARCH product} {default}
      bool UseLargePages                            = false                                  {pd product} {default}
@@ -486,51 +497,137 @@ ccstrlist OnOutOfMemoryError                       =                            
      bool UseNotificationThread                    = true                                      {product} {default}
      bool UseOnStackReplacement                    = true                                   {pd product} {default}
      bool UseOnlyInlinedBimorphic                  = true                                   {C2 product} {default}
+     bool UseOptoBiasInlining                      = false                                  {C2 product} {default}
      bool UsePSAdaptiveSurvivorSizePolicy          = true                                      {product} {default}
      bool UseParallelGC                            = false                                     {product} {default}
      bool UsePerfData                              = true                                      {product} {default}
      bool UsePopCountInstruction                   = true                                      {product} {default}
-     bool UseProfiledLoopPredicate                 = true                                      {product} {default}
-     bool UseSHA                                   = true                                      {product} {default}
+     bool UseProfiledLoopPredicate                 = true                                   {C2 product} {default}
+     bool UseSHA                                   = false                                     {product} {default}
      bool UseSIMDForArrayEquals                    = true                                 {ARCH product} {default}
      bool UseSIMDForBigIntegerShiftIntrinsics      = true                                 {ARCH product} {default}
      bool UseSIMDForMemoryOps                      = false                                {ARCH product} {default}
      uint UseSVE                                   = 0                                    {ARCH product} {default}
      bool UseSerialGC                              = false                                     {product} {default}
+     bool UseSharedSpaces                          = true                                      {product} {default}
      bool UseShenandoahGC                          = false                                     {product} {default}
      bool UseSignalChaining                        = true                                      {product} {default}
      bool UseSimpleArrayEquals                     = false                                {ARCH product} {default}
      bool UseStringDeduplication                   = false                                     {product} {default}
      bool UseSubwordForMaxVector                   = true                                   {C2 product} {default}
      bool UseSuperWord                             = true                                   {C2 product} {default}
-     bool UseSystemMemoryBarrier                   = false                                     {product} {default}
      bool UseTLAB                                  = true                                      {product} {default}
      bool UseThreadPriorities                      = true                                   {pd product} {default}
      bool UseTypeProfile                           = true                                      {product} {default}
-     bool UseTypeSpeculation                       = true                                      {product} {default}
+     bool UseTypeSpeculation                       = true                                   {C2 product} {default}
      bool UseVectorCmov                            = false                                  {C2 product} {default}
      bool UseXMMForArrayCopy                       = false                                     {product} {default}
      bool UseZGC                                   = false                                     {product} {default}
-      int VMThreadPriority                         = -1                                        {product} {default}
+     intx VMThreadPriority                         = -1                                        {product} {default}
      intx VMThreadStackSize                        = 2048                                   {pd product} {default}
      intx ValueMapInitialSize                      = 11                                     {C1 product} {default}
      intx ValueMapMaxLoopSize                      = 8                                      {C1 product} {default}
      intx ValueSearchLimit                         = 1000                                   {C2 product} {default}
-     bool VerifySharedSpaces                       = false                               {JVMCI product} {default}
+     bool VerifySharedSpaces                       = false                                     {product} {default}
     uintx YoungGenerationSizeIncrement             = 20                                        {product} {default}
     uintx YoungGenerationSizeSupplement            = 80                                        {product} {default}
     uintx YoungGenerationSizeSupplementDecay       = 8                                         {product} {default}
    size_t YoungPLABSize                            = 4096                                      {product} {default}
    double ZAllocationSpikeTolerance                = 2.000000                                  {product} {default}
    double ZCollectionInterval                      = 0.000000                                  {product} {default}
-   double ZCollectionIntervalMajor                 = -1.000000                                 {product} {default}
-   double ZCollectionIntervalMinor                 = -1.000000                                 {product} {default}
-     bool ZCollectionIntervalOnly                  = false                                     {product} {default}
-   double ZFragmentationLimit                      = 0.000000                                  {product} {default}
-     bool ZGenerational                            = false                                     {product} {default}
+   double ZFragmentationLimit                      = 25.000000                                 {product} {default}
    size_t ZMarkStackSpaceLimit                     = 8589934592                                {product} {default}
      bool ZProactive                               = true                                      {product} {default}
      bool ZUncommit                                = true                                      {product} {default}
     uintx ZUncommitDelay                           = 300                                       {product} {default}
-   double ZYoungCompactionLimit                    = 25.000000                                 {product} {default}
      bool ZeroTLAB                                 = false                                     {product} {default}
+Sintaxis: java [opciones] <clase principal> [argumentos...]
+           (para ejecutar una clase)
+   o  java [opciones] -jar <archivo jar> [argumentos...]
+           (para ejecutar un archivo jar)
+   o  java [opciones] -m <módulo>[/<clase principal>] [argumentos...]
+       java [opciones] --module <módulo>[/<clase principal>] [argumentos...]
+           (para ejecutar la clase principal en un módulo)
+
+ Argumentos que siguen la clase principal, -jar <archivo jar>, -m o --module
+ <módulo>/<clase principal> se transfieren como argumentos a una clase principal.
+
+ donde las opciones incluyen:
+
+    -cp <ruta de búsqueda de clase de directorios y archivos zip/jar>
+    -classpath <ruta de búsqueda de clase de directorios y archivos zip/jar>
+    --class-path <ruta de búsqueda de clase de directorios y archivos zip/jar>
+                  Una lista separada por el carácter :, archivos JAR
+                  y archivos ZIP para buscar archivos de clases.
+    -p <ruta módulo>
+    --module-path <ruta módulo>...
+                  Una lista de directorios separada por el carácter :, cada directorio
+                  es un directorio de módulos.
+    --upgrade-module-path <ruta módulo>...
+                  Una lista de directorios separada por el carácter :, cada directorio
+                  es un directorio de módulos que sustituye a
+                  los módulos actualizables en la imagen de tiempo de ejecución
+    --add-modules <nombre módulo>[,<nombre módulo>...]
+                  módulos de raíz que resolver, además del módulo inicial.
+                  <nombre módulo> también puede ser ALL-DEFAULT, ALL-SYSTEM,
+                  ALL-MODULE-PATH.
+    --list-modules
+                  mostrar módulos observables y salir
+    -d <nombre de módulo>
+    --describe-module <nombre módulo>
+                  describir un módulo y salir
+    --dry-run     crear VM y cargar la clase principal pero sin ejecutar el método principal.
+                  La opción --dry-run puede ser útil para validar
+                  las opciones de línea de comandos, como la configuración del sistema de módulos.
+    --validate-modules
+                  validar todos los módulos y salir
+                  La opción --validate-modules puede ser útil para encontrar
+                  conflictos y otros errores con módulos en la ruta de módulos.
+    -D<nombre>=<valor>
+                  definir una propiedad de sistema
+    -verbose:[class|module|gc|jni]
+                  activar la salida en modo verbose
+    -version      imprimir versión de producto en el flujo de errores y salir
+    --version     imprimir versión de producto en el flujo de salida y salir
+    -showversion  imprimir versión de producto en el flujo de errores y continuar
+    --show-version
+                  -showversion  imprimir versión de producto en el flujo de salida y continuar
+    --show-module-resolution
+                  mostrar la salida de resolución de módulo durante el inicio
+    -? -h -help
+                  imprimir este mensaje de ayuda en el flujo de errores
+    --help        imprimir este mensaje de ayuda en el flujo de salida
+    -X            imprimir ayuda de opciones adicionales en el flujo de errores
+    --help-extra  imprimir ayuda de opciones adicionales en el flujo de salida
+    -ea[:<nombre paquete>...|:<nombre clase>]
+    -enableassertions[:<nombre paquete>...|:<nombre clase>]
+                  activar afirmaciones con una granularidad especificada
+    -da[:<nombre paquete>...|:<nombre clase>]
+    -disableassertions[:<nombre paquete>...|:<nombre clase>]
+                  desactivar afirmaciones con una granularidad especificada
+    -esa | -enablesystemassertions
+                  activar afirmaciones del sistema
+    -dsa | -disablesystemassertions
+                  desactivar afirmaciones del sistema
+    -agentlib:<nombre bib>[=<opciones>]
+                  cargar biblioteca de agente nativo <nombre bib>, por ejemplo, -agentlib:jdwp
+                  ver también -agentlib:jdwp=help
+    -agentpath:<nombre ruta>[=<opciones>]
+                  cargar biblioteca de agente nativo por nombre completo de ruta
+    -javaagent:<ruta jar>[=<opciones>]
+                  cargar agente de lenguaje de programación Java, ver java.lang.instrument
+    -splash:<ruta imagen>
+       mostrar pantalla de presentación con imagen especificada
+                  Las imágenes a escala HiDPI están soportadas y se usan automáticamente
+                  si están disponibles. El nombre de archivo de la imagen sin escala, por ejemplo, image.ext,
+                  siempre debe transmitirse como el argumento para la opción -splash.
+                  La imagen a escala más adecuada que se haya proporcionado se escogerá
+                  automáticamente.
+                  Consulte la documentación de la API de la pantalla de presentación para obtener más información.
+    @argument files
+                  uno o más archivos de argumentos que contienen opciones
+    -disable-@files
+                  evitar una mayor expansión del archivo de argumentos
+Para especificar un argumento para una opción larga, puede usar --<nombre>=<valor> o
+--<nombre> <valor>.
+

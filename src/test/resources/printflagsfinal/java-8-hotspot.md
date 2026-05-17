@@ -722,3 +722,55 @@ ccstrlist OnOutOfMemoryError                        =                           
     uintx YoungPLABSize                             = 4096                                {product}
      bool ZeroTLAB                                  = false                               {product}
      intx hashCode                                  = 5                                   {product}
+Sintaxis: java [-options] class [args...]
+           (para ejecutar una clase)
+   o  java [-options] -jar jarfile [args...]
+           (para ejecutar un archivo jar)
+donde las opciones incluyen:
+    -d32	  usar un modelo de datos de 32 bits, si está disponible
+    -d64	  usar un modelo de datos de 64 bits, si está disponible
+    -server	  para seleccionar la VM "server"
+                  La VM por defecto es server,
+                  porque la ejecución se está llevando a cabo en una máquina de clase de servidor.
+
+
+    -cp <ruta de acceso de búsqueda de clases de los directorios y los archivos zip/jar>
+    -classpath <ruta de acceso de búsqueda de clases de los directorios y los archivos zip/jar>
+                  Lista separada por : de directorios, archivos JAR
+                  y archivos ZIP para buscar archivos de clase.
+    -D<nombre>=<valor>
+                  definir una propiedad del sistema
+    -verbose:[class|gc|jni]
+                  activar la salida verbose
+    -version      imprimir la versión del producto y salir
+    -version:<valor>
+                  Advertencia: Esta función está en desuso y se eliminará
+                  en una versión futura.
+                  es necesario que se ejecute la versión especificada
+    -showversion  imprimir la versión del producto y continuar
+    -jre-restrict-search | -no-jre-restrict-search
+                  Advertencia: Esta función está en desuso y se eliminará
+                  en una versión futura.
+                  incluir/excluir JRE privados de usuario en la búsqueda de versión
+    -? -help      imprimir este mensaje de ayuda
+    -X            imprimir la ayuda sobre las opciones que no sean estándar
+    -ea[:<nombre paquete>...|:<nombre clase>]
+    -enableassertions[:<nombre paquete>...|:<nombre clase>]
+                  activar afirmaciones con la granularidad especificada
+    -da[:<nombre paquete>...|:<nombre clase>]
+    -disableassertions[:<nombre paquete>...|:<nombre clase>]
+                  desactivar afirmaciones con la granularidad especificada
+    -esa | -enablesystemassertions
+                  activar afirmaciones del sistema
+    -dsa | -disablesystemassertions
+                  desactivar afirmaciones del sistema
+    -agentlib:<nombre bib>[=<opciones>]
+                  cargar la biblioteca de agente nativa <nombre bib>, como -agentlib:hprof
+                  véase también -agentlib:jdwp=help y -agentlib:hprof=help
+    -agentpath:<nombre ruta acceso>[=<opciones>]
+                  cargar biblioteca de agente nativa con el nombre de la ruta de acceso completa
+    -javaagent:<ruta acceso jar>[=<opciones>]
+                  cargar agente de lenguaje de programación Java, véase java.lang.instrument
+    -splash:<ruta acceso imagen>
+                  mostrar una pantalla de presentación con la imagen especificada
+Consulte http://www.oracle.com/technetwork/java/javase/documentation/index.html para obtener más información.

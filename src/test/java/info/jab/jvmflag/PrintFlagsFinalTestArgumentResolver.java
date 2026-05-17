@@ -13,7 +13,7 @@ import java.util.Map;
 
 final class PrintFlagsFinalTestArgumentResolver {
 
-    private static final String JAVA8_SNAPSHOT_RESOURCE = "printflagsfinal/java8.md";
+    private static final String JAVA8_SNAPSHOT_RESOURCE = PrintFlagsFinalSnapshot.snapshotResourceName(8);
 
     private static volatile Map<String, PrintFlagsFinalSnapshot.Flag> java8SnapshotFlags;
 

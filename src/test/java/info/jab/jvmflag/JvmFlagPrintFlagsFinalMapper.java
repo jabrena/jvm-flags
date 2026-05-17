@@ -76,12 +76,16 @@ final class JvmFlagPrintFlagsFinalMapper {
         return EXCLUDED_FROM_SNAPSHOT_CHECK.contains(catalogFlag);
     }
 
+    static boolean isExcludedFromSnapshotCheck(String catalogFlag, int javaFeatureVersion) {
+        return isExcludedFromSnapshotCheck(catalogFlag);
+    }
+
     static Optional<String> toPrintFlagsFinalName(String catalogFlag) {
         return toPrintFlagsFinalName(catalogFlag, 8);
     }
 
     static Optional<String> toPrintFlagsFinalName(String catalogFlag, int javaFeatureVersion) {
-        if (isExcludedFromSnapshotCheck(catalogFlag)) {
+        if (isExcludedFromSnapshotCheck(catalogFlag, javaFeatureVersion)) {
             return Optional.empty();
         }
         String alias = ERGONOMIC_ALIASES.get(catalogFlag);

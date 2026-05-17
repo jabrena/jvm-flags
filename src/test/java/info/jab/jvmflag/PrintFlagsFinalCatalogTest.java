@@ -35,7 +35,7 @@ class PrintFlagsFinalCatalogTest {
         List<String> unmapped = new ArrayList<>();
         for (JvmFlagEntry entry : entries) {
             String catalogFlag = entry.flag().flag();
-            if (JvmFlagPrintFlagsFinalMapper.isExcludedFromSnapshotCheck(catalogFlag)) {
+            if (JvmFlagPrintFlagsFinalMapper.isExcludedFromSnapshotCheck(catalogFlag, featureVersion)) {
                 continue;
             }
             Optional<String> printFlagsFinalName =

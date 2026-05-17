@@ -14,7 +14,8 @@ import java.util.regex.Pattern;
 
 final class PrintFlagsFinalSnapshot {
 
-    private static final String SNAPSHOT_RESOURCE_PREFIX = "printflagsfinal/java";
+    private static final String SNAPSHOT_RESOURCE_PREFIX = "printflagsfinal/java-";
+    private static final String SNAPSHOT_RESOURCE_SUFFIX = "-hotspot.md";
 
     static final class Flag {
         private final String name;
@@ -52,7 +53,7 @@ final class PrintFlagsFinalSnapshot {
     private PrintFlagsFinalSnapshot() {}
 
     static String snapshotResourceName(int javaFeatureVersion) {
-        return SNAPSHOT_RESOURCE_PREFIX + javaFeatureVersion + ".md";
+        return SNAPSHOT_RESOURCE_PREFIX + javaFeatureVersion + SNAPSHOT_RESOURCE_SUFFIX;
     }
 
     static boolean hasSnapshotForJavaVersion(int javaFeatureVersion) {
