@@ -140,7 +140,7 @@ The same `flagId` may appear in **different** question types or **different** `s
 | Target version | Random LTS (8, 11, 17, 21, 25) |
 | Correct answer | Count of flag nodes with a non-empty `description` in that version’s catalog (same pool as index building) |
 | Wrong answers | Flag counts from **three other** LTS catalogs (each LTS has a distinct count, so four unique numeric options) |
-| Options | Four numbers as strings (e.g. `753`, `698`), shuffled |
+| Options | Four numbers as strings (e.g. `723`, `654`), shuffled |
 | Display | No flag monospace block (prompt only) |
 | Abort | `null` if the version has no flags or fewer than three distinct distractor counts |
 

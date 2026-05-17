@@ -1,8 +1,8 @@
 package info.jab.jvmflag;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +45,23 @@ final class JvmFlagPrintFlagsFinalMapper {
             }
         }
         return Collections.unmodifiableMap(byName);
+    }
+
+    /**
+     * Catalog flag strings that are not {@code -XX:} options or whose internal PrintFlagsFinal name is absent
+     * from {@code snapshotNames}.
+     */
+    static List<String> catalogFlagsOutsideSnapshot(
+            List<JvmFlagEntry> entries, Set<String> snapshotNames, int javaFeatureVersion) {
+        List<String> outside = new ArrayList<>();
+        for (JvmFlagEntry entry : entries) {
+            Optional<String> printFlagsFinalName = toPrintFlagsFinalName(entry.flag().flag(), javaFeatureVersion);
+            if (!printFlagsFinalName.isPresent() || !snapshotNames.contains(printFlagsFinalName.get())) {
+                outside.add(entry.flag().flag());
+            }
+        }
+        Collections.sort(outside);
+        return Collections.unmodifiableList(outside);
     }
 
     static Optional<String> toPrintFlagsFinalName(String catalogFlag) {

@@ -239,7 +239,7 @@
   </header>
   <main>
     <p id="intro">
-      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are documented flags grouped by the level you choose below.
+      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are HotSpot flags from <code>-XX:+PrintFlagsFinal</code> (one catalog entry per internal flag), grouped by the level you choose below.
     </p>
     <div class="group-by-control">
       <label for="group-by">Group by</label>
@@ -422,7 +422,7 @@
       const catalogsByVersion = {};
       await Promise.all(
         CATALOG_VERSIONS.map(async (v) => {
-          const res = await fetch(`json/java-${v}.json`);
+          const res = await fetch(`json/java-${v}.json`, { cache: "no-store" });
           if (!res.ok) throw new Error(`Failed to load java-${v}.json (${res.status})`);
           catalogsByVersion[v] = await res.json();
         })

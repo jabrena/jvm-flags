@@ -43,16 +43,31 @@ class PrintFlagsFinalCatalogTest {
                 PrintFlagsFinalSnapshot.parseFlagNames(PrintFlagsFinalSnapshot.loadText(featureVersion));
         List<JvmFlagEntry> entries = JvmFlagCatalog.loadForJavaVersion(featureVersion);
 
+        assertThat(entries)
+                .as(
+                        "java-%s.json must contain only PrintFlagsFinal flags from %s (%d expected, no launcher or extra -XX options)",
+                        featureVersion,
+                        snapshotResource,
+                        snapshotNames.size())
+                .hasSize(snapshotNames.size());
+
+        assertThat(JvmFlagPrintFlagsFinalMapper.catalogFlagsOutsideSnapshot(
+                        entries, snapshotNames, featureVersion))
+                .as(
+                        "java-%s.json must not contain flags outside %s",
+                        featureVersion,
+                        snapshotResource)
+                .isEmpty();
+
         Map<String, JvmFlagEntry> catalogByPrintFlagsFinalName =
                 JvmFlagPrintFlagsFinalMapper.catalogEntriesByPrintFlagsFinalName(
                         entries, snapshotNames, featureVersion);
 
         assertThat(catalogByPrintFlagsFinalName)
                 .as(
-                        "java-%s.json must have exactly one catalog entry per PrintFlagsFinal flag in %s (%d expected)",
+                        "java-%s.json must have exactly one catalog entry per PrintFlagsFinal flag in %s",
                         featureVersion,
-                        snapshotResource,
-                        snapshotNames.size())
+                        snapshotResource)
                 .hasSize(snapshotNames.size())
                 .containsOnlyKeys(snapshotNames);
     }
