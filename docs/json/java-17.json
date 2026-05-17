@@ -543,7 +543,11 @@
       "flag": "-XX:ShenandoahGCHeuristics=<mode>",
       "description": "Selects Shenandoah heuristics mode (e.g. adaptive, static, aggressive).",
       "flagId": "fb21b3a7-04db-5f8c-a8a4-dea25bc25106",
-      "testValue": "-XX:ShenandoahGCHeuristics=adaptive"
+      "testValue": "-XX:ShenandoahGCHeuristics=adaptive",
+      "requires": [
+        "-XX:+UseShenandoahGC"
+      ],
+      "acceptNonZeroExit": true
     },
     {
       "id": "flag-shenandoahuncommitdelay",
@@ -554,8 +558,10 @@
       "flagId": "47680916-be61-51b9-9335-79e66b929fb9",
       "testValue": "-XX:ShenandoahUncommitDelay=1000",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
-      ]
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+UseShenandoahGC"
+      ],
+      "acceptNonZeroExit": true
     },
     {
       "id": "flag-useepsilongc",

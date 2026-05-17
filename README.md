@@ -2,6 +2,8 @@
 
 Interactive website about JVM flags by Java version.
 
+[![CI Builds](https://github.com/jabrena/jvm-flags/actions/workflows/maven.yaml/badge.svg)](https://github.com/jabrena/jvm-flags/actions/workflows/maven.yaml)
+
 ## Run locally
 
 ```bash
