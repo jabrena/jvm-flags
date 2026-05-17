@@ -931,7 +931,7 @@
       "requires": [
         "-XX:+UnlockDiagnosticVMOptions"
       ],
-      "testValue": "-XX:+UseCRC32"
+      "testValue": "-XX:+UseCRC32Intrinsics"
     },
     {
       "id": "flag-initialcodecachesiz",
@@ -1685,7 +1685,8 @@
       "flag": "-XX:+AvoidUnalignedAccesses",
       "description": "Avoid generating unaligned memory accesses on architectures where they are costly.",
       "flagId": "98abc4e3-b180-58a9-8a9a-1b1a6518ef09",
-      "testValue": "-XX:+AvoidUnalignedAccesses"
+      "testValue": "-XX:+AvoidUnalignedAccesses",
+      "testable": false
     },
     {
       "id": "flag-pending-bceatracelevel",
@@ -1784,7 +1785,8 @@
       "flag": "-XX:BlockZeroingLowLimit=<n>",
       "description": "Minimum size in bytes for using block zeroing instead of scalar stores.",
       "flagId": "84834f0f-5690-5a46-82a2-8dbb67328ac1",
-      "testValue": "-XX:BlockZeroingLowLimit=256"
+      "testValue": "-XX:BlockZeroingLowLimit=256",
+      "testable": false
     },
     {
       "id": "flag-pending-branchonregister",
@@ -3984,7 +3986,8 @@
       "flag": "-XX:+NearCpool",
       "description": "Place the constant pool near compiled code (platform-specific layout).",
       "flagId": "c62ed022-478c-5498-af16-8bd10d5d08b4",
-      "testValue": "-XX:+NearCpool"
+      "testValue": "-XX:+NearCpool",
+      "testable": false
     },
     {
       "id": "flag-pending-needsdeoptsuspend",
@@ -5633,7 +5636,8 @@
       "flag": "-XX:+TraceTraps",
       "description": "Trace traps handled by the signal handler (diagnostic).",
       "flagId": "9cd59436-1f74-550c-88f5-d539644e965a",
-      "testValue": "-XX:+TraceTraps"
+      "testValue": "-XX:+TraceTraps",
+      "testable": false
     },
     {
       "id": "flag-pending-trackedinitializationlimit",
@@ -5822,7 +5826,8 @@
       "flag": "-XX:+UseBarriersForVolatile",
       "description": "Use memory barriers to implement volatile field accesses.",
       "flagId": "7197a6fc-670d-59ff-8588-474bee712bd0",
-      "testValue": "-XX:+UseBarriersForVolatile"
+      "testValue": "-XX:+UseBarriersForVolatile",
+      "testable": false
     },
     {
       "id": "flag-pending-usebiasedlocking",
@@ -5849,7 +5854,8 @@
       "flag": "-XX:+UseBlockZeroing",
       "description": "Use block zeroing instructions when clearing memory.",
       "flagId": "95a41621-9526-560b-912a-1d61cb5490dc",
-      "testValue": "-XX:+UseBlockZeroing"
+      "testValue": "-XX:+UseBlockZeroing",
+      "testable": false
     },
     {
       "id": "flag-pending-usebsdposixthreadcpuclocks",
@@ -5858,7 +5864,8 @@
       "flag": "-XX:+UseBsdPosixThreadCPUClocks",
       "description": "Use POSIX thread CPU-time clocks on BSD systems.",
       "flagId": "c872d3e4-063a-59a7-b69e-8fd668ba3fde",
-      "testValue": "-XX:+UseBsdPosixThreadCPUClocks"
+      "testValue": "-XX:+UseBsdPosixThreadCPUClocks",
+      "testable": false
     },
     {
       "id": "flag-pending-usecmsbestfit",
@@ -5894,7 +5901,8 @@
       "flag": "-XX:+UseCRC32",
       "description": "Use hardware CRC32 instructions when available.",
       "flagId": "6e36c229-881d-53da-bede-05b681ed9067",
-      "testValue": "-XX:+UseCRC32"
+      "testValue": "-XX:+UseCRC32",
+      "testable": false
     },
     {
       "id": "flag-pending-usecodeaging",
@@ -6074,7 +6082,8 @@
       "flag": "-XX:+UseLSE",
       "description": "Use ARM Large System Extensions atomic instructions when available.",
       "flagId": "d9a73d60-3a5f-569b-9dce-0afa329c6e58",
-      "testValue": "-XX:+UseLSE"
+      "testValue": "-XX:+UseLSE",
+      "testable": false
     },
     {
       "id": "flag-pending-uselwpsynchronization",
@@ -6191,7 +6200,8 @@
       "flag": "-XX:+UseNeon",
       "description": "Use ARM NEON SIMD instructions when available.",
       "flagId": "11bf9785-63cf-521e-9963-5c5a7b9265e5",
-      "testValue": "-XX:+UseNeon"
+      "testValue": "-XX:+UseNeon",
+      "testable": false
     },
     {
       "id": "flag-pending-useoserrorreporting",
@@ -6299,7 +6309,8 @@
       "flag": "-XX:+UseSIMDForArrayEquals",
       "description": "Use SIMD instructions in generated code for Arrays.equals when supported by the CPU.",
       "flagId": "ac138142-7341-577d-8c13-f96b11fcc280",
-      "testValue": "-XX:+UseSIMDForArrayEquals"
+      "testValue": "-XX:+UseSIMDForArrayEquals",
+      "testable": false
     },
     {
       "id": "flag-pending-usesimdformemoryops",
@@ -6308,7 +6319,8 @@
       "flag": "-XX:+UseSIMDForMemoryOps",
       "description": "Use SIMD instructions in generated array copy and memory moves.",
       "flagId": "c9efdf98-c16c-500b-bdaa-4aea1c749a11",
-      "testValue": "-XX:+UseSIMDForMemoryOps"
+      "testValue": "-XX:+UseSIMDForMemoryOps",
+      "testable": false
     },
     {
       "id": "flag-pending-usesse",
@@ -6344,7 +6356,8 @@
       "flag": "-XX:+UseSimpleArrayEquals",
       "description": "Use a simple scalar implementation for Arrays.equals instead of SIMD intrinsics.",
       "flagId": "299abd89-f7ba-5d33-98cb-fd701ff47790",
-      "testValue": "-XX:+UseSimpleArrayEquals"
+      "testValue": "-XX:+UseSimpleArrayEquals",
+      "testable": false
     },
     {
       "id": "flag-pending-usesubwordformaxvector",
