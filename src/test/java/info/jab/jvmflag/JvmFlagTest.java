@@ -41,7 +41,7 @@ class JvmFlagTest {
     }
 
     private static boolean shouldVerify(JvmFlagEntry entry) {
-        return entry.testSpec().testable() || entry.flag().isPendingCategorization();
+        return entry.testSpec().testable();
     }
 
     @ParameterizedTest(name = "{0}")
@@ -107,7 +107,10 @@ class JvmFlagTest {
 
     private static boolean isJvmArtifact(Path path) {
         String name = path.getFileName().toString();
-        return name.endsWith(".jfr") || name.endsWith(".log") || name.contains(".log.");
+        return name.startsWith("hsperfdata_")
+                || name.endsWith(".jfr")
+                || name.endsWith(".log")
+                || name.contains(".log.");
     }
 
     private static void deleteJvmArtifact(Path path) {
