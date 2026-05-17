@@ -118,12 +118,6 @@
       gap: 0.4rem;
     }
 
-    .legend-bar .scroll-hint {
-      flex: 1 1 100%;
-      font-size: 0.72rem;
-      color: var(--accent);
-    }
-
     .dot {
       width: 10px;
       height: 10px;
@@ -335,12 +329,6 @@
       flex-shrink: 0;
     }
 
-    #detail .hint {
-      margin-top: 0.5rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
     .site-footer {
       border-top: 1px solid var(--border);
       background: var(--bg);
@@ -418,6 +406,17 @@
       color: var(--muted);
     }
 
+    .detail-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      width: 100%;
+    }
+
+    .detail-actions .btn-graph {
+      width: 100%;
+    }
+
     @media (min-width: 640px) {
       header {
         padding: 1.25rem 1.5rem 0.75rem;
@@ -447,11 +446,6 @@
         font-size: 0.8rem;
       }
 
-      .legend-bar .scroll-hint {
-        flex: 1 1 auto;
-        text-align: right;
-      }
-
       #timeline-scroller {
         height: 260px;
       }
@@ -467,7 +461,13 @@
         align-items: start;
       }
 
-      .btn-graph {
+      .detail-actions {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        width: auto;
+      }
+
+      .detail-actions .btn-graph {
         width: auto;
         white-space: nowrap;
       }
@@ -508,7 +508,6 @@
     <span><i class="dot release"></i> Major release</span>
     <span><i class="dot lts"></i> LTS (8, 11, 17, 21, 25)</span>
     <span>Tap a milestone</span>
-    <span class="scroll-hint">← Swipe timeline left / right →</span>
   </div>
 
   <main>
@@ -545,6 +544,7 @@
 
   <script>
     const GRAPH_URL = "java-version.html";
+    const EVOLUTION_URL = "jvm-flag-evolution.html";
 
     const events = [
       { version: 1, label: "Java 1.0", date: "1996-01-23" },
@@ -586,6 +586,10 @@
       return `${GRAPH_URL}?java=${version}`;
     }
 
+    function evolutionHref(version) {
+      return `${EVOLUTION_URL}?java=${version}`;
+    }
+
     function formatDate(d) {
       return d3.timeFormat("%B %d, %Y")(d);
     }
@@ -605,19 +609,23 @@
     function renderDetail(ev) {
       const lts = ev.lts || LTS_VERSIONS.has(ev.version);
       const hasGraph = LTS_VERSIONS.has(ev.version);
+      const exploreBtn = hasGraph
+        ? `<a class="btn-graph" href="${graphHref(ev.version)}">Explore JVM flags →</a>`
+        : `<button type="button" class="btn-graph" disabled>Explore JVM flags →</button>`;
+      const evolutionBtn = hasGraph
+        ? `<a class="btn-graph" href="${evolutionHref(ev.version)}">Visualize evolution →</a>`
+        : `<button type="button" class="btn-graph" disabled>Visualize evolution →</button>`;
       detailEl.innerHTML = `
         <div>
           <div class="detail-header">
             <h2>${ev.label}${lts ? '<span class="lts-tag">LTS</span>' : ""}</h2>
             <p class="meta">${formatDate(ev.parsed)}</p>
           </div>
-          ${hasGraph
-            ? `<p class="hint">JVM flag graph data is available for this LTS release.</p>`
-            : `<p class="hint">Flag graphs are maintained for LTS versions (8, 11, 17, 21, 25).</p>`}
         </div>
-        ${hasGraph
-          ? `<a class="btn-graph" href="${graphHref(ev.version)}">Explore JVM flags →</a>`
-          : `<button type="button" class="btn-graph" disabled>Explore JVM flags →</button>`}
+        <div class="detail-actions">
+          ${exploreBtn}
+          ${evolutionBtn}
+        </div>
       `;
     }
 

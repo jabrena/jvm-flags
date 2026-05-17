@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVM Flag Evolution</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #f59e0b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem 1.25rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    main {
+      max-width: 58rem;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem 3rem;
+    }
+
+    main > p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .group-by-control {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .group-by-control label {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .group-by-control select {
+      font: inherit;
+      font-size: 0.8rem;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.4rem 2rem 0.4rem 0.65rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b9cb3' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.55rem center;
+    }
+
+    .group-by-control select:hover,
+    .group-by-control select:focus {
+      border-color: var(--accent);
+      outline: none;
+    }
+
+    .chart-wrap {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 0.75rem 0.75rem;
+      overflow: visible;
+    }
+
+    .chart-wrap svg {
+      display: block;
+      width: 100%;
+      height: 24rem;
+    }
+
+    .chart-status {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .chart-status.error { color: #f87171; }
+
+    .axis text {
+      fill: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .axis line,
+    .axis path {
+      stroke: var(--border);
+    }
+
+    .axis-label {
+      fill: var(--muted);
+      font-size: 0.72rem;
+    }
+
+    .stack-total {
+      fill: var(--text);
+      font-size: 0.68rem;
+      font-weight: 600;
+      pointer-events: none;
+    }
+
+    .bar-group--selected .stack-segment {
+      stroke: var(--accent);
+      stroke-width: 1.5px;
+    }
+
+    .grid line {
+      stroke: var(--border);
+      stroke-opacity: 0.55;
+      stroke-dasharray: 2, 4;
+    }
+
+    .grid path { display: none; }
+
+    #tooltip {
+      position: absolute;
+      pointer-events: none;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: var(--text);
+      background: #0b1018;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      opacity: 0;
+      transition: opacity 0.12s;
+      z-index: 5;
+      max-width: 14rem;
+    }
+
+    #tooltip strong {
+      display: block;
+      color: var(--accent);
+      margin-bottom: 0.15rem;
+    }
+
+    .stack-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
+      gap: 0.45rem 0.75rem;
+      margin-top: 0.85rem;
+      padding: 0 0.25rem 0.15rem;
+      width: 100%;
+      overflow: visible;
+    }
+
+    .stack-legend span {
+      display: inline-flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      font-size: 0.72rem;
+      line-height: 1.35;
+      color: var(--muted);
+      min-width: 0;
+      word-break: break-word;
+    }
+
+    .stack-legend i {
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .legend-note {
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .legend-note a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .legend-note a:hover { text-decoration: underline; }
+  </style>
+  <link rel="icon" type="image/png" href="images/java-icon.png">
+</head>
+<body>
+  <header>
+    <a href="index.html" class="back-link" aria-label="Back">← Back</a>
+    <h1><span id="title-version">Java 25</span> JVM flag evolution</h1>
+  </header>
+  <main>
+    <p id="intro">
+      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are documented flags grouped by the level you choose below.
+    </p>
+    <div class="group-by-control">
+      <label for="group-by">Group by</label>
+      <select id="group-by" aria-label="Group flags by">
+        <option value="domain" selected>Domain</option>
+        <option value="category">Category</option>
+        <option value="subcategory">Subcategories</option>
+      </select>
+    </div>
+    <div class="chart-wrap" id="chart-wrap">
+      <div class="chart-status" id="chart-status">Loading catalogs…</div>
+      <svg id="chart" hidden></svg>
+      <div id="stack-legend" class="stack-legend" hidden></div>
+      <div id="tooltip" role="tooltip"></div>
+    </div>
+    <p class="legend-note" id="legend-note" hidden></p>
+  </main>
+  <script>
+    const DEFAULT_JAVA = "25";
+    const CATALOG_VERSIONS = ["8", "11", "17", "21", "25"];
+
+    const DOMAIN_ORDER = [
+      "Memory & layout",
+      "Garbage collection",
+      "Execution & code",
+      "Classes & modules",
+      "Concurrency",
+      "Operations & platform"
+    ];
+
+    const DOMAIN_COLORS = {
+      "Memory & layout": "#3b82f6",
+      "Garbage collection": "#34d399",
+      "Execution & code": "#f59e0b",
+      "Classes & modules": "#a78bfa",
+      "Concurrency": "#22d3ee",
+      "Operations & platform": "#ec4899"
+    };
+
+    const GROUP_LEVELS = {
+      domain: {
+        label: "Domain",
+        plural: "domains",
+        nodeType: "domain",
+        order: DOMAIN_ORDER
+      },
+      category: {
+        label: "Category",
+        plural: "categories",
+        nodeType: "category"
+      },
+      subcategory: {
+        label: "Subcategories",
+        plural: "subcategories",
+        nodeType: "subcategory"
+      }
+    };
+
+    function debounce(fn, wait) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), wait);
+      };
+    }
+
+    const java = new URLSearchParams(window.location.search).get("java");
+    const version =
+      java != null && /^\d+$/.test(String(java).trim())
+        ? String(java).trim()
+        : DEFAULT_JAVA;
+
+    document.getElementById("title-version").textContent = `Java ${version}`;
+    document.title = `Java ${version} JVM Flag Evolution`;
+
+    const chartWrap = document.getElementById("chart-wrap");
+    const chartStatus = document.getElementById("chart-status");
+    const stackLegend = document.getElementById("stack-legend");
+    const legendNote = document.getElementById("legend-note");
+    const groupBySelect = document.getElementById("group-by");
+    const svg = d3.select("#chart");
+    const tooltip = d3.select("#tooltip");
+
+    let catalogsCache = null;
+    let currentGroupBy = "domain";
+    let colorForKey = () => "#64748b";
+
+    function countFlagsByLevel(catalog, nodeType) {
+      const byId = new Map(catalog.nodes.map((n) => [n.id, n]));
+      const parentByChild = new Map();
+      for (const edge of catalog.edges) {
+        parentByChild.set(edge.target, edge.source);
+      }
+
+      function ancestorLabel(flagId, type) {
+        let cur = flagId;
+        const seen = new Set();
+        while (cur) {
+          if (seen.has(cur)) break;
+          seen.add(cur);
+          const node = byId.get(cur);
+          if (!node) break;
+          if (node.type === type) return node.label;
+          cur = parentByChild.get(cur);
+        }
+        return null;
+      }
+
+      const counts = {};
+      for (const node of catalog.nodes) {
+        if (node.type !== "flag") continue;
+        const label = ancestorLabel(node.id, nodeType);
+        if (!label) continue;
+        counts[label] = (counts[label] || 0) + 1;
+      }
+      return counts;
+    }
+
+    function buildStackData(catalogsByVersion, level) {
+      const config = GROUP_LEVELS[level];
+      const versions = CATALOG_VERSIONS.map((v) => ({
+        version: v,
+        label: `Java ${v}`,
+        groups: countFlagsByLevel(catalogsByVersion[v], config.nodeType)
+      }));
+
+      const keySet = new Set();
+      if (config.order) {
+        config.order.forEach((k) => keySet.add(k));
+      }
+      for (const v of versions) {
+        Object.keys(v.groups).forEach((k) => keySet.add(k));
+      }
+
+      let keys;
+      if (config.order) {
+        keys = config.order.filter((k) => keySet.has(k));
+        for (const k of keySet) {
+          if (!keys.includes(k)) keys.push(k);
+        }
+      } else {
+        const totals = new Map();
+        for (const k of keySet) totals.set(k, 0);
+        for (const v of versions) {
+          for (const [k, n] of Object.entries(v.groups)) {
+            totals.set(k, totals.get(k) + n);
+          }
+        }
+        keys = [...keySet].sort(
+          (a, b) => totals.get(b) - totals.get(a) || a.localeCompare(b)
+        );
+      }
+
+      const rows = versions.map((v) => {
+        const row = { version: v.version, label: v.label };
+        let total = 0;
+        for (const k of keys) {
+          const n = v.groups[k] || 0;
+          row[k] = n;
+          total += n;
+        }
+        row.total = total;
+        return row;
+      });
+
+      return { rows, keys, level };
+    }
+
+    function buildColorFn(keys, level) {
+      if (level === "domain") {
+        return (key) => DOMAIN_COLORS[key] || "#64748b";
+      }
+      const scale = d3
+        .scaleOrdinal(d3.schemeTableau10.concat(d3.schemeSet3))
+        .domain(keys);
+      return (key) => scale(key);
+    }
+
+    async function loadCatalogs() {
+      const catalogsByVersion = {};
+      await Promise.all(
+        CATALOG_VERSIONS.map(async (v) => {
+          const res = await fetch(`json/java-${v}.json`);
+          if (!res.ok) throw new Error(`Failed to load java-${v}.json (${res.status})`);
+          catalogsByVersion[v] = await res.json();
+        })
+      );
+      return catalogsByVersion;
+    }
+
+    function renderStackLegend(keys) {
+      stackLegend.hidden = false;
+      stackLegend.innerHTML = keys
+        .map(
+          (key) =>
+            `<span><i style="background:${colorForKey(key)}"></i>${key}</span>`
+        )
+        .join("");
+    }
+
+    function showLoadError(message) {
+      chartStatus.style.display = "block";
+      chartStatus.classList.add("error");
+      chartStatus.textContent = message;
+      document.getElementById("chart").hidden = true;
+      stackLegend.hidden = true;
+      legendNote.hidden = true;
+    }
+
+    function refreshChart() {
+      if (!catalogsCache) {
+        showLoadError(
+          "Could not load flag catalogs. Serve the site from the docs folder (jwebserver -d docs -p 8080)."
+        );
+        return;
+      }
+
+      chartStatus.style.display = "none";
+      chartStatus.classList.remove("error");
+      const stackData = buildStackData(catalogsCache, currentGroupBy);
+      colorForKey = buildColorFn(stackData.keys, stackData.level);
+      drawStackedChart(stackData, version);
+    }
+
+    function drawStackedChart(stackData, selectedVersion) {
+      const { rows, keys, level } = stackData;
+      if (!rows.length) return;
+
+      chartStatus.style.display = "none";
+      const chartEl = document.getElementById("chart");
+      chartEl.hidden = false;
+      chartEl.removeAttribute("aria-hidden");
+      renderStackLegend(keys);
+
+      const groupLabel = GROUP_LEVELS[level].label.toLowerCase();
+
+      const margin = { top: 28, right: 20, bottom: 52, left: 52 };
+      const innerWidth = Math.max(
+        300,
+        Math.min(760, chartWrap.clientWidth - 24) - margin.left - margin.right
+      );
+      const innerHeight = 360 - margin.top - margin.bottom;
+      const width = innerWidth + margin.left + margin.right;
+      const height = innerHeight + margin.top + margin.bottom;
+
+      svg.selectAll("*").remove();
+
+      const root = svg
+        .attr("viewBox", `0 0 ${width} ${height}`)
+        .attr("width", "100%")
+        .attr("height", height)
+        .attr("role", "img")
+        .attr(
+          "aria-label",
+          `Stacked bar chart of JVM flag counts per Java LTS release, grouped by ${groupLabel}`
+        )
+        .append("g")
+        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+      const series = d3.stack().keys(keys).order(d3.stackOrderNone).offset(d3.stackOffsetNone)(
+        rows
+      );
+
+      const yMax = d3.max(rows, (d) => d.total);
+      const y = d3
+        .scaleLinear()
+        .domain([0, yMax * 1.06])
+        .nice()
+        .range([innerHeight, 0]);
+
+      const x = d3
+        .scaleBand()
+        .domain(rows.map((d) => d.label))
+        .range([0, innerWidth])
+        .padding(0.22);
+
+      root
+        .append("g")
+        .attr("class", "grid")
+        .call(
+          d3
+            .axisLeft(y)
+            .tickSize(-innerWidth)
+            .tickFormat("")
+        );
+
+      root
+        .append("g")
+        .attr("class", "axis")
+        .attr("transform", `translate(0,${innerHeight})`)
+        .call(d3.axisBottom(x));
+
+      root.append("g").attr("class", "axis").call(d3.axisLeft(y).ticks(7));
+
+      root
+        .append("text")
+        .attr("class", "axis-label")
+        .attr("x", innerWidth / 2)
+        .attr("y", innerHeight + 42)
+        .attr("text-anchor", "middle")
+        .text("Java release");
+
+      root
+        .append("text")
+        .attr("class", "axis-label")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -innerHeight / 2)
+        .attr("y", -40)
+        .attr("text-anchor", "middle")
+        .text("Flags in catalog");
+
+      const versionGroups = root
+        .selectAll(".bar-group")
+        .data(rows)
+        .join("g")
+        .attr("class", (d) =>
+          d.version === selectedVersion
+            ? "bar-group bar-group--selected"
+            : "bar-group"
+        )
+        .attr("transform", (d) => `translate(${x(d.label)},0)`);
+
+      versionGroups
+        .append("text")
+        .attr("class", "stack-total")
+        .attr("x", x.bandwidth() / 2)
+        .attr("y", (d) => y(d.total) - 6)
+        .attr("text-anchor", "middle")
+        .text((d) => d.total.toLocaleString());
+
+      versionGroups
+        .selectAll(".layer")
+        .data((row) =>
+          series.map((layer) => ({
+            key: layer.key,
+            segment: layer.find((p) => p.data.version === row.version)
+          }))
+        )
+        .join("g")
+        .attr("class", "layer")
+        .selectAll("rect")
+        .data((d) => (d.segment ? [d] : []))
+        .join("rect")
+        .attr("class", "stack-segment")
+        .attr("x", 0)
+        .attr("width", x.bandwidth())
+        .attr("y", innerHeight)
+        .attr("height", 0)
+        .attr("fill", (d) => colorForKey(d.key))
+        .on("mouseenter", function (event, d) {
+          d3.select(this).attr("fill-opacity", 0.82);
+          const row = d.segment.data;
+          const count = row[d.key];
+          tooltip.style("opacity", 1).html(
+            `<strong>${row.label}</strong>` +
+              `${d.key}<br>` +
+              `${count.toLocaleString()} flags` +
+              (row.version === selectedVersion ? "<br>Selected release" : "")
+          );
+        })
+        .on("mousemove", (event) => {
+          const bounds = chartWrap.getBoundingClientRect();
+          tooltip
+            .style("left", `${event.clientX - bounds.left + 12}px`)
+            .style("top", `${event.clientY - bounds.top - 8}px`);
+        })
+        .on("mouseleave", function () {
+          d3.select(this).attr("fill-opacity", 1);
+          tooltip.style("opacity", 0);
+        })
+        .transition()
+        .duration(550)
+        .ease(d3.easeCubicOut)
+        .attr("y", (d) => y(d.segment[1]))
+        .attr("height", (d) => Math.max(0, y(d.segment[0]) - y(d.segment[1])));
+
+      const selected = rows.find((d) => d.version === selectedVersion);
+      if (selected) {
+        legendNote.hidden = false;
+        legendNote.innerHTML =
+          `Viewing context: <strong>Java ${selectedVersion}</strong> ` +
+          `(${selected.total.toLocaleString()} flags across ${keys.length} ${GROUP_LEVELS[level].plural}). ` +
+          `<a href="java-version.html?java=${selectedVersion}">Open full flag graph →</a>`;
+      }
+    }
+
+    function initChart() {
+      loadCatalogs()
+        .then((catalogs) => {
+          catalogsCache = catalogs;
+          refreshChart();
+        })
+        .catch((err) => {
+          console.error(err);
+          catalogsCache = null;
+          showLoadError(
+            "Could not load flag catalogs. Serve the site from the docs folder (jwebserver -d docs -p 8080)."
+          );
+        });
+    }
+
+    groupBySelect.addEventListener("change", () => {
+      currentGroupBy = groupBySelect.value;
+      refreshChart();
+    });
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initChart);
+    } else {
+      initChart();
+    }
+
+    window.addEventListener(
+      "resize",
+      debounce(() => {
+        if (catalogsCache) refreshChart();
+      }, 150)
+    );
+  </script>
+</body>
+</html>

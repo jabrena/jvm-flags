@@ -470,6 +470,8 @@
       versionPresence: "Version check",
       whichVersion: "LTS release",
       description: "Flag description",
+      flagFromDescription: "Flag name",
+      firstLts: "First LTS",
       flagCount: "Catalog size"
     };
 
@@ -503,6 +505,7 @@
       for (const node of data.nodes) {
         if (node.type !== "flag" || !node.description) continue;
 
+        const parentId = parentOfFlag.get(node.id) || "_ungrouped";
         const entry = {
           version,
           id: node.id,
@@ -512,7 +515,6 @@
         };
         flags.push(entry);
 
-        const parentId = parentOfFlag.get(node.id) || "_ungrouped";
         if (!parentGroups.has(parentId)) parentGroups.set(parentId, []);
         parentGroups.get(parentId).push(entry);
       }
@@ -634,14 +636,8 @@
 
     function buildDescriptionQuestion(index) {
       const version = pickRandom(LTS_VERSIONS);
-      const groups = index.parentGroupsByVersion.get(version);
-      const eligible = [...groups.values()].filter((g) => {
-        if (g.length < 4) return false;
-        return new Set(g.map((f) => f.description)).size >= 4;
-      });
-      if (!eligible.length) return null;
-
-      const siblings = pickRandom(eligible);
+      const siblings = pickEligibleSiblingGroup(index, version);
+      if (!siblings) return null;
       const correct = pickRandom(siblings);
       const distractors = shuffle(siblings.filter((f) => f !== correct)).slice(0, 3);
 
@@ -664,6 +660,72 @@
         flag: correct.flag,
         options: options.map((o) => o.text),
         correctIndex: options.findIndex((o) => o.correct)
+      };
+    }
+
+    function pickEligibleSiblingGroup(index, version) {
+      const groups = index.parentGroupsByVersion.get(version);
+      const eligible = [...groups.values()].filter((g) => {
+        if (g.length < 4) return false;
+        return new Set(g.map((f) => f.description)).size >= 4;
+      });
+      if (!eligible.length) return null;
+      return pickRandom(eligible);
+    }
+
+    function buildFlagFromDescriptionQuestion(index) {
+      const version = pickRandom(LTS_VERSIONS);
+      const siblings = pickEligibleSiblingGroup(index, version);
+      if (!siblings) return null;
+
+      const correct = pickRandom(siblings);
+      const distractors = shuffle(siblings.filter((f) => f !== correct)).slice(0, 3);
+
+      const optionTexts = [correct.flag, ...distractors.map((f) => f.flag)];
+      if (new Set(optionTexts).size < 4) return null;
+
+      const options = shuffle([
+        { text: correct.flag, correct: true },
+        ...distractors.map((f) => ({ text: f.flag, correct: false }))
+      ]);
+
+      return {
+        type: "flagFromDescription",
+        flagId: correct.flagId,
+        scopeVersion: version,
+        prompt: "Which JVM flag matches this description?",
+        flag: correct.description,
+        options: options.map((o) => o.text),
+        correctIndex: options.findIndex((o) => o.correct)
+      };
+    }
+
+    function buildFirstLtsQuestion(index) {
+      const entries = [...index.versionsForFlagId.entries()].filter(([, vers]) => {
+        const lts = [...vers].filter((v) => LTS_VERSIONS.includes(v));
+        return lts.length > 0;
+      });
+      if (!entries.length) return null;
+
+      const [flagId, versions] = pickRandom(entries);
+      const flag = index.byFlagId.get(flagId);
+      const ltsPresent = [...versions]
+        .filter((v) => LTS_VERSIONS.includes(v))
+        .sort((a, b) => a - b);
+      const firstLts = ltsPresent[0];
+      const wrongVersions = shuffle(LTS_VERSIONS.filter((v) => v !== firstLts)).slice(0, 3);
+      const options = shuffle([
+        `Java ${firstLts}`,
+        ...wrongVersions.map((v) => `Java ${v}`)
+      ]);
+
+      return {
+        type: "firstLts",
+        flagId,
+        prompt: "In which LTS release did this flag <strong>first</strong> appear?",
+        flag: flag.flag,
+        options,
+        correctIndex: options.indexOf(`Java ${firstLts}`)
       };
     }
 
@@ -700,25 +762,58 @@
       return `${q.type}|${q.flagId}|${scope}`;
     }
 
-    function generateQuiz(index) {
-      const generators = [
-        () => buildVersionPresenceQuestion(index),
-        () => buildWhichVersionQuestion(index),
-        () => buildDescriptionQuestion(index),
-        () => buildFlagCountQuestion(index)
-      ];
+    const BALANCED_TYPES = [
+      "versionPresence",
+      "whichVersion",
+      "description",
+      "flagFromDescription",
+      "firstLts"
+    ];
 
+    function buildBalancedQuizPlan() {
+      const counts = Object.fromEntries(BALANCED_TYPES.map((t) => [t, 2]));
+      let remaining = TOTAL_QUESTIONS - 1 - BALANCED_TYPES.length * 2;
+      while (remaining > 0) {
+        for (const type of shuffle([...BALANCED_TYPES])) {
+          if (remaining <= 0) break;
+          counts[type]++;
+          remaining--;
+        }
+      }
+      const plan = ["flagCount"];
+      for (const type of BALANCED_TYPES) {
+        for (let i = 0; i < counts[type]; i++) plan.push(type);
+      }
+      return shuffle(plan);
+    }
+
+    function generateQuiz(index) {
+      const builders = {
+        versionPresence: () => buildVersionPresenceQuestion(index),
+        whichVersion: () => buildWhichVersionQuestion(index),
+        description: () => buildDescriptionQuestion(index),
+        flagFromDescription: () => buildFlagFromDescriptionQuestion(index),
+        firstLts: () => buildFirstLtsQuestion(index),
+        flagCount: () => buildFlagCountQuestion(index)
+      };
+
+      const plan = buildBalancedQuizPlan();
       const questions = [];
       const usedKeys = new Set();
-      let attempts = 0;
-      while (questions.length < TOTAL_QUESTIONS && attempts < 300) {
-        attempts++;
-        const q = pickRandom(generators)();
-        if (!q) continue;
-        const key = questionDedupKey(q);
-        if (usedKeys.has(key)) continue;
-        usedKeys.add(key);
-        questions.push(q);
+      const maxAttemptsPerSlot = 50;
+
+      for (const type of plan) {
+        let added = false;
+        for (let attempt = 0; attempt < maxAttemptsPerSlot && !added; attempt++) {
+          const q = builders[type]();
+          if (!q) continue;
+          const key = questionDedupKey(q);
+          if (usedKeys.has(key)) continue;
+          usedKeys.add(key);
+          questions.push(q);
+          added = true;
+        }
+        if (!added) return questions;
       }
       return questions;
     }
