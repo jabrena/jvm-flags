@@ -2913,7 +2913,7 @@
       "flag": "-XX:LargePageSizeInBytes=<n>",
       "description": "Large page size (0 to let VM choose the page size).",
       "flagId": "502fe1cb-53f9-56bc-a947-be4a817064d2",
-      "testValue": "-XX:LargePageSizeInBytes=0"
+      "testValue": "-XX:LargePageSizeInBytes=2097152"
     },
     {
       "id": "flag-pending-livenodecountinliningcutoff",
@@ -4333,7 +4333,8 @@
       "flag": "-XX:SoftwarePrefetchHintDistance=<n>",
       "description": "Distance for software prefetch hints in compiled code.",
       "flagId": "ab16314d-afe1-59f7-a53b-599f4b47c4e1",
-      "testValue": "-XX:SoftwarePrefetchHintDistance=384"
+      "testValue": "-XX:SoftwarePrefetchHintDistance=384",
+      "testable": false
     },
     {
       "id": "flag-pending-splitifblocks",
@@ -5356,7 +5357,8 @@
       "flag": "-XX:+UseSIMDForBigIntegerShiftIntrinsics",
       "description": "Use SIMD for BigInteger shift intrinsics when supported.",
       "flagId": "a6de9a0b-e29a-5349-80ef-6ff96fe9abe5",
-      "testValue": "-XX:+UseSIMDForBigIntegerShiftIntrinsics"
+      "testValue": "-XX:+UseSIMDForBigIntegerShiftIntrinsics",
+      "testable": false
     },
     {
       "id": "flag-pending-usesimdformemoryops",
