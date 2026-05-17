@@ -2653,7 +2653,8 @@
       "flagId": "65934e25-9cfc-524b-b98d-5011c5f81b7b",
       "testValue": "-XX:JVMCICompilerIdleDelay=1000",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2665,7 +2666,8 @@
       "flagId": "5f607853-caed-590d-b1a9-b9d7bb4538aa",
       "testValue": "-XX:JVMCICounterSize=0",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2677,7 +2679,8 @@
       "flagId": "5020c590-a9ba-56d4-aff9-69219ddafe85",
       "testValue": "-XX:+JVMCICountersExcludeCompiler",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2689,7 +2692,8 @@
       "flagId": "da2e8b9a-1b96-5204-a224-4cc89ce13c5f",
       "testValue": "-XX:JVMCIEventLogLevel=1",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2719,7 +2723,8 @@
       "flagId": "d302f4eb-b25f-5feb-9ddc-e9292901bf77",
       "testValue": "-XX:JVMCINMethodSizeLimit=655360",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2740,7 +2745,8 @@
       "flagId": "30fe5470-83da-55ce-b98b-a339068f9dea",
       "testValue": "-XX:JVMCINativeLibraryThreadFraction=0.330000",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2752,7 +2758,8 @@
       "flagId": "21c32ff7-4c78-5732-9968-083cc9f85bc1",
       "testValue": "-XX:-JVMCIPrintProperties",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2764,7 +2771,9 @@
       "flagId": "06783251-3b48-51f5-b230-68f2c5d7fd2b",
       "testValue": "-XX:JVMCIThreads=1",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI",
+        "-XX:+UseJVMCICompiler"
       ]
     },
     {
@@ -2776,7 +2785,8 @@
       "flagId": "1c8658eb-b146-5723-8916-9316bd72703c",
       "testValue": "-XX:JVMCIThreadsPerNativeLibraryRuntime=1",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -2788,7 +2798,8 @@
       "flagId": "769ee383-1780-59f7-bb9a-9df59cb7afcc",
       "testValue": "-XX:JVMCITraceLevel=0",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
@@ -5103,7 +5114,8 @@
       "flagId": "f9e95f4f-ec17-571c-940d-4bc914857cb9",
       "testValue": "-XX:+UseJVMCINativeLibrary",
       "requires": [
-        "-XX:+UnlockExperimentalVMOptions"
+        "-XX:+UnlockExperimentalVMOptions",
+        "-XX:+EnableJVMCI"
       ]
     },
     {
