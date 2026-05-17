@@ -24,8 +24,8 @@ class JvmFlagCatalogTaxonomyTest {
     @Test
     void taxonomyDefinesExpectedContainerCounts() {
         assertThat(taxonomy.domainCount()).isEqualTo(6);
-        assertThat(taxonomy.categoryCount()).isEqualTo(17);
-        assertThat(taxonomy.subcategoryCount()).isEqualTo(97);
+        assertThat(taxonomy.categoryCount()).isEqualTo(15);
+        assertThat(taxonomy.subcategoryCount()).isEqualTo(89);
     }
 
     @ParameterizedTest(name = "java-{0}.json")

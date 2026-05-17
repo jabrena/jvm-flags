@@ -275,12 +275,6 @@
       "parent": "domain-operations"
     },
     {
-      "id": "modules",
-      "label": "Modules",
-      "type": "category",
-      "parent": "domain-classes"
-    },
-    {
       "id": "security",
       "label": "Security",
       "type": "category",
@@ -319,12 +313,6 @@
     {
       "id": "gc-shenandoah",
       "label": "Shenandoah",
-      "type": "subcategory",
-      "parent": "garbage-collection"
-    },
-    {
-      "id": "gc-epsilon",
-      "label": "EpsilonGC",
       "type": "subcategory",
       "parent": "garbage-collection"
     },
@@ -425,12 +413,6 @@
       "parent": "class-loading"
     },
     {
-      "id": "logging-unified",
-      "label": "Unified Logging",
-      "type": "subcategory",
-      "parent": "logging"
-    },
-    {
       "id": "diag-heap-dumps",
       "label": "Heap Dumps",
       "type": "subcategory",
@@ -455,12 +437,6 @@
       "parent": "diagnostics"
     },
     {
-      "id": "virtual-threads",
-      "label": "Virtual Threads",
-      "type": "category",
-      "parent": "domain-concurrency"
-    },
-    {
       "id": "class-boot-loader",
       "label": "Boot Class Loader",
       "type": "subcategory",
@@ -479,12 +455,6 @@
       "parent": "metaspace"
     },
     {
-      "id": "metaspace-perm-legacy",
-      "label": "Permanent Generation (legacy)",
-      "type": "subcategory",
-      "parent": "metaspace"
-    },
-    {
       "id": "runtime-memory-model",
       "label": "Memory Model & Barriers",
       "type": "subcategory",
@@ -495,12 +465,6 @@
       "label": "JVM Properties",
       "type": "subcategory",
       "parent": "system-properties"
-    },
-    {
-      "id": "vt-scheduler",
-      "label": "Virtual Thread Scheduler",
-      "type": "subcategory",
-      "parent": "virtual-threads"
     },
     {
       "id": "flag-printflagsfinal",
@@ -5486,30 +5450,6 @@
       "parent": "containers"
     },
     {
-      "id": "modules-path",
-      "label": "Module Path",
-      "type": "subcategory",
-      "parent": "modules"
-    },
-    {
-      "id": "modules-access",
-      "label": "Module Access",
-      "type": "subcategory",
-      "parent": "modules"
-    },
-    {
-      "id": "modules-general",
-      "label": "General Modules",
-      "type": "subcategory",
-      "parent": "modules"
-    },
-    {
-      "id": "sysprop-standard",
-      "label": "Standard Properties",
-      "type": "subcategory",
-      "parent": "system-properties"
-    },
-    {
       "id": "gc-adaptive-policy",
       "label": "Adaptive Size Policy",
       "type": "subcategory",
@@ -5757,10 +5697,6 @@
     },
     {
       "source": "garbage-collection",
-      "target": "gc-epsilon"
-    },
-    {
-      "source": "garbage-collection",
       "target": "gc-threads"
     },
     {
@@ -5822,10 +5758,6 @@
     {
       "source": "class-loading",
       "target": "class-verification"
-    },
-    {
-      "source": "logging",
-      "target": "logging-unified"
     },
     {
       "source": "diagnostics",
@@ -7772,22 +7704,6 @@
       "target": "flag-activeprocessorcount"
     },
     {
-      "source": "modules",
-      "target": "modules-path"
-    },
-    {
-      "source": "modules",
-      "target": "modules-access"
-    },
-    {
-      "source": "modules",
-      "target": "modules-general"
-    },
-    {
-      "source": "system-properties",
-      "target": "sysprop-standard"
-    },
-    {
       "source": "garbage-collection",
       "target": "gc-adaptive-policy"
     },
@@ -8176,20 +8092,12 @@
       "target": "metaspace-large-pages"
     },
     {
-      "source": "metaspace",
-      "target": "metaspace-perm-legacy"
-    },
-    {
       "source": "runtime",
       "target": "runtime-memory-model"
     },
     {
       "source": "system-properties",
       "target": "sysprop-jvm"
-    },
-    {
-      "source": "virtual-threads",
-      "target": "vt-scheduler"
     },
     {
       "source": "root",
@@ -8252,10 +8160,6 @@
       "target": "metaspace"
     },
     {
-      "source": "domain-classes",
-      "target": "modules"
-    },
-    {
       "source": "domain-memory",
       "target": "object-layout"
     },
@@ -8278,10 +8182,6 @@
     {
       "source": "domain-concurrency",
       "target": "threads-synchronization"
-    },
-    {
-      "source": "domain-concurrency",
-      "target": "virtual-threads"
     }
   ]
 }

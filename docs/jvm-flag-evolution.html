@@ -234,6 +234,88 @@
     }
 
     .legend-note a:hover { text-decoration: underline; }
+
+    .flags-panel {
+      margin-top: 1.25rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 0.75rem;
+      overflow: visible;
+    }
+
+    .flags-panel-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .flags-panel-title span { color: var(--accent); }
+
+    .flags-panel-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .flags-table-wrap {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .flags-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      table-layout: fixed;
+    }
+
+    .flags-table th,
+    .flags-table td {
+      text-align: left;
+      padding: 0.5rem 0.65rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    .flags-table th:first-child,
+    .flags-table td:first-child {
+      width: 38%;
+    }
+
+    .flags-table thead th {
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .flags-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .flags-table tbody tr:hover {
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .flags-table a.flag-link {
+      color: #34d399;
+      text-decoration: none;
+      word-break: break-all;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 0.78rem;
+    }
+
+    .flags-table a.flag-link:hover { text-decoration: underline; }
+
+    .flags-table td.description {
+      color: var(--muted);
+      font-size: 0.78rem;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
+    }
   </style>
   <link rel="icon" type="image/png" href="images/java-icon.png">
 </head>
@@ -264,6 +346,21 @@
       <div id="stack-legend" class="stack-legend" hidden></div>
       <div id="tooltip" role="tooltip"></div>
     </div>
+    <section id="flags-panel" class="flags-panel" hidden>
+      <h2 id="flags-panel-title" class="flags-panel-title"></h2>
+      <p id="flags-panel-meta" class="flags-panel-meta"></p>
+      <div class="flags-table-wrap">
+        <table class="flags-table">
+          <thead>
+            <tr>
+              <th scope="col">Flag</th>
+              <th scope="col">Description</th>
+            </tr>
+          </thead>
+          <tbody id="flags-table-body"></tbody>
+        </table>
+      </div>
+    </section>
     <p class="legend-note" id="legend-note" hidden></p>
   </main>
   <script>
@@ -334,6 +431,10 @@
     const filterFocusSelect = document.getElementById("filter-focus");
     const filterFocusLabel = document.getElementById("filter-focus-label");
     const groupBySelect = document.getElementById("group-by");
+    const flagsPanel = document.getElementById("flags-panel");
+    const flagsPanelTitle = document.getElementById("flags-panel-title");
+    const flagsPanelMeta = document.getElementById("flags-panel-meta");
+    const flagsTableBody = document.getElementById("flags-table-body");
     const svg = d3.select("#chart");
     const tooltip = d3.select("#tooltip");
 
@@ -524,6 +625,101 @@
         .join("");
     }
 
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function flagDetailUrl(flagId) {
+      return `jvm-flag.html?java=${encodeURIComponent(version)}&flag=${encodeURIComponent(flagId)}`;
+    }
+
+    function flagsForAncestor(catalog, ancestorType, ancestorLabel) {
+      const byId = new Map(catalog.nodes.map((n) => [n.id, n]));
+      const parentByChild = new Map();
+      for (const edge of catalog.edges) {
+        parentByChild.set(edge.target, edge.source);
+      }
+
+      function ancestorLabelFor(flagId, type) {
+        let cur = flagId;
+        const seen = new Set();
+        while (cur) {
+          if (seen.has(cur)) break;
+          seen.add(cur);
+          const node = byId.get(cur);
+          if (!node) break;
+          if (node.type === type) return node.label;
+          cur = parentByChild.get(cur) ?? node.parent ?? null;
+        }
+        return null;
+      }
+
+      const flags = [];
+      for (const node of catalog.nodes) {
+        if (node.type !== "flag") continue;
+        if (ancestorLabelFor(node.id, ancestorType) !== ancestorLabel) continue;
+        flags.push({
+          flag: node.flag || node.label,
+          description: node.description || "",
+          flagId: node.flagId || node.id
+        });
+      }
+      return flags.sort((a, b) => a.flag.localeCompare(b.flag));
+    }
+
+    function renderFlagsPanel() {
+      const show =
+        currentGroupBy === "subcategory" &&
+        currentFocusFilter !== "-" &&
+        catalogsCache;
+
+      if (!show) {
+        flagsPanel.hidden = true;
+        return;
+      }
+
+      const catalog = catalogsCache[version];
+      if (!catalog) {
+        flagsPanel.hidden = true;
+        return;
+      }
+
+      const flags = flagsForAncestor(
+        catalog,
+        "subcategory",
+        currentFocusFilter
+      );
+
+      flagsPanel.hidden = false;
+      flagsPanelTitle.innerHTML =
+        `Flags in <span>${escapeHtml(currentFocusFilter)}</span>`;
+      flagsPanelMeta.textContent =
+        `Java ${version} catalog — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
+
+      if (!flags.length) {
+        flagsTableBody.innerHTML =
+          '<tr><td colspan="2" class="description">No flags in this subcategory for this release.</td></tr>';
+        return;
+      }
+
+      flagsTableBody.innerHTML = flags
+        .map((f) => {
+          const href = flagDetailUrl(f.flagId);
+          const desc = f.description
+            ? escapeHtml(f.description)
+            : '<span class="description">—</span>';
+          return `<tr>
+            <td><a class="flag-link" href="${escapeHtml(href)}">${escapeHtml(f.flag)}</a></td>
+            <td class="description">${desc}</td>
+          </tr>`;
+        })
+        .join("");
+    }
+
     function showLoadError(message) {
       chartStatus.style.display = "block";
       chartStatus.classList.add("error");
@@ -531,6 +727,7 @@
       document.getElementById("chart").hidden = true;
       stackLegend.hidden = true;
       legendNote.hidden = true;
+      flagsPanel.hidden = true;
     }
 
     function refreshChart() {
@@ -552,6 +749,7 @@
       );
       colorForKey = buildColorFn(stackData.keys, stackData.level);
       drawStackedChart(stackData, version);
+      renderFlagsPanel();
     }
 
     function drawStackedChart(stackData, selectedVersion) {

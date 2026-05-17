@@ -46,11 +46,6 @@
       "parent": "domain-memory"
     },
     {
-      "id": "modules",
-      "label": "Modules",
-      "parent": "domain-classes"
-    },
-    {
       "id": "object-layout",
       "label": "Object Layout",
       "parent": "domain-memory"
@@ -78,11 +73,6 @@
     {
       "id": "threads-synchronization",
       "label": "Threads and Synchronization",
-      "parent": "domain-concurrency"
-    },
-    {
-      "id": "virtual-threads",
-      "label": "Virtual Threads",
       "parent": "domain-concurrency"
     }
   ],
@@ -210,11 +200,6 @@
     {
       "id": "gc-default",
       "label": "Default",
-      "parent": "garbage-collection"
-    },
-    {
-      "id": "gc-epsilon",
-      "label": "EpsilonGC",
       "parent": "garbage-collection"
     },
     {
@@ -403,18 +388,8 @@
       "parent": "logging"
     },
     {
-      "id": "logging-unified",
-      "label": "Unified Logging",
-      "parent": "logging"
-    },
-    {
       "id": "metaspace-large-pages",
       "label": "Large Pages",
-      "parent": "metaspace"
-    },
-    {
-      "id": "metaspace-perm-legacy",
-      "label": "Permanent Generation (legacy)",
       "parent": "metaspace"
     },
     {
@@ -426,21 +401,6 @@
       "id": "metaspace-sizing",
       "label": "Metaspace Sizing",
       "parent": "metaspace"
-    },
-    {
-      "id": "modules-access",
-      "label": "Module Access",
-      "parent": "modules"
-    },
-    {
-      "id": "modules-general",
-      "label": "General Modules",
-      "parent": "modules"
-    },
-    {
-      "id": "modules-path",
-      "label": "Module Path",
-      "parent": "modules"
     },
     {
       "id": "object-layout-alignment",
@@ -561,16 +521,6 @@
       "id": "sysprop-jvm",
       "label": "JVM Properties",
       "parent": "system-properties"
-    },
-    {
-      "id": "sysprop-standard",
-      "label": "Standard Properties",
-      "parent": "system-properties"
-    },
-    {
-      "id": "vt-scheduler",
-      "label": "Virtual Thread Scheduler",
-      "parent": "virtual-threads"
     }
   ],
   "domains": [
@@ -604,16 +554,14 @@
       "id": "domain-classes",
       "label": "Classes & modules",
       "categories": [
-        "class-loading",
-        "modules"
+        "class-loading"
       ]
     },
     {
       "id": "domain-concurrency",
       "label": "Concurrency",
       "categories": [
-        "threads-synchronization",
-        "virtual-threads"
+        "threads-synchronization"
       ]
     },
     {

@@ -425,18 +425,6 @@
       "parent": "domain-operations"
     },
     {
-      "id": "modules",
-      "label": "Modules",
-      "type": "category",
-      "parent": "domain-classes"
-    },
-    {
-      "id": "virtual-threads",
-      "label": "Virtual Threads",
-      "type": "category",
-      "parent": "domain-concurrency"
-    },
-    {
       "id": "containers-cpu",
       "label": "CPU Limits",
       "type": "subcategory",
@@ -453,12 +441,6 @@
       "label": "General Diagnostics",
       "type": "subcategory",
       "parent": "diagnostics"
-    },
-    {
-      "id": "gc-epsilon",
-      "label": "EpsilonGC",
-      "type": "subcategory",
-      "parent": "garbage-collection"
     },
     {
       "id": "gc-general",
@@ -491,46 +473,16 @@
       "parent": "logging"
     },
     {
-      "id": "logging-unified",
-      "label": "Unified Logging",
-      "type": "subcategory",
-      "parent": "logging"
-    },
-    {
       "id": "metaspace-policy",
       "label": "Reclaim Policy",
       "type": "subcategory",
       "parent": "metaspace"
     },
     {
-      "id": "modules-access",
-      "label": "Module Access",
-      "type": "subcategory",
-      "parent": "modules"
-    },
-    {
-      "id": "modules-general",
-      "label": "General Modules",
-      "type": "subcategory",
-      "parent": "modules"
-    },
-    {
-      "id": "modules-path",
-      "label": "Module Path",
-      "type": "subcategory",
-      "parent": "modules"
-    },
-    {
       "id": "stack-general",
       "label": "General Stack",
       "type": "subcategory",
       "parent": "stack"
-    },
-    {
-      "id": "vt-scheduler",
-      "label": "Virtual Thread Scheduler",
-      "type": "subcategory",
-      "parent": "virtual-threads"
     },
     {
       "id": "flag-printflagsfinal",
@@ -7107,12 +7059,6 @@
       "parent": "metaspace"
     },
     {
-      "id": "metaspace-perm-legacy",
-      "label": "Permanent Generation (legacy)",
-      "type": "subcategory",
-      "parent": "metaspace"
-    },
-    {
       "id": "metaspace-large-pages",
       "label": "Large Pages",
       "type": "subcategory",
@@ -7153,12 +7099,6 @@
       "label": "Code Cache Behavior",
       "type": "subcategory",
       "parent": "code-cache"
-    },
-    {
-      "id": "sysprop-standard",
-      "label": "Standard Properties",
-      "type": "subcategory",
-      "parent": "system-properties"
     },
     {
       "id": "sysprop-jvm",
@@ -9855,10 +9795,6 @@
       "target": "flag-maxmetaspacefreeratio"
     },
     {
-      "source": "metaspace",
-      "target": "metaspace-perm-legacy"
-    },
-    {
       "source": "metaspace-sizing",
       "target": "flag-pending-maxmetaspaceexpansion"
     },
@@ -9973,10 +9909,6 @@
     {
       "source": "code-cache-sizing",
       "target": "flag-pending-codecacheminimumfreespace"
-    },
-    {
-      "source": "system-properties",
-      "target": "sysprop-standard"
     },
     {
       "source": "system-properties",
@@ -10500,10 +10432,6 @@
     },
     {
       "source": "garbage-collection",
-      "target": "gc-epsilon"
-    },
-    {
-      "source": "garbage-collection",
       "target": "gc-general"
     },
     {
@@ -10523,32 +10451,12 @@
       "target": "logging-async"
     },
     {
-      "source": "logging",
-      "target": "logging-unified"
-    },
-    {
       "source": "metaspace",
       "target": "metaspace-policy"
     },
     {
-      "source": "modules",
-      "target": "modules-access"
-    },
-    {
-      "source": "modules",
-      "target": "modules-general"
-    },
-    {
-      "source": "modules",
-      "target": "modules-path"
-    },
-    {
       "source": "stack",
       "target": "stack-general"
-    },
-    {
-      "source": "virtual-threads",
-      "target": "vt-scheduler"
     },
     {
       "source": "root",
@@ -10611,10 +10519,6 @@
       "target": "metaspace"
     },
     {
-      "source": "domain-classes",
-      "target": "modules"
-    },
-    {
       "source": "domain-memory",
       "target": "object-layout"
     },
@@ -10637,10 +10541,6 @@
     {
       "source": "domain-concurrency",
       "target": "threads-synchronization"
-    },
-    {
-      "source": "domain-concurrency",
-      "target": "virtual-threads"
     }
   ]
 }

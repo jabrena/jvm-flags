@@ -206,7 +206,8 @@ public final class JvmFlagCatalogGraph {
         return false;
     }
 
-    private int countDirectFlags(String nodeId) {
+    /** Number of flag nodes linked directly from {@code nodeId} (category or subcategory). */
+    public int directFlagCount(String nodeId) {
         int count = 0;
         for (String targetId : targetsFor(nodeId)) {
             if ("flag".equals(nodeType(targetId))) {
@@ -214,6 +215,10 @@ public final class JvmFlagCatalogGraph {
             }
         }
         return count;
+    }
+
+    private int countDirectFlags(String nodeId) {
+        return directFlagCount(nodeId);
     }
 
     private List<String> targetsFor(String sourceId) {
