@@ -14,6 +14,7 @@
       --root: #f59e0b;
       --category: #3b82f6;
       --flag: #34d399;
+      --subcategory: #a78bfa;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -185,6 +186,22 @@
       color: var(--flag);
       min-height: 1.1em;
     }
+
+    .breadcrumb-mobile { display: none; }
+
+    @media (max-width: 768px) {
+      .breadcrumb-full,
+      .section-title,
+      .description,
+      .research {
+        display: none;
+      }
+
+      .breadcrumb-mobile {
+        display: block;
+        color: var(--subcategory);
+      }
+    }
   </style>
   <link rel="icon" type="image/png" href="images/java-icon.png">
 </head>
@@ -246,6 +263,16 @@
         cur = parentByTarget.get(cur);
       }
       return parts.length ? parts.join(" › ") : "";
+    }
+
+    function findSubcategoryLabel(flagNode, nodesById, parentByTarget) {
+      let cur = parentByTarget.get(flagNode.id);
+      while (cur && cur !== "root") {
+        const node = nodesById.get(cur);
+        if (node?.type === "subcategory") return node.label;
+        cur = parentByTarget.get(cur);
+      }
+      return "";
     }
 
     function showError(html) {
@@ -320,7 +347,7 @@
       });
     }
 
-    function renderFlag(flag, breadcrumb) {
+    function renderFlag(flag, breadcrumb, subcategoryLabel) {
       document.title = `${flag.flag || flag.label} — Java ${JAVA_VERSION}`;
       const desc = flag.description
         ? `<p class="description">${escapeHtml(flag.description)}</p>`
@@ -329,7 +356,8 @@
       const backHref = `java-version.html?java=${encodeURIComponent(JAVA_VERSION)}`;
 
       document.getElementById("content").innerHTML = `
-        ${breadcrumb ? `<p class="breadcrumb">${escapeHtml(breadcrumb)}</p>` : ""}
+        ${breadcrumb ? `<p class="breadcrumb breadcrumb-full">${escapeHtml(breadcrumb)}</p>` : ""}
+        ${subcategoryLabel ? `<p class="breadcrumb breadcrumb-mobile">${escapeHtml(subcategoryLabel)}</p>` : ""}
         <p class="flag-name">${escapeHtml(flag.flag || flag.label)}</p>
         <h2 class="section-title">Description</h2>
         ${desc}
@@ -368,7 +396,8 @@
           const nodesById = new Map(nodes.map(n => [n.id, n]));
           const parentByTarget = buildParentMap(edges);
           const breadcrumb = buildBreadcrumb(flag, nodesById, parentByTarget);
-          renderFlag(flag, breadcrumb);
+          const subcategoryLabel = findSubcategoryLabel(flag, nodesById, parentByTarget);
+          renderFlag(flag, breadcrumb, subcategoryLabel);
         })
         .catch(() => {
           showError(

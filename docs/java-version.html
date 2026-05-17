@@ -167,6 +167,15 @@
       color: var(--muted);
     }
 
+    @media (max-width: 768px) {
+      body.table-view #domain-col,
+      body.table-view #category-col,
+      body.table-view .flags-table td.domain,
+      body.table-view .flags-table td.category {
+        display: none;
+      }
+    }
+
     .back-link {
       display: inline-flex;
       align-items: center;
@@ -381,7 +390,7 @@
       <thead>
         <tr>
           <th scope="col" id="domain-col">Domain</th>
-          <th scope="col">Category</th>
+          <th scope="col" id="category-col">Category</th>
           <th scope="col" id="subcategory-col">Subcategory</th>
           <th scope="col">Flag</th>
         </tr>
