@@ -7,8 +7,8 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
 | Rule | Value |
 |------|--------|
 | LTS versions | Java **8, 11, 17, 21, 25** only |
-| Questions per game | **10** |
-| Pass threshold | **8/10** correct |
+| Questions per game | **20** |
+| Pass threshold | **70%** correct (**14/20**) |
 | Data source | `json/java-{version}.json` for each LTS release |
 
 ## Index building (before any question)
@@ -20,13 +20,14 @@ This document describes how [docs/quiz-game.html](../docs/quiz-game.html) builds
 
 ## Quiz assembly (`generateQuiz`)
 
-1. **Three generators**, chosen uniformly at random each attempt:
+1. **Four generators**, chosen uniformly at random each attempt:
    - `buildVersionPresenceQuestion`
    - `buildWhichVersionQuestion`
    - `buildDescriptionQuestion`
-2. **Repeat until 10 valid questions** or **300 attempts** (failed generators return `null` and are skipped).
+   - `buildFlagCountQuestion`
+2. **Repeat until 20 valid questions** or **300 attempts** (failed generators return `null` and are skipped).
 3. **No guarantee of type mix** — Types are random per slot, not balanced (e.g. not forced 3/3/4).
-4. **No duplicate slots in a deck** — Each accepted question must have a unique dedup key (see below). Collisions are discarded and the attempt does not count toward the 10 questions.
+4. **No duplicate slots in a deck** — Each accepted question must have a unique dedup key (see below). Collisions are discarded and the attempt does not count toward the 20 questions.
 
 ### Dedup keys (`questionDedupKey`)
 
@@ -37,6 +38,7 @@ A `Set` tracks keys for questions already in the current deck. Format: `` `${typ
 | `versionPresence` | Flag under test | Target LTS in the prompt | `versionPresence|UseG1GC|17` |
 | `whichVersion` | Flag under test | *(empty)* | `whichVersion|UseG1GC|` |
 | `description` | Correct flag | LTS catalog used for sibling pool | `description|UseG1GC|25` |
+| `flagCount` | `_catalog` (synthetic) | Target LTS in the prompt | `flagCount|_catalog|17` |
 
 The same `flagId` may appear in **different** question types or **different** `scopeVersion` values (e.g. version check on Java 8 and description on Java 25). It cannot appear twice with the same type and scope (e.g. two “which LTS includes this flag?” questions for the same flag).
 
@@ -93,6 +95,22 @@ The same `flagId` may appear in **different** question types or **different** `s
 
 ---
 
+## Type 4: Catalog size (`flagCount`)
+
+**UI label:** Catalog size  
+**Prompt:** “How many JVM flags are cataloged for **Java {version}** on this site?”
+
+| Rule | Detail |
+|------|--------|
+| Target version | Random LTS (8, 11, 17, 21, 25) |
+| Correct answer | Count of flag nodes with a non-empty `description` in that version’s catalog (same pool as index building) |
+| Wrong answers | Flag counts from **three other** LTS catalogs (each LTS has a distinct count, so four unique numeric options) |
+| Options | Four numbers as strings (e.g. `753`, `698`), shuffled |
+| Display | No flag monospace block (prompt only) |
+| Abort | `null` if the version has no flags or fewer than three distinct distractor counts |
+
+---
+
 ## Presentation rules (all types)
 
 - **4 multiple-choice options** per question (binary for version presence; four Java versions or four descriptions for the other types).
@@ -101,9 +119,10 @@ The same `flagId` may appear in **different** question types or **different** `s
 
 ## Scoring and replay
 
+- Pass when `score >= WIN_THRESHOLD`, where `WIN_THRESHOLD = ceil(TOTAL_QUESTIONS × 70 / 100)` (14 for 20 questions).
 - One click per question; correct if `selectedIndex === correctIndex`.
 - **Play again** rebuilds a new random set with the same index (same loaded JSON).
-- If fewer than 10 questions after generation, show: “Could not generate enough questions.”
+- If fewer than 20 questions after generation, show: “Could not generate enough questions.”
 - On failure, the result screen lists incorrect answers with your choice vs. the correct option.
 
 ## Practical implications
@@ -112,15 +131,17 @@ The same `flagId` may appear in **different** question types or **different** `s
 - **Which-version** accepts any LTS option where the flag is present; flags that appear in all five LTS catalogs never appear in this type.
 - **Version presence** “absent” uses a flag from *some* catalog that is missing in the asked version—not a synthetic flag name.
 - **Dedup** prevents repeating the same `(type, flagId, scopeVersion)` in one game; unrelated types or scopes for the same flag are still allowed.
+- **Catalog size** asks for the total flagged options in one JDK’s JSON catalog; at most one such question per LTS version per game (`flagCount|_catalog|{version}`).
 
 ## Source references
 
 | Constant / function | Location in `docs/quiz-game.html` |
 |---------------------|-----------------------------------|
-| `LTS_VERSIONS`, `TOTAL_QUESTIONS`, `WIN_THRESHOLD` | ~463–465 |
+| `LTS_VERSIONS`, `TOTAL_QUESTIONS`, `PASS_PERCENT`, `WIN_THRESHOLD` | ~464–467 |
 | `parseGraph`, `buildFlagIndex` | ~486–551 |
 | `buildVersionPresenceQuestion` | ~553–581 |
 | `buildWhichVersionQuestion` | ~583–616 |
-| `buildDescriptionQuestion` | ~618–640 |
-| `questionDedupKey` | ~642–645 |
-| `generateQuiz` | ~647–668 |
+| `buildDescriptionQuestion` | ~618–666 |
+| `buildFlagCountQuestion` | ~668–694 |
+| `questionDedupKey` | ~696–699 |
+| `generateQuiz` | ~701–722 |

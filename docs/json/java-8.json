@@ -871,18 +871,6 @@
       "testValue": "-Xshare:auto"
     },
     {
-      "id": "flag-sharedarchivefile",
-      "label": "-XX:SharedArchiveFile=<file>",
-      "type": "flag",
-      "flag": "-XX:SharedArchiveFile=<file>",
-      "description": "Path to a shared classes archive for CDS.",
-      "flagId": "272e963e-e1ea-5429-8673-f3ffdfb92b9a",
-      "testValue": "-XX:SharedArchiveFile=/tmp/jvm-flags-graph.txt",
-      "requires": [
-        "-XX:+UnlockDiagnosticVMOptions"
-      ]
-    },
-    {
       "id": "flag-xverify-all",
       "label": "-Xverify:all",
       "type": "flag",
@@ -1058,6 +1046,15 @@
       "description": "Enables parallel remark phase for the Concurrent Mark Sweep collector.",
       "flagId": "b448b808-2127-534b-95ff-cedf03e2c4f0",
       "testValue": "-XX:+CMSParallelRemarkEnabled"
+    },
+    {
+      "id": "flag-printgc",
+      "label": "-XX:+PrintGC",
+      "type": "flag",
+      "flag": "-XX:+PrintGC",
+      "description": "Prints one line of garbage collection information per collection (same effect as -verbose:gc).",
+      "flagId": "a8f3c2e1-4b5d-5a9e-8c1f-2d6e7f0a3b4c",
+      "testValue": "-XX:+PrintGC"
     },
     {
       "id": "flag-verbosegc",
@@ -3790,6 +3787,15 @@
       "description": "Maximum percentage of real memory used for maximum heap size.",
       "flagId": "701e70f0-6774-5b33-8bdb-bb222055c6bf",
       "testValue": "-XX:MaxRAMPercentage=25.000000"
+    },
+    {
+      "id": "flag-pending-maxram",
+      "label": "-XX:MaxRAM=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxRAM=<n>",
+      "description": "Maximum RAM available to the JVM (ergonomic cap).",
+      "flagId": "c89e1279-0d88-5545-b731-f934c7a95a84",
+      "testValue": "-XX:MaxRAM=137438953472"
     },
     {
       "id": "flag-pending-maxtenuringthreshold",
@@ -7461,10 +7467,6 @@
       "target": "flag-xshare-auto"
     },
     {
-      "source": "class-cds",
-      "target": "flag-sharedarchivefile"
-    },
-    {
       "source": "class-verification",
       "target": "flag-xverify-all"
     },
@@ -10031,6 +10033,10 @@
     {
       "source": "system-properties",
       "target": "flag-pending-hashcode"
+    },
+    {
+      "source": "gc-logging-legacy",
+      "target": "flag-printgc"
     },
     {
       "source": "gc-logging-legacy",

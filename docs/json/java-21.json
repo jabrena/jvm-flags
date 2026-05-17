@@ -550,6 +550,32 @@
       "acceptNonZeroExit": true
     },
     {
+      "id": "flag-shenandoahgcheuristics",
+      "label": "-XX:ShenandoahGCHeuristics=<mode>",
+      "type": "flag",
+      "flag": "-XX:ShenandoahGCHeuristics=<mode>",
+      "description": "Selects Shenandoah heuristics mode (e.g. adaptive, static, aggressive).",
+      "flagId": "fb21b3a7-04db-5f8c-a8a4-dea25bc25106",
+      "testValue": "-XX:ShenandoahGCHeuristics=adaptive",
+      "requires": [
+        "-XX:+UseShenandoahGC"
+      ],
+      "acceptNonZeroExit": true
+    },
+    {
+      "id": "flag-shenandoahgcmode",
+      "label": "-XX:ShenandoahGCMode=<value>",
+      "type": "flag",
+      "flag": "-XX:ShenandoahGCMode=<value>",
+      "description": "Shenandoah GC mode (for example SATB); defines which barriers are installed.",
+      "flagId": "69c3cecd-869c-5c6c-af96-6f4aa8cfb869",
+      "testValue": "-XX:ShenandoahGCMode=satb",
+      "requires": [
+        "-XX:+UseShenandoahGC"
+      ],
+      "acceptNonZeroExit": true
+    },
+    {
       "id": "flag-useepsilongc",
       "label": "-XX:+UseEpsilonGC",
       "type": "flag",
@@ -1263,33 +1289,6 @@
       "description": "Overrides the number of CPUs the JVM believes are available.",
       "flagId": "65f5e3b4-0d1d-545c-aedd-b8522a0acfad",
       "testValue": "-XX:ActiveProcessorCount=5"
-    },
-    {
-      "id": "flag-initialrampercentage-containers",
-      "label": "-XX:InitialRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:InitialRAMPercentage=<n>",
-      "description": "Initial heap as a percentage of container-visible memory in cgroups.",
-      "flagId": "c04b721c-c3cb-5ad5-9f7f-218c25daa698",
-      "testValue": "-XX:InitialRAMPercentage=5"
-    },
-    {
-      "id": "flag-minrampercentage-containers",
-      "label": "-XX:MinRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:MinRAMPercentage=<n>",
-      "description": "Minimum heap as a percentage of container-visible memory.",
-      "flagId": "ca38f6b2-6fce-5586-bc86-f0ca52d4d4d3",
-      "testValue": "-XX:MinRAMPercentage=5"
-    },
-    {
-      "id": "flag-maxrampercentage-containers",
-      "label": "-XX:MaxRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:MaxRAMPercentage=<n>",
-      "description": "Maximum heap as a percentage of container-visible memory.",
-      "flagId": "edd3fce3-4eba-52ad-acb7-213e7b6f98f7",
-      "testValue": "-XX:MaxRAMPercentage=5"
     },
     {
       "id": "flag-vt-scheduler-parallelism",
@@ -4556,6 +4555,15 @@
       "testValue": "-XX:+TimeLinearScan"
     },
     {
+      "id": "flag-pending-trimnativeheapinterval",
+      "label": "-XX:TrimNativeHeapInterval=<n>",
+      "type": "flag",
+      "flag": "-XX:TrimNativeHeapInterval=<n>",
+      "description": "Interval in ms to trim the native heap (0 disables trimming).",
+      "flagId": "37f12ae7-5471-51d1-a1b5-5d56fa2ce6e9",
+      "testValue": "-XX:TrimNativeHeapInterval=0"
+    },
+    {
       "id": "flag-pending-tracejvmti",
       "label": "-XX:TraceJVMTI=<value>",
       "type": "flag",
@@ -4799,6 +4807,16 @@
       "description": "Adjust recompilation counters.",
       "flagId": "c15a82a2-2cf6-5e26-a876-93921a5e59df",
       "testValue": "-XX:+UseCounterDecay"
+    },
+    {
+      "id": "flag-pending-usecrc32",
+      "label": "-XX:+UseCRC32",
+      "type": "flag",
+      "flag": "-XX:+UseCRC32",
+      "description": "Use hardware CRC32 instructions when available.",
+      "flagId": "6e36c229-881d-53da-bede-05b681ed9067",
+      "testValue": "-XX:+UseCRC32",
+      "testable": false
     },
     {
       "id": "flag-pending-usecryptopmullforcrc32",
@@ -6040,18 +6058,6 @@
     {
       "source": "containers",
       "target": "flag-activeprocessorcount"
-    },
-    {
-      "source": "containers",
-      "target": "flag-initialrampercentage-containers"
-    },
-    {
-      "source": "containers",
-      "target": "flag-minrampercentage-containers"
-    },
-    {
-      "source": "containers",
-      "target": "flag-maxrampercentage-containers"
     },
     {
       "source": "virtual-threads",
@@ -7600,6 +7606,10 @@
     {
       "source": "runtime",
       "target": "flag-pending-usecounterdecay"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-pending-usecrc32"
     },
     {
       "source": "jit-compiler",

@@ -1286,33 +1286,6 @@
       "testValue": "-XX:ActiveProcessorCount=5"
     },
     {
-      "id": "flag-initialrampercentage-containers",
-      "label": "-XX:InitialRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:InitialRAMPercentage=<n>",
-      "description": "Initial heap as a percentage of container-visible memory in cgroups.",
-      "flagId": "c04b721c-c3cb-5ad5-9f7f-218c25daa698",
-      "testValue": "-XX:InitialRAMPercentage=5"
-    },
-    {
-      "id": "flag-minrampercentage-containers",
-      "label": "-XX:MinRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:MinRAMPercentage=<n>",
-      "description": "Minimum heap as a percentage of container-visible memory.",
-      "flagId": "ca38f6b2-6fce-5586-bc86-f0ca52d4d4d3",
-      "testValue": "-XX:MinRAMPercentage=5"
-    },
-    {
-      "id": "flag-maxrampercentage-containers",
-      "label": "-XX:MaxRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:MaxRAMPercentage=<n>",
-      "description": "Maximum heap as a percentage of container-visible memory.",
-      "flagId": "edd3fce3-4eba-52ad-acb7-213e7b6f98f7",
-      "testValue": "-XX:MaxRAMPercentage=5"
-    },
-    {
       "id": "flag-vt-scheduler-parallelism",
       "label": "-Djdk.virtualThreadScheduler.parallelism=<n>",
       "type": "flag",
@@ -4729,6 +4702,16 @@
       "testValue": "-XX:+UseCountedLoopSafepoints"
     },
     {
+      "id": "flag-pending-usecrc32",
+      "label": "-XX:+UseCRC32",
+      "type": "flag",
+      "flag": "-XX:+UseCRC32",
+      "description": "Use hardware CRC32 instructions when available.",
+      "flagId": "6e36c229-881d-53da-bede-05b681ed9067",
+      "testValue": "-XX:+UseCRC32",
+      "testable": false
+    },
+    {
       "id": "flag-pending-usecryptopmullforcrc32",
       "label": "-XX:+UseCryptoPmullForCRC32",
       "type": "flag",
@@ -5954,18 +5937,6 @@
     {
       "source": "containers",
       "target": "flag-activeprocessorcount"
-    },
-    {
-      "source": "containers",
-      "target": "flag-initialrampercentage-containers"
-    },
-    {
-      "source": "containers",
-      "target": "flag-minrampercentage-containers"
-    },
-    {
-      "source": "containers",
-      "target": "flag-maxrampercentage-containers"
     },
     {
       "source": "virtual-threads",
@@ -7470,6 +7441,10 @@
     {
       "source": "jit-compilation",
       "target": "flag-pending-usecountedloopsafepoints"
+    },
+    {
+      "source": "jit-intrinsics",
+      "target": "flag-pending-usecrc32"
     },
     {
       "source": "jit-compiler",

@@ -1228,33 +1228,6 @@
       "testable": false
     },
     {
-      "id": "flag-initialrampercentage-containers",
-      "label": "-XX:InitialRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:InitialRAMPercentage=<n>",
-      "description": "Initial heap as a percentage of container-visible memory in cgroups.",
-      "flagId": "c04b721c-c3cb-5ad5-9f7f-218c25daa698",
-      "testValue": "-XX:InitialRAMPercentage=5"
-    },
-    {
-      "id": "flag-minrampercentage-containers",
-      "label": "-XX:MinRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:MinRAMPercentage=<n>",
-      "description": "Minimum heap as a percentage of container-visible memory.",
-      "flagId": "ca38f6b2-6fce-5586-bc86-f0ca52d4d4d3",
-      "testValue": "-XX:MinRAMPercentage=5"
-    },
-    {
-      "id": "flag-maxrampercentage-containers",
-      "label": "-XX:MaxRAMPercentage=<n>",
-      "type": "flag",
-      "flag": "-XX:MaxRAMPercentage=<n>",
-      "description": "Maximum heap as a percentage of container-visible memory.",
-      "flagId": "edd3fce3-4eba-52ad-acb7-213e7b6f98f7",
-      "testValue": "-XX:MaxRAMPercentage=5"
-    },
-    {
       "id": "flag-module-path",
       "label": "--module-path",
       "type": "flag",
@@ -3798,6 +3771,88 @@
       "description": "Maximum number of nodes.",
       "flagId": "75c6f9cb-3ef4-5ba9-9e20-dd7205a3b5bd",
       "testValue": "-XX:MaxNodeLimit=75000"
+    },
+    {
+      "id": "flag-pending-errorlogtimeout",
+      "label": "-XX:ErrorLogTimeout=<n>",
+      "type": "flag",
+      "flag": "-XX:ErrorLogTimeout=<n>",
+      "description": "Timeout (seconds) for error reporting subprocess.",
+      "flagId": "8012ab1c-77d2-53f3-a355-9a7617d44dee",
+      "testValue": "-XX:ErrorLogTimeout=120"
+    },
+    {
+      "id": "flag-pending-g1concrefinementthreads",
+      "label": "-XX:G1ConcRefinementThreads=<n>",
+      "type": "flag",
+      "flag": "-XX:G1ConcRefinementThreads=<n>",
+      "description": "If non-0 is the number of parallel rem set update threads, otherwise the value is determined ergonomically.",
+      "flagId": "de959b23-a10f-56b1-a803-b9ba4f8ebc09",
+      "testValue": "-XX:G1ConcRefinementThreads=0"
+    },
+    {
+      "id": "flag-pending-g1refprocdraininterval",
+      "label": "-XX:G1RefProcDrainInterval=<n>",
+      "type": "flag",
+      "flag": "-XX:G1RefProcDrainInterval=<n>",
+      "description": "The number of discovered reference objects to process before draining concurrent marking work queues.",
+      "flagId": "c919b93d-6ea1-5d79-9246-8a0f1b48cb41",
+      "testValue": "-XX:G1RefProcDrainInterval=10"
+    },
+    {
+      "id": "flag-pending-gctasktimestampentries",
+      "label": "-XX:GCTaskTimeStampEntries=<n>",
+      "type": "flag",
+      "flag": "-XX:GCTaskTimeStampEntries=<n>",
+      "description": "Number of time stamp entries per gc worker thread.",
+      "flagId": "1a5f9b24-1baa-5215-ae5a-ac8f3a383f4d",
+      "testValue": "-XX:GCTaskTimeStampEntries=200"
+    },
+    {
+      "id": "flag-pending-marksweepalwayscompactcount",
+      "label": "-XX:MarkSweepAlwaysCompactCount=<n>",
+      "type": "flag",
+      "flag": "-XX:MarkSweepAlwaysCompactCount=<n>",
+      "description": "How often should we fully compact the heap (ignoring the dead space parameters).",
+      "flagId": "91a704f6-7545-5631-ae7e-da0e35feb6de",
+      "testValue": "-XX:MarkSweepAlwaysCompactCount=4"
+    },
+    {
+      "id": "flag-pending-maxdirectmemorysize",
+      "label": "-XX:MaxDirectMemorySize=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxDirectMemorySize=<n>",
+      "description": "Maximum total size of NIO direct-buffer allocations.",
+      "flagId": "4df7f661-277d-5ca3-b1b3-b6933bf1fa82",
+      "testValue": "-XX:MaxDirectMemorySize=0"
+    },
+    {
+      "id": "flag-pending-maxram",
+      "label": "-XX:MaxRAM=<n>",
+      "type": "flag",
+      "flag": "-XX:MaxRAM=<n>",
+      "description": "Maximum RAM available to the JVM (ergonomic cap).",
+      "flagId": "c89e1279-0d88-5545-b731-f934c7a95a84",
+      "testValue": "-XX:MaxRAM=137438953472"
+    },
+    {
+      "id": "flag-pending-pargcarrayscanchunk",
+      "label": "-XX:ParGCArrayScanChunk=<n>",
+      "type": "flag",
+      "flag": "-XX:ParGCArrayScanChunk=<n>",
+      "description": "Scan a subset of object array and push remainder, if array is bigger than this.",
+      "flagId": "58e3fd79-76c4-59e0-9a66-6de2cf362c05",
+      "testValue": "-XX:ParGCArrayScanChunk=50"
+    },
+    {
+      "id": "flag-pending-softwareprefetchhintdistance",
+      "label": "-XX:SoftwarePrefetchHintDistance=<n>",
+      "type": "flag",
+      "flag": "-XX:SoftwarePrefetchHintDistance=<n>",
+      "description": "Distance for software prefetch hints in compiled code.",
+      "flagId": "ab16314d-afe1-59f7-a53b-599f4b47c4e1",
+      "testValue": "-XX:SoftwarePrefetchHintDistance=384",
+      "testable": false
     },
     {
       "id": "flag-pending-maxramfraction",
@@ -7131,18 +7186,6 @@
     {
       "source": "containers",
       "target": "flag-activeprocessorcount"
-    },
-    {
-      "source": "containers",
-      "target": "flag-initialrampercentage-containers"
-    },
-    {
-      "source": "containers",
-      "target": "flag-minrampercentage-containers"
-    },
-    {
-      "source": "containers",
-      "target": "flag-maxrampercentage-containers"
     },
     {
       "source": "modules",

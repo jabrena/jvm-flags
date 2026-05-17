@@ -451,7 +451,7 @@
       <a class="back-link" href="index.html">← Back</a>
       <h1><span>Quiz</span> Game</h1>
     </div>
-    <p>10 random questions from LTS releases (8, 11, 17, 21, 25). Score 8/10 or better to pass the quiz.</p>
+    <p>20 random questions about JVM flags from LTS releases (8, 11, 17, 21, 25). Score 70% or better (14/20) to pass the quiz.</p>
   </header>
 
   <main>
@@ -462,13 +462,15 @@
 
   <script>
     const LTS_VERSIONS = [8, 11, 17, 21, 25];
-    const TOTAL_QUESTIONS = 10;
-    const WIN_THRESHOLD = 8;
+    const TOTAL_QUESTIONS = 20;
+    const PASS_PERCENT = 70;
+    const WIN_THRESHOLD = Math.ceil((TOTAL_QUESTIONS * PASS_PERCENT) / 100);
 
     const TYPE_LABELS = {
       versionPresence: "Version check",
       whichVersion: "LTS release",
-      description: "Flag description"
+      description: "Flag description",
+      flagCount: "Catalog size"
     };
 
     function shuffle(arr) {
@@ -665,6 +667,34 @@
       };
     }
 
+    function buildFlagCountQuestion(index) {
+      const version = pickRandom(LTS_VERSIONS);
+      const flags = index.byVersion.get(version);
+      if (!flags?.length) return null;
+
+      const correctCount = flags.length;
+      const distractorCounts = LTS_VERSIONS.filter((v) => v !== version)
+        .map((v) => index.byVersion.get(v)?.length)
+        .filter((c) => c != null && c !== correctCount);
+      const distractors = shuffle(distractorCounts).slice(0, 3);
+      if (distractors.length < 3) return null;
+
+      const options = shuffle([
+        String(correctCount),
+        ...distractors.map(String)
+      ]);
+
+      return {
+        type: "flagCount",
+        flagId: "_catalog",
+        scopeVersion: version,
+        prompt: `How many JVM flags are cataloged for <strong>Java ${version}</strong> on this site?`,
+        flag: "",
+        options,
+        correctIndex: options.indexOf(String(correctCount))
+      };
+    }
+
     function questionDedupKey(q) {
       const scope = q.scopeVersion != null ? String(q.scopeVersion) : "";
       return `${q.type}|${q.flagId}|${scope}`;
@@ -674,7 +704,8 @@
       const generators = [
         () => buildVersionPresenceQuestion(index),
         () => buildWhichVersionQuestion(index),
-        () => buildDescriptionQuestion(index)
+        () => buildDescriptionQuestion(index),
+        () => buildFlagCountQuestion(index)
       ];
 
       const questions = [];
@@ -756,7 +787,7 @@
           <article class="question-card">
             <p class="question-type">${TYPE_LABELS[q.type]}</p>
             <p class="question-prompt">${q.prompt}</p>
-            <p class="flag-display">${escapeHtml(q.flag)}</p>
+            ${q.flag ? `<p class="flag-display">${escapeHtml(q.flag)}</p>` : ""}
             <div class="answers" role="group" aria-label="Answer choices">
               ${q.options
                 .map(
@@ -808,7 +839,7 @@
               <span class="review-q">Q${r.questionNumber}</span>
               <span class="review-type">${TYPE_LABELS[r.question.type]}</span>
             </div>
-            <p class="review-flag">${escapeHtml(r.question.flag)}</p>
+            ${r.question.flag ? `<p class="review-flag">${escapeHtml(r.question.flag)}</p>` : ""}
             <p class="review-prompt">${escapeHtml(prompt)}</p>
             <div class="review-answers">
               <p class="your-answer"><span class="label">Yours</span>${escapeHtml(r.userAnswer)}</p>
