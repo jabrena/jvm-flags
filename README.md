@@ -7,8 +7,9 @@ Interactive website about JVM flags by Java version.
 ## Run locally
 
 ```bash
-jwebserver -d docs -p 8080
 ./mvnw clean install -Psync-docs-json
+jwebserver -d "$(pwd)/docs" -p 8080
+open http://localhost:8080/
 ```
 
 ## References

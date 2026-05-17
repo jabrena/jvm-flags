@@ -36,6 +36,8 @@ final class JvmFlagPrintFlagsFinalMapper {
                     "-Djava.io.tmpdir=<path>",
                     "-Djava.security.manager",
                     "-Djava.security.manager=allow",
+                    "-Djdk.virtualThreadScheduler.parallelism=<n>",
+                    "-Djdk.virtualThreadScheduler.maxPoolSize=<n>",
                     "-XX:+UnlockDiagnosticVMOptions",
                     "-XX:+UseVectorizedMismatchIntrinsic",
                     "-XX:MonitorDeflationMax=<n>",
