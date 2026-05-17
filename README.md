@@ -6,6 +6,7 @@ Interactive website about JVM flags by Java version.
 
 ```bash
 jwebserver -d docs -p 8080
+./mvnw clean install -Psync-docs-json
 ```
 
 ## References
