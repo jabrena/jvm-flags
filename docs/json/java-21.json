@@ -576,7 +576,10 @@
       "flag": "-XX:ConcGCThreads=<n>",
       "description": "Number of threads for concurrent GC work (e.g. G1 or ZGC concurrent phases).",
       "flagId": "8a703edf-6bdc-51f1-9e4c-517eaf0f190c",
-      "testValue": "-XX:ConcGCThreads=5"
+      "testValue": "-XX:ConcGCThreads=2",
+      "requires": [
+        "-XX:ParallelGCThreads=8"
+      ]
     },
     {
       "id": "flag-maxgcpausemillis",
@@ -1375,7 +1378,7 @@
       "flagId": "682a0786-3b8e-5740-be8e-f16d069bf980",
       "testArgs": [
         "--patch-module",
-        "java.base=/tmp"
+        "java.base=."
       ]
     },
     {
