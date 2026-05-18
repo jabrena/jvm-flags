@@ -114,6 +114,9 @@
     }
 
     .control-row select {
+      width: 200px;
+      min-width: 200px;
+      max-width: 200px;
       font: inherit;
       font-size: 0.8rem;
       color: var(--text);
@@ -368,7 +371,7 @@
   </header>
   <main>
     <p id="intro">
-      Explore HotSpot JVM flag catalogs across Java LTS releases. Use <strong>SELECT COUNT(*)</strong> to group and filter, compare counts in the stacked bar chart, and browse matching flags in the table below.
+      Explore HotSpot JVM flag catalogs across Java LTS releases.
     </p>
     <div class="select-controls" role="group" aria-labelledby="select-star-label">
       <p class="select-star-label" id="select-star-label">SELECT COUNT(*)</p>
