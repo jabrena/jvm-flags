@@ -1164,12 +1164,6 @@
       "testValue": "-XX:ActiveProcessorCount=5"
     },
     {
-      "id": "gc-logging-legacy",
-      "label": "Legacy Logging",
-      "type": "subcategory",
-      "parent": "garbage-collection"
-    },
-    {
       "id": "flag-pending-adaptivesizedecrementscalefactor",
       "label": "-XX:AdaptiveSizeDecrementScaleFactor=<n>",
       "type": "flag",
@@ -6028,10 +6022,6 @@
       "target": "flag-flightrecorderoptions"
     },
     {
-      "source": "garbage-collection",
-      "target": "gc-logging-legacy"
-    },
-    {
       "source": "gc-default",
       "target": "flag-pending-adaptivetimeweight"
     },
@@ -6460,7 +6450,7 @@
       "target": "flag-pending-g1useadaptiveihop"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-gcpauseintervalmillis"
     },
     {
@@ -6888,11 +6878,11 @@
       "target": "flag-pending-printgc"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-printgcdetails"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printheapatsigbreak"
     },
     {
@@ -6904,7 +6894,7 @@
       "target": "flag-pending-printshareddictionary"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printstringtablestatistics"
     },
     {

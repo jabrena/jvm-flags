@@ -1149,12 +1149,6 @@
       "parent": "garbage-collection"
     },
     {
-      "id": "gc-logging-legacy",
-      "label": "Legacy Logging",
-      "type": "subcategory",
-      "parent": "garbage-collection"
-    },
-    {
       "id": "flag-pending-adaptivesizedecrementscalefactor",
       "label": "-XX:AdaptiveSizeDecrementScaleFactor=<n>",
       "type": "flag",
@@ -7023,10 +7017,6 @@
       "target": "gc-cms"
     },
     {
-      "source": "garbage-collection",
-      "target": "gc-logging-legacy"
-    },
-    {
       "source": "gc-default",
       "target": "flag-pending-adaptivetimeweight"
     },
@@ -7739,7 +7729,7 @@
       "target": "flag-pending-g1useadaptiveihop"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-gcpauseintervalmillis"
     },
     {
@@ -8187,23 +8177,23 @@
       "target": "flag-pending-printgc"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-printgcdetails"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printheapatsigbreak"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printsafepointstatistics"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printsafepointstatisticscount"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printsafepointstatisticstimeout"
     },
     {
@@ -8215,7 +8205,7 @@
       "target": "flag-pending-printshareddictionary"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-printstringtablestatistics"
     },
     {
@@ -8911,7 +8901,7 @@
       "target": "flag-pending-g1refprocdraininterval"
     },
     {
-      "source": "gc-logging-legacy",
+      "source": "gc-logging",
       "target": "flag-pending-gctasktimestampentries"
     },
     {

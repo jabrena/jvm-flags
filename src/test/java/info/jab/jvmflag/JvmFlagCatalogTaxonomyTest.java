@@ -5,10 +5,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -16,15 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class JvmFlagCatalogTaxonomyTest {
-
-    /** JDK 8 merges {@code gc-logging-legacy} flags under {@code gc-logging}. */
-    private static final Map<Integer, Set<String>> SUBCATEGORIES_OMITTED_BY_VERSION;
-
-    static {
-        Map<Integer, Set<String>> omitted = new HashMap<>();
-        omitted.put(8, Collections.singleton("gc-logging-legacy"));
-        SUBCATEGORIES_OMITTED_BY_VERSION = Collections.unmodifiableMap(omitted);
-    }
 
     private static CatalogTaxonomy taxonomy;
 
@@ -37,7 +25,7 @@ class JvmFlagCatalogTaxonomyTest {
     void taxonomyDefinesExpectedContainerCounts() {
         assertThat(taxonomy.domainCount()).isEqualTo(6);
         assertThat(taxonomy.categoryCount()).isEqualTo(15);
-        assertThat(taxonomy.subcategoryCount()).isEqualTo(89);
+        assertThat(taxonomy.subcategoryCount()).isEqualTo(88);
     }
 
     @ParameterizedTest(name = "java-{0}.json")
@@ -67,14 +55,9 @@ class JvmFlagCatalogTaxonomyTest {
         assertThat(categoryIds)
                 .as("java-%s.json categories", featureVersion)
                 .containsExactlyInAnyOrderElementsOf(taxonomy.categoryIds());
-        Set<String> expectedSubcategoryIds = new HashSet<>(taxonomy.subcategoryIds());
-        Set<String> omitted = SUBCATEGORIES_OMITTED_BY_VERSION.get(featureVersion);
-        if (omitted != null) {
-            expectedSubcategoryIds.removeAll(omitted);
-        }
         assertThat(subcategoryIds)
                 .as("java-%s.json subcategories", featureVersion)
-                .containsExactlyInAnyOrderElementsOf(expectedSubcategoryIds);
+                .containsExactlyInAnyOrderElementsOf(taxonomy.subcategoryIds());
 
         assertThat(graph.findCategoriesLinkedDirectlyToRoot())
                 .as("java-%s.json must link categories under domains, not root", featureVersion)

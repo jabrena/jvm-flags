@@ -243,11 +243,6 @@
       "parent": "garbage-collection"
     },
     {
-      "id": "gc-logging-legacy",
-      "label": "Legacy Logging",
-      "parent": "garbage-collection"
-    },
-    {
       "id": "gc-mark-stack",
       "label": "Mark Stack",
       "parent": "garbage-collection"

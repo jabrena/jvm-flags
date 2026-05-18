@@ -455,12 +455,6 @@
       "parent": "garbage-collection"
     },
     {
-      "id": "gc-logging-legacy",
-      "label": "Legacy Logging",
-      "type": "subcategory",
-      "parent": "garbage-collection"
-    },
-    {
       "id": "metaspace-large-pages",
       "label": "Large Pages",
       "type": "subcategory",
@@ -7806,10 +7800,6 @@
     {
       "source": "garbage-collection",
       "target": "gc-cms"
-    },
-    {
-      "source": "garbage-collection",
-      "target": "gc-logging-legacy"
     },
     {
       "source": "metaspace",
