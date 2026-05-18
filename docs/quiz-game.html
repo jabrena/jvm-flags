@@ -451,7 +451,7 @@
       <a class="back-link" href="index.html">← Back</a>
       <h1><span>Quiz</span> Game</h1>
     </div>
-    <p>20 random questions about JVM flags from LTS releases (8, 11, 17, 21, 25). Score 70% or better (14/20) to pass the quiz.</p>
+    <p>20 random questions about JVM flags in Java 25. Score 70% or better (14/20) to pass the quiz.</p>
   </header>
 
   <main>
@@ -462,13 +462,13 @@
 
   <script>
     const LTS_VERSIONS = [8, 11, 17, 21, 25];
+    const QUIZ_SCOPE_VERSION = 25;
     const TOTAL_QUESTIONS = 20;
     const PASS_PERCENT = 70;
     const WIN_THRESHOLD = Math.ceil((TOTAL_QUESTIONS * PASS_PERCENT) / 100);
 
     const TYPE_LABELS = {
       versionPresence: "Version check",
-      whichVersion: "LTS release",
       description: "Flag description",
       flagFromDescription: "Flag name",
       flagCount: "Catalog size"
@@ -554,21 +554,28 @@
       };
     }
 
+    function flagInVersion(index, flagId, version) {
+      return index.versionsForFlagId.get(flagId)?.has(version) ?? false;
+    }
+
+    function pickFlagFromVersion(index, version) {
+      const flags = index.byVersion.get(version);
+      if (!flags?.length) return null;
+      return pickRandom(flags);
+    }
+
     function buildVersionPresenceQuestion(index) {
-      const version = pickRandom(LTS_VERSIONS);
+      const version = QUIZ_SCOPE_VERSION;
       const present = Math.random() < 0.5;
       let flag;
       let answerYes;
 
       if (present) {
-        const inVersion = index.byVersion.get(version);
-        if (!inVersion?.length) return null;
-        flag = pickRandom(inVersion);
+        flag = pickFlagFromVersion(index, version);
+        if (!flag) return null;
         answerYes = true;
       } else {
-        const absent = index.allFlags.filter(
-          (f) => !index.versionsForFlagId.get(f.flagId)?.has(version)
-        );
+        const absent = index.allFlags.filter((f) => !flagInVersion(index, f.flagId, version));
         if (!absent.length) return null;
         flag = pickRandom(absent);
         answerYes = false;
@@ -586,55 +593,8 @@
       };
     }
 
-    function parseJavaVersionOption(option) {
-      const match = /^Java (\d+)$/.exec(option);
-      return match ? Number(match[1]) : null;
-    }
-
-    function isWhichVersionCorrect(q, selectedIndex) {
-      const version = parseJavaVersionOption(q.options[selectedIndex]);
-      return version != null && q.correctVersions.includes(version);
-    }
-
-    function formatWhichVersionCorrectAnswer(correctVersions) {
-      const labels = correctVersions.map((v) => `Java ${v}`);
-      return labels.length === 1 ? labels[0] : `Any of: ${labels.join(", ")}`;
-    }
-
-    function buildWhichVersionQuestion(index) {
-      const entries = [...index.versionsForFlagId.entries()].filter(([, vers]) => {
-        const lts = [...vers].filter((v) => LTS_VERSIONS.includes(v));
-        return lts.length > 0 && lts.length < LTS_VERSIONS.length;
-      });
-      if (!entries.length) return null;
-
-      const [flagId, versions] = pickRandom(entries);
-      const flag = index.byFlagId.get(flagId);
-      const ltsPresent = [...versions].filter((v) => LTS_VERSIONS.includes(v));
-      const ltsAbsent = LTS_VERSIONS.filter((v) => !versions.has(v));
-
-      const wrongVersions = shuffle(ltsAbsent).slice(0, 3);
-      const presentCount = Math.min(ltsPresent.length, 4 - wrongVersions.length);
-      const presentVersions = shuffle(ltsPresent).slice(0, presentCount);
-      const options = shuffle([
-        ...presentVersions.map((v) => `Java ${v}`),
-        ...wrongVersions.map((v) => `Java ${v}`)
-      ]);
-
-      if (options.length < 2) return null;
-
-      return {
-        type: "whichVersion",
-        flagId,
-        correctVersions: ltsPresent,
-        prompt: "Name <strong>one</strong> LTS release that includes this flag.",
-        flag: flag.flag,
-        options
-      };
-    }
-
     function buildDescriptionQuestion(index) {
-      const version = pickRandom(LTS_VERSIONS);
+      const version = QUIZ_SCOPE_VERSION;
       const siblings = pickEligibleSiblingGroup(index, version);
       if (!siblings) return null;
       const correct = pickRandom(siblings);
@@ -673,7 +633,7 @@
     }
 
     function buildFlagFromDescriptionQuestion(index) {
-      const version = pickRandom(LTS_VERSIONS);
+      const version = QUIZ_SCOPE_VERSION;
       const siblings = pickEligibleSiblingGroup(index, version);
       if (!siblings) return null;
 
@@ -700,7 +660,7 @@
     }
 
     function buildFlagCountQuestion(index) {
-      const version = pickRandom(LTS_VERSIONS);
+      const version = QUIZ_SCOPE_VERSION;
       const flags = index.byVersion.get(version);
       if (!flags?.length) return null;
 
@@ -734,7 +694,6 @@
 
     const BALANCED_TYPES = [
       "versionPresence",
-      "whichVersion",
       "description",
       "flagFromDescription"
     ];
@@ -759,7 +718,6 @@
     function generateQuiz(index) {
       const builders = {
         versionPresence: () => buildVersionPresenceQuestion(index),
-        whichVersion: () => buildWhichVersionQuestion(index),
         description: () => buildDescriptionQuestion(index),
         flagFromDescription: () => buildFlagFromDescriptionQuestion(index),
         flagCount: () => buildFlagCountQuestion(index)
@@ -868,16 +826,10 @@
         this.answered = true;
 
         const q = this.questions[this.current];
-        const correct =
-          q.type === "whichVersion"
-            ? isWhichVersionCorrect(q, selectedIndex)
-            : selectedIndex === q.correctIndex;
+        const correct = selectedIndex === q.correctIndex;
         if (correct) this.score++;
 
-        const correctAnswer =
-          q.type === "whichVersion"
-            ? formatWhichVersionCorrectAnswer(q.correctVersions)
-            : q.options[q.correctIndex];
+        const correctAnswer = q.options[q.correctIndex];
 
         this.results.push({
           correct,
@@ -969,6 +921,15 @@
     }
 
     init();
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-2035DNSSEF');
   </script>
 </body>
 </html>

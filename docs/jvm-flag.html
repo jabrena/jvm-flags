@@ -12,6 +12,7 @@
       --text: #e7ecf3;
       --muted: #8b9cb3;
       --root: #f59e0b;
+      --accent: #f59e0b;
       --category: #3b82f6;
       --flag: #34d399;
       --subcategory: #a78bfa;
@@ -155,30 +156,49 @@
       flex-wrap: wrap;
     }
 
-    .btn-copy {
+    .btn-graph {
       display: inline-flex;
       align-items: center;
-      padding: 0.45rem 0.85rem;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
       font: inherit;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: var(--text);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--accent);
+      border: none;
+      border-radius: 8px;
       text-decoration: none;
-      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: filter 0.15s, transform 0.1s;
     }
 
-    .btn-copy:hover {
-      border-color: var(--category);
-      background: var(--bg);
+    .btn-graph:not(:disabled):hover {
+      filter: brightness(1.08);
     }
 
-    .btn-copy:disabled {
-      opacity: 0.5;
+    .btn-graph:not(:disabled):active {
+      transform: scale(0.98);
+    }
+
+    .btn-graph:disabled {
+      opacity: 0.4;
       cursor: not-allowed;
+      background: var(--border);
+      color: var(--muted);
+    }
+
+    .btn-graph.btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-graph.btn-secondary:hover {
+      filter: none;
+      border-color: var(--accent);
     }
 
     .copy-status {
@@ -363,8 +383,8 @@
           <p class="research-hint">Copy this prompt into your preferred search or AI assistant to learn more about this flag.</p>
           <textarea id="search-prompt" class="research-prompt" rows="1" aria-label="Search prompt">${escapeHtml(prompt)}</textarea>
           <div class="research-actions">
-            <a class="btn-copy" href="${backHref}">Back</a>
-            <button type="button" id="copy-prompt" class="btn-copy">Copy to clipboard</button>
+            <button type="button" id="copy-prompt" class="btn-graph">Copy to clipboard</button>
+            <a class="btn-graph btn-secondary" href="${backHref}">Back</a>
             <span id="copy-status" class="copy-status" role="status" aria-live="polite"></span>
           </div>
         </section>
@@ -403,6 +423,15 @@
           );
         });
     }
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-2035DNSSEF');
   </script>
 </body>
 </html>

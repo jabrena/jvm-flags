@@ -73,21 +73,50 @@
       margin-bottom: 1rem;
     }
 
-    .group-by-control {
+    .select-star-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .select-controls {
+      margin-bottom: 1.25rem;
+    }
+
+    .control-row {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
       gap: 0.5rem 0.75rem;
-      margin-bottom: 1.25rem;
+      margin-bottom: 0.65rem;
     }
 
-    .group-by-control label {
+    .control-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .level-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       font-size: 0.8rem;
       font-weight: 500;
-      color: var(--muted);
+      color: var(--text);
+      cursor: pointer;
+      min-width: 6.5rem;
     }
 
-    .group-by-control select {
+    .level-check input {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .control-row select {
+      width: 200px;
+      min-width: 200px;
+      max-width: 200px;
       font: inherit;
       font-size: 0.8rem;
       color: var(--text);
@@ -102,13 +131,13 @@
       background-position: right 0.55rem center;
     }
 
-    .group-by-control select:hover:not(:disabled),
-    .group-by-control select:focus:not(:disabled) {
+    .control-row select:hover:not(:disabled),
+    .control-row select:focus:not(:disabled) {
       border-color: var(--accent);
       outline: none;
     }
 
-    .group-by-control select:disabled {
+    .control-row select:disabled {
       opacity: 0.45;
       cursor: not-allowed;
     }
@@ -283,6 +312,22 @@
       width: 38%;
     }
 
+    .flags-table.summary-table th:first-child,
+    .flags-table.summary-table td:first-child {
+      width: 22%;
+    }
+
+    .flags-table.summary-table th:not(:first-child),
+    .flags-table.summary-table td:not(:first-child) {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .flags-table.summary-table tbody th[scope="row"] {
+      font-weight: 500;
+      color: var(--text);
+    }
+
     .flags-table thead th {
       background: var(--surface);
       color: var(--muted);
@@ -326,19 +371,37 @@
   </header>
   <main>
     <p id="intro">
-      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are HotSpot flags from <code>-XX:+PrintFlagsFinal</code> (one catalog entry per internal flag). Choose a grouping level, then pick a specific domain, category, or subcategory to zoom into the next level down.
+      Explore HotSpot JVM flag catalogs across Java LTS releases.
     </p>
-    <div class="group-by-control">
-      <label for="group-by">Group by</label>
-      <select id="group-by" aria-label="Group flags by">
-        <option value="domain" selected>Domain</option>
-        <option value="category">Category</option>
-        <option value="subcategory">Subcategories</option>
-      </select>
-      <label for="filter-focus" id="filter-focus-label">Domain</label>
-      <select id="filter-focus" aria-label="Focus on one group">
-        <option value="-" selected>-</option>
-      </select>
+    <div class="select-controls" role="group" aria-labelledby="select-star-label">
+      <p class="select-star-label" id="select-star-label">SELECT COUNT(*) WHERE</p>
+      <div class="control-row select-level-row" data-level="domain">
+        <label class="level-check">
+          <input type="checkbox" id="check-domain" checked aria-controls="filter-domain">
+          Domain
+        </label>
+        <select id="filter-domain" aria-label="Domain: all or one">
+          <option value="-" selected>-</option>
+        </select>
+      </div>
+      <div class="control-row select-level-row" data-level="category">
+        <label class="level-check">
+          <input type="checkbox" id="check-category" aria-controls="filter-category">
+          Category
+        </label>
+        <select id="filter-category" aria-label="Category: all or one">
+          <option value="-" selected>-</option>
+        </select>
+      </div>
+      <div class="control-row select-level-row" data-level="subcategory">
+        <label class="level-check">
+          <input type="checkbox" id="check-subcategory" aria-controls="filter-subcategory">
+          Subcategory
+        </label>
+        <select id="filter-subcategory" aria-label="Subcategory: all or one">
+          <option value="-" selected>-</option>
+        </select>
+      </div>
     </div>
     <div class="chart-wrap" id="chart-wrap">
       <div class="chart-status" id="chart-status">Loading catalogs…</div>
@@ -350,8 +413,8 @@
       <h2 id="flags-panel-title" class="flags-panel-title"></h2>
       <p id="flags-panel-meta" class="flags-panel-meta"></p>
       <div class="flags-table-wrap">
-        <table class="flags-table">
-          <thead>
+        <table class="flags-table" id="flags-table">
+          <thead id="flags-table-head">
             <tr>
               <th scope="col">Flag</th>
               <th scope="col">Description</th>
@@ -428,78 +491,33 @@
     const chartStatus = document.getElementById("chart-status");
     const stackLegend = document.getElementById("stack-legend");
     const legendNote = document.getElementById("legend-note");
-    const filterFocusSelect = document.getElementById("filter-focus");
-    const filterFocusLabel = document.getElementById("filter-focus-label");
-    const groupBySelect = document.getElementById("group-by");
+    const SELECT_LEVELS = ["domain", "category", "subcategory"];
+    const levelCheckboxes = {
+      domain: document.getElementById("check-domain"),
+      category: document.getElementById("check-category"),
+      subcategory: document.getElementById("check-subcategory")
+    };
+    const levelSelects = {
+      domain: document.getElementById("filter-domain"),
+      category: document.getElementById("filter-category"),
+      subcategory: document.getElementById("filter-subcategory")
+    };
     const flagsPanel = document.getElementById("flags-panel");
     const flagsPanelTitle = document.getElementById("flags-panel-title");
     const flagsPanelMeta = document.getElementById("flags-panel-meta");
+    const flagsTable = document.getElementById("flags-table");
+    const flagsTableHead = document.getElementById("flags-table-head");
     const flagsTableBody = document.getElementById("flags-table-body");
     const svg = d3.select("#chart");
     const tooltip = d3.select("#tooltip");
 
     let catalogsCache = null;
-    let currentGroupBy = "domain";
-    let currentFocusFilter = "-";
+    let taxonomyIndex = null;
+    let activeSelectLevel = "domain";
+    const selectValues = { domain: "-", category: "-", subcategory: "-" };
     let colorForKey = () => "#64748b";
 
-    function collectLabelsAcrossCatalogs(catalogsByVersion, nodeType, orderedLabels) {
-      const labels = new Set();
-      for (const catalog of Object.values(catalogsByVersion)) {
-        for (const node of catalog.nodes) {
-          if (node.type === nodeType) labels.add(node.label);
-        }
-      }
-      if (orderedLabels) {
-        const result = orderedLabels.filter((l) => labels.has(l));
-        for (const l of labels) {
-          if (!result.includes(l)) result.push(l);
-        }
-        return result;
-      }
-      return [...labels].sort((a, b) => a.localeCompare(b));
-    }
-
-    function rebuildFocusSelect(resetToAll = false) {
-      const config = GROUP_LEVELS[currentGroupBy];
-      filterFocusLabel.textContent = config.label;
-      filterFocusSelect.setAttribute(
-        "aria-label",
-        `Focus on one ${config.label.toLowerCase()}`
-      );
-
-      const previous = resetToAll ? "-" : filterFocusSelect.value;
-      const labels = collectLabelsAcrossCatalogs(
-        catalogsCache,
-        config.nodeType,
-        config.order
-      );
-
-      filterFocusSelect.replaceChildren();
-      const allOpt = document.createElement("option");
-      allOpt.value = "-";
-      allOpt.textContent = "-";
-      filterFocusSelect.appendChild(allOpt);
-
-      for (const label of labels) {
-        const opt = document.createElement("option");
-        opt.value = label;
-        opt.textContent = label;
-        filterFocusSelect.appendChild(opt);
-      }
-
-      const next =
-        previous !== "-" && labels.includes(previous) ? previous : "-";
-      filterFocusSelect.value = next;
-      currentFocusFilter = next;
-    }
-
-    function effectiveGroupLevel(groupBy, focusFilter) {
-      if (focusFilter === "-") return groupBy;
-      return GROUP_LEVELS[groupBy].childLevel || groupBy;
-    }
-
-    function countFlagsByLevel(catalog, nodeType, ancestorFilter = null) {
+    function catalogGraphMaps(catalog) {
       const byId = new Map(catalog.nodes.map((n) => [n.id, n]));
       const parentByChild = new Map();
       for (const edge of catalog.edges) {
@@ -520,13 +538,208 @@
         return null;
       }
 
+      return { ancestorLabel };
+    }
+
+    function buildTaxonomyIndex(catalogsByVersion) {
+      const domainToCategories = new Map();
+      const domainToSubcategories = new Map();
+      const categoryToSubcategories = new Map();
+      const domainCategoryToSubcategories = new Map();
+      const allCategories = new Set();
+      const allSubcategories = new Set();
+
+      const addToMapSet = (map, key, value) => {
+        if (!key || !value) return;
+        if (!map.has(key)) map.set(key, new Set());
+        map.get(key).add(value);
+      };
+
+      for (const catalog of Object.values(catalogsByVersion)) {
+        const { ancestorLabel } = catalogGraphMaps(catalog);
+        for (const node of catalog.nodes) {
+          if (node.type !== "flag") continue;
+          const domain = ancestorLabel(node.id, "domain");
+          const category = ancestorLabel(node.id, "category");
+          const subcategory = ancestorLabel(node.id, "subcategory");
+          if (category) allCategories.add(category);
+          if (subcategory) allSubcategories.add(subcategory);
+          addToMapSet(domainToCategories, domain, category);
+          addToMapSet(domainToSubcategories, domain, subcategory);
+          addToMapSet(categoryToSubcategories, category, subcategory);
+          if (domain && category) {
+            addToMapSet(
+              domainCategoryToSubcategories,
+              `${domain}\0${category}`,
+              subcategory
+            );
+          }
+        }
+      }
+
+      const sortSet = (set) => [...set].sort((a, b) => a.localeCompare(b));
+
+      return {
+        domainToCategories,
+        domainToSubcategories,
+        categoryToSubcategories,
+        domainCategoryToSubcategories,
+        allCategories: sortSet(allCategories),
+        allSubcategories: sortSet(allSubcategories)
+      };
+    }
+
+    function labelsFromSet(map, key) {
+      if (!map.has(key)) return [];
+      return [...map.get(key)].sort((a, b) => a.localeCompare(b));
+    }
+
+    function categoryOptions() {
+      if (!taxonomyIndex) return [];
+      if (selectValues.domain === "-") return taxonomyIndex.allCategories;
+      return labelsFromSet(taxonomyIndex.domainToCategories, selectValues.domain);
+    }
+
+    function subcategoryOptions() {
+      if (!taxonomyIndex) return [];
+      const { domain, category } = selectValues;
+      if (domain !== "-" && category !== "-") {
+        return labelsFromSet(
+          taxonomyIndex.domainCategoryToSubcategories,
+          `${domain}\0${category}`
+        );
+      }
+      if (domain !== "-") {
+        return labelsFromSet(taxonomyIndex.domainToSubcategories, domain);
+      }
+      if (category !== "-") {
+        return labelsFromSet(taxonomyIndex.categoryToSubcategories, category);
+      }
+      return taxonomyIndex.allSubcategories;
+    }
+
+    function fillSelectOptions(select, labels, value) {
+      select.replaceChildren();
+      const allOpt = document.createElement("option");
+      allOpt.value = "-";
+      allOpt.textContent = "-";
+      select.appendChild(allOpt);
+      for (const label of labels) {
+        const opt = document.createElement("option");
+        opt.value = label;
+        opt.textContent = label;
+        select.appendChild(opt);
+      }
+      const next = value !== "-" && labels.includes(value) ? value : "-";
+      select.value = next;
+      return next;
+    }
+
+    function syncSelectsToState() {
+      levelSelects.domain.value = selectValues.domain;
+      levelSelects.category.value = selectValues.category;
+      levelSelects.subcategory.value = selectValues.subcategory;
+    }
+
+    function refreshCascadeOptions(fromLevel = "domain") {
+      if (!taxonomyIndex) return;
+
+      if (fromLevel === "domain") {
+        selectValues.domain = fillSelectOptions(
+          levelSelects.domain,
+          collectLabelsAcrossCatalogs(catalogsCache, "domain", DOMAIN_ORDER),
+          selectValues.domain
+        );
+      }
+
+      if (fromLevel === "domain" || fromLevel === "category") {
+        selectValues.category = fillSelectOptions(
+          levelSelects.category,
+          categoryOptions(),
+          selectValues.category
+        );
+      }
+
+      selectValues.subcategory = fillSelectOptions(
+        levelSelects.subcategory,
+        subcategoryOptions(),
+        selectValues.subcategory
+      );
+    }
+
+    function collectLabelsAcrossCatalogs(catalogsByVersion, nodeType, orderedLabels) {
+      const labels = new Set();
+      for (const catalog of Object.values(catalogsByVersion)) {
+        for (const node of catalog.nodes) {
+          if (node.type === nodeType) labels.add(node.label);
+        }
+      }
+      if (orderedLabels) {
+        const result = orderedLabels.filter((l) => labels.has(l));
+        for (const l of labels) {
+          if (!result.includes(l)) result.push(l);
+        }
+        return result;
+      }
+      return [...labels].sort((a, b) => a.localeCompare(b));
+    }
+
+    function syncLevelControlState() {
+      for (const level of SELECT_LEVELS) {
+        levelCheckboxes[level].checked = level === activeSelectLevel;
+      }
+    }
+
+    function setActiveSelectLevel(level) {
+      if (!SELECT_LEVELS.includes(level)) return;
+      activeSelectLevel = level;
+      syncLevelControlState();
+    }
+
+    function effectiveGroupLevel(groupBy, focusFilter) {
+      if (focusFilter === "-") return groupBy;
+      return GROUP_LEVELS[groupBy].childLevel || groupBy;
+    }
+
+    function cascadeAncestorFilters() {
+      const filters = [];
+      if (selectValues.domain !== "-") {
+        filters.push({ type: "domain", label: selectValues.domain });
+      }
+      if (selectValues.category !== "-") {
+        filters.push({ type: "category", label: selectValues.category });
+      }
+      if (selectValues.subcategory !== "-") {
+        filters.push({ type: "subcategory", label: selectValues.subcategory });
+      }
+      return filters;
+    }
+
+    function queryState() {
+      const groupBy = activeSelectLevel;
+      const focusFilter = selectValues[groupBy];
+      const chartLevel = effectiveGroupLevel(groupBy, focusFilter);
+      return {
+        groupBy,
+        focusFilter,
+        chartLevel,
+        ancestorFilters: cascadeAncestorFilters()
+      };
+    }
+
+    function countFlagsByLevel(catalog, nodeType, ancestorFilters = []) {
+      const { ancestorLabel } = catalogGraphMaps(catalog);
       const counts = {};
       for (const node of catalog.nodes) {
         if (node.type !== "flag") continue;
-        if (ancestorFilter) {
-          const ancestor = ancestorLabel(node.id, ancestorFilter.type);
-          if (ancestor !== ancestorFilter.label) continue;
+        let matches = true;
+        for (const filter of ancestorFilters) {
+          if (ancestorLabel(node.id, filter.type) !== filter.label) {
+            matches = false;
+            break;
+          }
         }
+        if (!matches) continue;
         const label = ancestorLabel(node.id, nodeType);
         if (!label) continue;
         counts[label] = (counts[label] || 0) + 1;
@@ -534,12 +747,8 @@
       return counts;
     }
 
-    function buildStackData(catalogsByVersion, level, groupBy, focusFilter) {
+    function buildStackData(catalogsByVersion, level, ancestorFilters) {
       const config = GROUP_LEVELS[level];
-      const ancestorFilter =
-        focusFilter === "-"
-          ? null
-          : { type: GROUP_LEVELS[groupBy].nodeType, label: focusFilter };
 
       const versions = CATALOG_VERSIONS.map((v) => ({
         version: v,
@@ -547,7 +756,7 @@
         groups: countFlagsByLevel(
           catalogsByVersion[v],
           config.nodeType,
-          ancestorFilter
+          ancestorFilters
         )
       }));
 
@@ -590,7 +799,14 @@
         return row;
       });
 
-      return { rows, keys, level, groupBy, focusFilter };
+      return {
+        rows,
+        keys,
+        level,
+        groupBy: activeSelectLevel,
+        focusFilter: selectValues[activeSelectLevel],
+        ancestorFilters
+      };
     }
 
     function buildColorFn(keys, level) {
@@ -637,31 +853,19 @@
       return `jvm-flag.html?java=${encodeURIComponent(version)}&flag=${encodeURIComponent(flagId)}`;
     }
 
-    function flagsForAncestor(catalog, ancestorType, ancestorLabel) {
-      const byId = new Map(catalog.nodes.map((n) => [n.id, n]));
-      const parentByChild = new Map();
-      for (const edge of catalog.edges) {
-        parentByChild.set(edge.target, edge.source);
-      }
-
-      function ancestorLabelFor(flagId, type) {
-        let cur = flagId;
-        const seen = new Set();
-        while (cur) {
-          if (seen.has(cur)) break;
-          seen.add(cur);
-          const node = byId.get(cur);
-          if (!node) break;
-          if (node.type === type) return node.label;
-          cur = parentByChild.get(cur) ?? node.parent ?? null;
-        }
-        return null;
-      }
-
+    function flagsMatchingFilters(catalog, ancestorFilters) {
+      const { ancestorLabel } = catalogGraphMaps(catalog);
       const flags = [];
       for (const node of catalog.nodes) {
         if (node.type !== "flag") continue;
-        if (ancestorLabelFor(node.id, ancestorType) !== ancestorLabel) continue;
+        let matches = true;
+        for (const filter of ancestorFilters) {
+          if (ancestorLabel(node.id, filter.type) !== filter.label) {
+            matches = false;
+            break;
+          }
+        }
+        if (!matches) continue;
         flags.push({
           flag: node.flag || node.label,
           description: node.description || "",
@@ -671,41 +875,35 @@
       return flags.sort((a, b) => a.flag.localeCompare(b.flag));
     }
 
-    function renderFlagsPanel() {
-      const show =
-        currentGroupBy === "subcategory" &&
-        currentFocusFilter !== "-" &&
-        catalogsCache;
-
-      if (!show) {
-        flagsPanel.hidden = true;
-        return;
+    function formatWhereClause() {
+      const parts = [];
+      if (selectValues.domain !== "-") {
+        parts.push(`Domain = ${selectValues.domain}`);
       }
-
-      const catalog = catalogsCache[version];
-      if (!catalog) {
-        flagsPanel.hidden = true;
-        return;
+      if (selectValues.category !== "-") {
+        parts.push(`Category = ${selectValues.category}`);
       }
+      if (selectValues.subcategory !== "-") {
+        parts.push(`Subcategory = ${selectValues.subcategory}`);
+      }
+      return parts.length ? parts.join(" · ") : "all flags";
+    }
 
-      const flags = flagsForAncestor(
-        catalog,
-        "subcategory",
-        currentFocusFilter
-      );
+    function formatWhereClauseHtml() {
+      return escapeHtml(formatWhereClause());
+    }
 
-      flagsPanel.hidden = false;
-      flagsPanelTitle.innerHTML =
-        `Flags in <span>${escapeHtml(currentFocusFilter)}</span>`;
-      flagsPanelMeta.textContent =
-        `Java ${version} catalog — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
-
+    function renderFlagListTable(flags) {
+      flagsTable.classList.remove("summary-table");
+      flagsTableHead.innerHTML = `<tr>
+        <th scope="col">Flag</th>
+        <th scope="col">Description</th>
+      </tr>`;
       if (!flags.length) {
         flagsTableBody.innerHTML =
-          '<tr><td colspan="2" class="description">No flags in this subcategory for this release.</td></tr>';
+          '<tr><td colspan="2" class="description">No flags in this group for this release.</td></tr>';
         return;
       }
-
       flagsTableBody.innerHTML = flags
         .map((f) => {
           const href = flagDetailUrl(f.flagId);
@@ -718,6 +916,29 @@
           </tr>`;
         })
         .join("");
+    }
+
+    function renderResultsPanel() {
+      if (!catalogsCache) {
+        flagsPanel.hidden = true;
+        return;
+      }
+
+      const catalog = catalogsCache[version];
+      if (!catalog) {
+        flagsPanel.hidden = true;
+        return;
+      }
+
+      const ancestorFilters = cascadeAncestorFilters();
+      const flags = flagsMatchingFilters(catalog, ancestorFilters);
+
+      flagsPanel.hidden = false;
+      flagsPanelTitle.innerHTML =
+        `SELECT COUNT(*) WHERE <span>${formatWhereClauseHtml()}</span>`;
+      flagsPanelMeta.textContent =
+        `Java ${version} catalog — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
+      renderFlagListTable(flags);
     }
 
     function showLoadError(message) {
@@ -740,20 +961,15 @@
 
       chartStatus.style.display = "none";
       chartStatus.classList.remove("error");
-      const level = effectiveGroupLevel(currentGroupBy, currentFocusFilter);
-      const stackData = buildStackData(
-        catalogsCache,
-        level,
-        currentGroupBy,
-        currentFocusFilter
-      );
+      const { chartLevel, ancestorFilters } = queryState();
+      const stackData = buildStackData(catalogsCache, chartLevel, ancestorFilters);
       colorForKey = buildColorFn(stackData.keys, stackData.level);
       drawStackedChart(stackData, version);
-      renderFlagsPanel();
+      renderResultsPanel();
     }
 
     function drawStackedChart(stackData, selectedVersion) {
-      const { rows, keys, level, groupBy, focusFilter } = stackData;
+      const { rows, keys, level, groupBy, focusFilter, ancestorFilters } = stackData;
       if (!rows.length) return;
 
       chartStatus.style.display = "none";
@@ -764,8 +980,8 @@
 
       const groupLabel = GROUP_LEVELS[level].label.toLowerCase();
       const filterNote =
-        focusFilter !== "-"
-          ? `, ${GROUP_LEVELS[groupBy].label.toLowerCase()} ${focusFilter}`
+        ancestorFilters.length > 0
+          ? `, ${ancestorFilters.map((f) => `${f.type} ${f.label}`).join(", ")}`
           : "";
 
       const margin = { top: 28, right: 20, bottom: 52, left: 52 };
@@ -912,8 +1128,8 @@
       if (selected) {
         legendNote.hidden = false;
         const scope =
-          focusFilter !== "-"
-            ? ` — <strong>${focusFilter}</strong> (${GROUP_LEVELS[groupBy].label.toLowerCase()})`
+          ancestorFilters.length > 0
+            ? ` — <strong>${formatWhereClauseHtml()}</strong>`
             : "";
         legendNote.innerHTML =
           `Viewing context: <strong>Java ${selectedVersion}</strong>${scope} ` +
@@ -926,7 +1142,12 @@
       loadCatalogs()
         .then((catalogs) => {
           catalogsCache = catalogs;
-          rebuildFocusSelect(true);
+          taxonomyIndex = buildTaxonomyIndex(catalogs);
+          selectValues.domain = "-";
+          selectValues.category = "-";
+          selectValues.subcategory = "-";
+          refreshCascadeOptions("domain");
+          syncLevelControlState();
           refreshChart();
         })
         .catch((err) => {
@@ -938,16 +1159,37 @@
         });
     }
 
-    filterFocusSelect.addEventListener("change", () => {
-      currentFocusFilter = filterFocusSelect.value;
-      refreshChart();
-    });
+    for (const level of SELECT_LEVELS) {
+      levelCheckboxes[level].addEventListener("change", () => {
+        if (levelCheckboxes[level].checked) {
+          setActiveSelectLevel(level);
+          refreshChart();
+        } else {
+          levelCheckboxes[level].checked = true;
+        }
+      });
 
-    groupBySelect.addEventListener("change", () => {
-      currentGroupBy = groupBySelect.value;
-      rebuildFocusSelect(true);
-      refreshChart();
-    });
+      levelSelects[level].addEventListener("change", () => {
+        selectValues[level] = levelSelects[level].value;
+
+        if (level === "domain") {
+          if (selectValues.domain === "-") {
+            selectValues.category = "-";
+            selectValues.subcategory = "-";
+          } else {
+            selectValues.category = "-";
+            selectValues.subcategory = "-";
+          }
+          refreshCascadeOptions("domain");
+        } else if (level === "category") {
+          selectValues.subcategory = "-";
+          refreshCascadeOptions("category");
+        }
+
+        syncSelectsToState();
+        refreshChart();
+      });
+    }
 
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", initChart);
@@ -961,6 +1203,15 @@
         if (catalogsCache) refreshChart();
       }, 150)
     );
+  </script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'G-2035DNSSEF');
   </script>
 </body>
 </html>
