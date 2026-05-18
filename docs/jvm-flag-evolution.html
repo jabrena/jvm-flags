@@ -618,16 +618,50 @@
       return taxonomyIndex.allSubcategories;
     }
 
-    function fillSelectOptions(select, labels, value) {
+    function ancestorFiltersUpTo(beforeLevel) {
+      const filters = [];
+      if (
+        (beforeLevel === "category" || beforeLevel === "subcategory") &&
+        selectValues.domain !== "-"
+      ) {
+        filters.push({ type: "domain", label: selectValues.domain });
+      }
+      if (beforeLevel === "subcategory" && selectValues.category !== "-") {
+        filters.push({ type: "category", label: selectValues.category });
+      }
+      return filters;
+    }
+
+    function optionCountsForLevel(level) {
+      if (!catalogsCache || !catalogsCache[version]) return {};
+      return countFlagsByLevel(
+        catalogsCache[version],
+        level,
+        ancestorFiltersUpTo(level)
+      );
+    }
+
+    function sortLabelsAlpha(labels) {
+      return [...labels].sort((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: "base" })
+      );
+    }
+
+    function formatSelectOptionLabel(label, counts) {
+      const n = counts[label];
+      return n != null ? `${label} (${n})` : label;
+    }
+
+    function fillSelectOptions(select, labels, value, counts = {}) {
       select.replaceChildren();
       const allOpt = document.createElement("option");
       allOpt.value = "-";
       allOpt.textContent = "-";
       select.appendChild(allOpt);
-      for (const label of labels) {
+      for (const label of sortLabelsAlpha(labels)) {
         const opt = document.createElement("option");
         opt.value = label;
-        opt.textContent = label;
+        opt.textContent = formatSelectOptionLabel(label, counts);
         select.appendChild(opt);
       }
       const next = value !== "-" && labels.includes(value) ? value : "-";
@@ -647,8 +681,9 @@
       if (fromLevel === "domain") {
         selectValues.domain = fillSelectOptions(
           levelSelects.domain,
-          collectLabelsAcrossCatalogs(catalogsCache, "domain", DOMAIN_ORDER),
-          selectValues.domain
+          collectLabelsAcrossCatalogs(catalogsCache, "domain"),
+          selectValues.domain,
+          optionCountsForLevel("domain")
         );
       }
 
@@ -656,14 +691,16 @@
         selectValues.category = fillSelectOptions(
           levelSelects.category,
           categoryOptions(),
-          selectValues.category
+          selectValues.category,
+          optionCountsForLevel("category")
         );
       }
 
       selectValues.subcategory = fillSelectOptions(
         levelSelects.subcategory,
         subcategoryOptions(),
-        selectValues.subcategory
+        selectValues.subcategory,
+        optionCountsForLevel("subcategory")
       );
     }
 
