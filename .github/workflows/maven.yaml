@@ -33,10 +33,11 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: true
-      - uses: actions/setup-java@v5
+      - uses: graalvm/setup-graalvm@v1
         with:
-          distribution: graalvm
           java-version: ${{ matrix.java-version }}
+          distribution: graalvm-community
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Maven build
         working-directory: json-graph-generator
         run: ./mvnw --batch-mode --no-transfer-progress test
