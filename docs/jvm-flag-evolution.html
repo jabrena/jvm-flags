@@ -374,7 +374,7 @@
       Explore HotSpot JVM flag catalogs across Java LTS releases.
     </p>
     <div class="select-controls" role="group" aria-labelledby="select-star-label">
-      <p class="select-star-label" id="select-star-label">SELECT COUNT(*)</p>
+      <p class="select-star-label" id="select-star-label">SELECT COUNT(*) WHERE</p>
       <div class="control-row select-level-row" data-level="domain">
         <label class="level-check">
           <input type="checkbox" id="check-domain" checked aria-controls="filter-domain">
@@ -935,7 +935,7 @@
 
       flagsPanel.hidden = false;
       flagsPanelTitle.innerHTML =
-        `SELECT COUNT(*) — <span>${formatWhereClauseHtml()}</span>`;
+        `SELECT COUNT(*) WHERE <span>${formatWhereClauseHtml()}</span>`;
       flagsPanelMeta.textContent =
         `Java ${version} catalog — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
       renderFlagListTable(flags);
