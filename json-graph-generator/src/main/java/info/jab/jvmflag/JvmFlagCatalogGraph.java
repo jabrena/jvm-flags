@@ -16,6 +16,12 @@ import java.util.Map;
  */
 public final class JvmFlagCatalogGraph {
 
+    /** JVM implementation id for Oracle/OpenJDK HotSpot. */
+    public static final String JVM_HOTSPOT = JvmImplementation.HOTSPOT;
+
+    /** JVM implementation id for GraalVM (HotSpot-derived VM with JVMCI). */
+    public static final String JVM_GRAALVM = JvmImplementation.GRAALVM;
+
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final Map<String, JsonNode> nodesById;
@@ -63,6 +69,85 @@ public final class JvmFlagCatalogGraph {
     /** All graph nodes keyed by id (categories, subcategories, flags, root). */
     public Collection<JsonNode> nodes() {
         return nodesById.values();
+    }
+
+    /**
+     * Flag nodes whose {@code jvm} array does not include {@link #JVM_HOTSPOT}.
+     */
+    public List<OrphanFlag> findFlagsWithoutHotspotJvm() {
+        List<OrphanFlag> missing = new ArrayList<>();
+        for (JsonNode node : nodesById.values()) {
+            if (!"flag".equals(nodeType(node))) {
+                continue;
+            }
+            if (!includesJvmImplementation(node, JVM_HOTSPOT)) {
+                missing.add(new OrphanFlag(
+                        node.path("id").asText(),
+                        nodeLabel(node),
+                        textOrNull(node, "flag")));
+            }
+        }
+        missing.sort((a, b) -> a.id().compareTo(b.id()));
+        return missing;
+    }
+
+    /** Flag nodes with no {@code jvm} array (required on every flag node). */
+    public List<OrphanFlag> findFlagsMissingJvmProperty() {
+        List<OrphanFlag> missing = new ArrayList<>();
+        for (JsonNode node : nodesById.values()) {
+            if (!"flag".equals(nodeType(node))) {
+                continue;
+            }
+            JsonNode jvm = node.get("jvm");
+            if (jvm == null || !jvm.isArray() || jvm.isEmpty()) {
+                missing.add(new OrphanFlag(
+                        node.path("id").asText(),
+                        nodeLabel(node),
+                        textOrNull(node, "flag")));
+            }
+        }
+        missing.sort((a, b) -> a.id().compareTo(b.id()));
+        return missing;
+    }
+
+    /** Flag nodes whose {@code jvm} array contains values other than {@link #JVM_HOTSPOT} and {@link #JVM_GRAALVM}. */
+    public List<OrphanFlag> findFlagsWithUnknownJvmValues() {
+        List<OrphanFlag> invalid = new ArrayList<>();
+        for (JsonNode node : nodesById.values()) {
+            if (!"flag".equals(nodeType(node))) {
+                continue;
+            }
+            JsonNode jvm = node.get("jvm");
+            if (jvm == null || !jvm.isArray()) {
+                continue;
+            }
+            for (JsonNode entry : jvm) {
+                if (!JvmImplementation.isKnown(entry.asText())) {
+                    invalid.add(new OrphanFlag(
+                            node.path("id").asText(),
+                            nodeLabel(node),
+                            textOrNull(node, "flag")));
+                    break;
+                }
+            }
+        }
+        invalid.sort((a, b) -> a.id().compareTo(b.id()));
+        return invalid;
+    }
+
+    /** Non-flag nodes that incorrectly carry a {@code jvm} property (reserved for flag nodes). */
+    public List<String> findNonFlagNodesWithJvmProperty() {
+        List<String> violations = new ArrayList<>();
+        for (JsonNode node : nodesById.values()) {
+            if ("flag".equals(nodeType(node))) {
+                continue;
+            }
+            if (node.has("jvm")) {
+                violations.add(node.path("id").asText() + " (" + nodeType(node) + ")");
+            }
+        }
+        violations.sort(String::compareTo);
+        return violations;
     }
 
     /**
@@ -247,6 +332,19 @@ public final class JvmFlagCatalogGraph {
     private static String textOrNull(JsonNode node, String field) {
         JsonNode value = node.get(field);
         return value == null || value.isNull() ? null : value.asText();
+    }
+
+    private static boolean includesJvmImplementation(JsonNode node, String implementation) {
+        JsonNode jvm = node.get("jvm");
+        if (jvm == null || !jvm.isArray()) {
+            return false;
+        }
+        for (JsonNode entry : jvm) {
+            if (implementation.equals(entry.asText())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static final class OrphanCategory {

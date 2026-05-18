@@ -3,6 +3,7 @@ package info.jab.jvmflag;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +38,7 @@ class PrintFlagsFinalTestArgumentResolverTest {
 
     private static JvmFlagEntry pendingEntry(String flag) {
         JvmFlag jvmFlag = new JvmFlag("flag-pending-test", flag, JvmFlag.PENDING_CATEGORIZATION_DESCRIPTION);
-        return new JvmFlagEntry(jvmFlag, JvmFlagTestSpec.defaults());
+        return new JvmFlagEntry(
+                jvmFlag, JvmFlagTestSpec.defaults(), Collections.singletonList(JvmImplementation.HOTSPOT));
     }
 }

@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 final class PrintFlagsFinalSnapshot {
 
     private static final String SNAPSHOT_RESOURCE_PREFIX = "printflagsfinal/java-";
-    private static final String SNAPSHOT_RESOURCE_SUFFIX = "-hotspot.md";
+    private static final String SNAPSHOT_RESOURCE_SUFFIX = ".md";
 
     static final class Flag {
         private final String name;
@@ -53,18 +53,34 @@ final class PrintFlagsFinalSnapshot {
     private PrintFlagsFinalSnapshot() {}
 
     static String snapshotResourceName(int javaFeatureVersion) {
-        return SNAPSHOT_RESOURCE_PREFIX + javaFeatureVersion + SNAPSHOT_RESOURCE_SUFFIX;
+        return snapshotResourceName(javaFeatureVersion, JvmImplementation.HOTSPOT);
+    }
+
+    static String snapshotResourceName(int javaFeatureVersion, String jvmImplementation) {
+        return SNAPSHOT_RESOURCE_PREFIX + javaFeatureVersion + "-" + jvmImplementation + SNAPSHOT_RESOURCE_SUFFIX;
     }
 
     static boolean hasSnapshotForJavaVersion(int javaFeatureVersion) {
+        return hasSnapshotForJavaVersion(javaFeatureVersion, JvmImplementation.HOTSPOT);
+    }
+
+    static boolean hasSnapshotForJavaVersion(int javaFeatureVersion, String jvmImplementation) {
         return PrintFlagsFinalSnapshot.class
                         .getClassLoader()
-                        .getResource(snapshotResourceName(javaFeatureVersion))
+                        .getResource(snapshotResourceName(javaFeatureVersion, jvmImplementation))
                 != null;
     }
 
+    static boolean hasGraalvmSnapshotForJavaVersion(int javaFeatureVersion) {
+        return hasSnapshotForJavaVersion(javaFeatureVersion, JvmImplementation.GRAALVM);
+    }
+
     static String loadText(int javaFeatureVersion) throws IOException {
-        String resource = snapshotResourceName(javaFeatureVersion);
+        return loadText(javaFeatureVersion, JvmImplementation.HOTSPOT);
+    }
+
+    static String loadText(int javaFeatureVersion, String jvmImplementation) throws IOException {
+        String resource = snapshotResourceName(javaFeatureVersion, jvmImplementation);
         try (InputStream input = PrintFlagsFinalSnapshot.class.getClassLoader().getResourceAsStream(resource)) {
             if (input == null) {
                 throw new IllegalStateException("Missing test resource " + resource);

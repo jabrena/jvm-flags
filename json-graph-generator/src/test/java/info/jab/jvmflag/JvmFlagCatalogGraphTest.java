@@ -106,4 +106,72 @@ class JvmFlagCatalogGraphTest {
                 .containsExactly("heap");
         assertThat(graph.findCategoriesWithDirectFlags().get(0).directFlagCount()).isEqualTo(1);
     }
+
+    @Test
+    void detectsFlagMissingJvmProperty() throws Exception {
+        String json =
+                "{"
+                        + "\"nodes\":["
+                        + "{\"id\":\"root\",\"type\":\"root\",\"label\":\"Root\"},"
+                        + "{\"id\":\"heap\",\"type\":\"category\",\"label\":\"Heap\"},"
+                        + "{\"id\":\"flag-xms\",\"type\":\"flag\",\"label\":\"-Xms\",\"flag\":\"-Xms\","
+                        + "\"jvm\":[\"hotspot\"]},"
+                        + "{\"id\":\"flag-missing\",\"type\":\"flag\",\"label\":\"-missing\",\"flag\":\"-missing\"}"
+                        + "],"
+                        + "\"edges\":["
+                        + "{\"source\":\"root\",\"target\":\"heap\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-xms\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-missing\"}"
+                        + "]}";
+
+        JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.fromRoot(MAPPER.readTree(json));
+
+        assertThat(graph.findFlagsMissingJvmProperty())
+                .extracting(JvmFlagCatalogGraph.OrphanFlag::id)
+                .containsExactly("flag-missing");
+    }
+
+    @Test
+    void detectsFlagWithoutHotspotJvm() throws Exception {
+        String json =
+                "{"
+                        + "\"nodes\":["
+                        + "{\"id\":\"root\",\"type\":\"root\",\"label\":\"Root\"},"
+                        + "{\"id\":\"heap\",\"type\":\"category\",\"label\":\"Heap\"},"
+                        + "{\"id\":\"flag-xms\",\"type\":\"flag\",\"label\":\"-Xms\",\"flag\":\"-Xms\","
+                        + "\"jvm\":[\"hotspot\"]},"
+                        + "{\"id\":\"flag-missing\",\"type\":\"flag\",\"label\":\"-missing\",\"flag\":\"-missing\"},"
+                        + "{\"id\":\"flag-graal\",\"type\":\"flag\",\"label\":\"-graal\",\"flag\":\"-graal\","
+                        + "\"jvm\":[\"graalvm\"]}"
+                        + "],"
+                        + "\"edges\":["
+                        + "{\"source\":\"root\",\"target\":\"heap\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-xms\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-missing\"},"
+                        + "{\"source\":\"heap\",\"target\":\"flag-graal\"}"
+                        + "]}";
+
+        JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.fromRoot(MAPPER.readTree(json));
+
+        assertThat(graph.findFlagsWithoutHotspotJvm())
+                .extracting(JvmFlagCatalogGraph.OrphanFlag::id)
+                .containsExactly("flag-graal", "flag-missing");
+    }
+
+    @Test
+    void detectsJvmPropertyOnNonFlagNode() throws Exception {
+        String json =
+                "{"
+                        + "\"nodes\":["
+                        + "{\"id\":\"root\",\"type\":\"root\",\"label\":\"Root\",\"jvm\":[\"hotspot\"]},"
+                        + "{\"id\":\"flag-xms\",\"type\":\"flag\",\"label\":\"-Xms\",\"flag\":\"-Xms\","
+                        + "\"jvm\":[\"hotspot\"]}"
+                        + "],"
+                        + "\"edges\":[]}";
+
+        JvmFlagCatalogGraph graph = JvmFlagCatalogGraph.fromRoot(MAPPER.readTree(json));
+
+        assertThat(graph.findNonFlagNodesWithJvmProperty()).containsExactly("root (root)");
+        assertThat(graph.findFlagsWithoutHotspotJvm()).isEmpty();
+    }
 }

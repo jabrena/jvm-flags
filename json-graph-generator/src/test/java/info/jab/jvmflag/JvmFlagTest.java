@@ -41,7 +41,7 @@ class JvmFlagTest {
     }
 
     private static boolean shouldVerify(JvmFlagEntry entry) {
-        return entry.testSpec().testable();
+        return entry.testSpec().testable() && entry.supportsJvm(JvmImplementation.current());
     }
 
     @ParameterizedTest(name = "{0}")

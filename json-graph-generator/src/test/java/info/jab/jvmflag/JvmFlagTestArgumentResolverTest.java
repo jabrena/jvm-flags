@@ -21,7 +21,8 @@ class JvmFlagTestArgumentResolverTest {
                 Collections.<String>emptyList(),
                 false,
                 true);
-        JvmFlagEntry entry = new JvmFlagEntry(flag, spec);
+        JvmFlagEntry entry =
+                new JvmFlagEntry(flag, spec, Collections.singletonList(JvmImplementation.HOTSPOT));
 
         List<String> arguments = JvmFlagTestArgumentResolver.resolve(entry);
 

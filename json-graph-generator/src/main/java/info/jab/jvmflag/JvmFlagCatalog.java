@@ -63,9 +63,21 @@ public final class JvmFlagCatalog {
                     readStringArray(node, "testArgs"),
                     !node.has("testable") || node.path("testable").asBoolean(true),
                     node.path("acceptNonZeroExit").asBoolean(false));
-            entries.add(new JvmFlagEntry(flag, testSpec));
+            entries.add(new JvmFlagEntry(flag, testSpec, readJvmImplementations(node)));
         }
         return entries;
+    }
+
+    private static List<String> readJvmImplementations(JsonNode node) {
+        JsonNode jvm = node.get("jvm");
+        if (jvm == null || !jvm.isArray() || jvm.isEmpty()) {
+            return Collections.singletonList(JvmImplementation.HOTSPOT);
+        }
+        List<String> values = new ArrayList<>();
+        for (Iterator<JsonNode> it = jvm.elements(); it.hasNext(); ) {
+            values.add(it.next().asText());
+        }
+        return values;
     }
 
     private static String textOrNull(JsonNode node, String field) {
