@@ -10,7 +10,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+MAVEN_ROOT="${REPO_ROOT}/json-graph-generator"
 
 # shellcheck source=sdk-java-common.sh
 source "${SCRIPT_DIR}/sdk-java-common.sh"
@@ -38,7 +39,7 @@ run_tests_for_version() {
 }
 
 run_tests() {
-  cd "${PROJECT_ROOT}"
+  cd "${MAVEN_ROOT}"
   ./mvnw clean test
 }
 

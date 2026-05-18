@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVM Flags - Methodology</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #f59e0b;
+      --lts: #fbbf24;
+      --card: #15202b;
+      --flag: #34d399;
+      --category: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 1rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .header-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-title-row .title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .nav-menu { position: relative; }
+
+    .nav-menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      padding: 0;
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .nav-menu-toggle:hover,
+    .nav-menu-toggle[aria-expanded="true"] {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .nav-menu-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 1rem;
+    }
+
+    .nav-menu-icon span {
+      display: block;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+    }
+
+    .nav-menu-panel {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      min-width: 11rem;
+      padding: 0.35rem;
+      list-style: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 100;
+    }
+
+    .nav-menu-panel[hidden] { display: none; }
+
+    .nav-menu-panel a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-menu-panel a:hover {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .nav-menu-panel a[aria-current="page"] {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    header > p {
+      margin-top: 0.55rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 52rem;
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    section { margin-bottom: 2rem; }
+
+    section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    section h3 {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin: 1rem 0 0.45rem;
+      color: var(--text);
+    }
+
+    section p,
+    section li {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    section p + p { margin-top: 0.65rem; }
+
+    section ul,
+    section ol {
+      margin: 0.5rem 0 0 1.15rem;
+    }
+
+    section li + li { margin-top: 0.35rem; }
+
+    section a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    section a:hover { text-decoration: underline; }
+
+    code {
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.82em;
+      color: var(--text);
+      background: var(--card);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    pre {
+      margin-top: 0.75rem;
+      padding: 0.85rem 1rem;
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.76rem;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .diagram {
+      margin-top: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.78rem;
+      line-height: 1.45;
+      color: var(--muted);
+      overflow-x: auto;
+    }
+
+    .diagram strong { color: var(--accent); font-weight: 600; }
+
+    .callout {
+      margin-top: 0.75rem;
+      padding: 0.75rem 0.9rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .table-wrap {
+      margin-top: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th,
+    td {
+      padding: 0.5rem 0.7rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    td {
+      color: var(--muted);
+      background: var(--card);
+    }
+
+    td code { font-size: 0.9em; }
+
+    ol.steps {
+      list-style: none;
+      margin: 0.75rem 0 0;
+      padding: 0;
+      counter-reset: step;
+    }
+
+    ol.steps > li {
+      position: relative;
+      padding-left: 2.1rem;
+      margin-top: 0.85rem;
+    }
+
+    ol.steps > li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0.1rem;
+      width: 1.45rem;
+      height: 1.45rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--bg);
+      background: var(--accent);
+      border-radius: 50%;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      padding: 0.85rem 1rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .site-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-footer a:hover { text-decoration: underline; }
+
+    .site-footer p {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    .site-footer__github {
+      display: inline-flex;
+      align-items: center;
+      line-height: 0;
+    }
+
+    .site-footer__github:hover { text-decoration: none; }
+
+    .site-footer__github svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      fill: currentColor;
+    }
+
+    @media (min-width: 640px) {
+      header { padding: 1.25rem 1.5rem 0.75rem; }
+      header h1 { font-size: 1.5rem; }
+      header > p { font-size: 0.9rem; }
+      main { padding: 1.5rem 1.5rem 2.5rem; }
+    }
+  </style>
+  <link rel="icon" type="image/png" href="images/java-icon.png">
+</head>
+<body>
+  <header>
+    <div class="header-title-row">
+      <div class="title-group">
+        <a class="back-link" href="index.html">← Back</a>
+        <h1><span>Methodology</span></h1>
+      </div>
+      <div class="header-actions">
+        <nav class="nav-menu" aria-label="Site">
+          <button
+            type="button"
+            class="nav-menu-toggle"
+            id="nav-menu-toggle"
+            aria-expanded="false"
+            aria-controls="nav-menu-panel"
+          >
+            <span class="sr-only">Menu</span>
+            <span class="nav-menu-icon" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+          </button>
+          <div class="nav-menu-panel" id="nav-menu-panel" role="menu" hidden>
+            <a href="methodology.html" role="menuitem" aria-current="page">Methodology</a>
+            <a href="concepts.html" role="menuitem">Concepts</a>
+            <a href="about.html" role="menuitem">About</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <p>
+      How the Java module loads, validates, and publishes versioned JVM flag catalogs as JSON graphs
+      for the static site.
+    </p>
+  </header>
+
+  <main>
+    <section aria-labelledby="overview-heading">
+      <h2 id="overview-heading">Overview</h2>
+      <p>
+        The Maven module <code>jvmflags</code> does <strong style="color: var(--text); font-weight: 600;">not</strong>
+        generate catalog JSON at compile time. Catalogs are maintained as hand-authored (or script-assisted)
+        files under <code>json-graph-generator/src/main/resources/</code>. Java uses Jackson to read those graphs, enforces structural
+        rules with JUnit tests, and verifies that testable flags are accepted by a live HotSpot JVM.
+      </p>
+      <div class="callout">
+        <strong style="color: var(--text);">Source of truth:</strong>
+        <code>json-graph-generator/src/main/resources/java-*.json</code> and
+        <code>catalog-taxonomy.json</code>.
+        The profile <code>sync-docs-json</code> copies them to
+        <code>docs/json/</code> for the browser (D3 pages fetch <code>json/java-N.json</code>).
+      </div>
+    </section>
+
+    <section aria-labelledby="format-heading">
+      <h2 id="format-heading">Graph document format</h2>
+      <p>Each version file (<code>java-8.json</code> … <code>java-25.json</code>) is one JSON object with three top-level keys:</p>
+      <pre><code>{
+  "metadata": {
+    "title": "Java 25 JVM Flags",
+    "version": "25",
+    "description": "Graph representation of JVM flags organized by category"
+  },
+  "nodes": [ /* root, domains, categories, subcategories, flags */ ],
+  "edges": [ { "source": "&lt;id&gt;", "target": "&lt;id&gt;" } ]
+}</code></pre>
+      <p>
+        <code>nodes</code> hold every vertex in the tree (and metadata on flag nodes).
+        <code>edges</code> are directed parent→child links used by the site and by
+        <code>JvmFlagCatalogGraph</code> for structural checks. There are no edge types or weights.
+      </p>
+    </section>
+
+    <section aria-labelledby="hierarchy-heading">
+      <h2 id="hierarchy-heading">Node types and hierarchy</h2>
+      <p>Every catalog shares the same container taxonomy. Flags always hang under a subcategory:</p>
+      <div class="diagram" aria-hidden="true">
+        <strong>root</strong> (single node, id <code>root</code>)<br>
+        └── <strong>domain</strong> (6 nodes, e.g. <code>domain-memory</code>)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <strong>category</strong> (15 nodes, <code>parent</code> = domain id)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <strong>subcategory</strong> (<code>parent</code> = category id)<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <strong>flag</strong> (actual JVM option)
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col"><code>type</code></th>
+              <th scope="col">Typical fields</th>
+              <th scope="col">Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>root</code></td>
+              <td><code>id</code>, <code>label</code></td>
+              <td>Graph entry point</td>
+            </tr>
+            <tr>
+              <td><code>domain</code></td>
+              <td><code>id</code>, <code>label</code></td>
+              <td>Top grouping (memory, GC, execution, …)</td>
+            </tr>
+            <tr>
+              <td><code>category</code></td>
+              <td><code>id</code>, <code>label</code>, <code>parent</code></td>
+              <td>Mid-level; must link to a domain via edge + matching <code>parent</code></td>
+            </tr>
+            <tr>
+              <td><code>subcategory</code></td>
+              <td><code>id</code>, <code>label</code>, <code>parent</code></td>
+              <td>Leaf container; holds flag nodes</td>
+            </tr>
+            <tr>
+              <td><code>flag</code></td>
+              <td><code>id</code>, <code>label</code>, <code>flag</code>, <code>description</code>, optional test fields</td>
+              <td>Catalog entry parsed by <code>JvmFlagCatalog</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Example edge chain: <code>root → domain-memory → heap → heap-size → flag-initialheapsize</code>.</p>
+    </section>
+
+    <section aria-labelledby="flag-fields-heading">
+      <h2 id="flag-fields-heading">Flag nodes and verification metadata</h2>
+      <p>
+        <code>JvmFlagCatalog.parseEntries</code> walks <code>nodes</code>, keeps only
+        <code>type == "flag"</code>, and builds a <code>JvmFlag</code> plus
+        <code>JvmFlagTestSpec</code> for each row:
+      </p>
+      <pre><code>{
+  "id": "flag-initialheapsize",
+  "label": "-XX:InitialHeapSize=&lt;size&gt;",
+  "type": "flag",
+  "flag": "-XX:InitialHeapSize=&lt;size&gt;",
+  "description": "Initial heap size …",
+  "flagId": "…",
+  "testValue": "-XX:InitialHeapSize=256m",
+  "requires": ["-XX:+UnlockExperimentalVMOptions"],
+  "testable": true,
+  "acceptNonZeroExit": false
+}</code></pre>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Field</th>
+              <th scope="col">Read by Java tests</th>
+              <th scope="col">Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>flag</code></td>
+              <td>Yes</td>
+              <td>Canonical option string (may include <code>&lt;placeholders&gt;</code>)</td>
+            </tr>
+            <tr>
+              <td><code>description</code></td>
+              <td>Yes</td>
+              <td>Human text; must be unique per catalog</td>
+            </tr>
+            <tr>
+              <td><code>testValue</code></td>
+              <td>Yes</td>
+              <td>Concrete JVM argument when <code>flag</code> is not literal</td>
+            </tr>
+            <tr>
+              <td><code>requires</code></td>
+              <td>Yes</td>
+              <td>Arguments prepended before <code>testValue</code> / <code>flag</code></td>
+            </tr>
+            <tr>
+              <td><code>testArgs</code></td>
+              <td>Yes</td>
+              <td>Full multi-token list (overrides <code>testValue</code> / <code>flag</code>)</td>
+            </tr>
+            <tr>
+              <td><code>testable</code></td>
+              <td>Yes</td>
+              <td>Default <code>true</code>; <code>false</code> skips <code>JvmFlagTest</code></td>
+            </tr>
+            <tr>
+              <td><code>acceptNonZeroExit</code></td>
+              <td>Yes</td>
+              <td>Allow non-zero exit when the JVM accepts the flag but <code>-version</code> fails</td>
+            </tr>
+            <tr>
+              <td><code>flagId</code></td>
+              <td>No (site only)</td>
+              <td>Stable UUID for cross-version evolution views</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>How tests resolve JVM arguments</h3>
+      <p><code>JvmFlagTestArgumentResolver</code> builds the argument list in this order:</p>
+      <ol>
+        <li>If <code>testArgs</code> is non-empty → <code>requires</code> + <code>testArgs</code></li>
+        <li>Else if <code>testValue</code> is set → <code>requires</code> + <code>testValue</code></li>
+        <li>Else → <code>requires</code> + <code>flag</code></li>
+      </ol>
+      <p>
+        <code>JvmFlagVerifier</code> then runs
+        <code>java [arguments…] -version</code> and asserts the JVM does not report an unrecognized option.
+        Pending Java&nbsp;8 flags (description
+        <code>Present in Java 8 PrintFlagsFinal; categorization pending.</code>)
+        fall back to <code>PrintFlagsFinalTestArgumentResolver</code> using snapshots under
+        <code>json-graph-generator/src/test/resources/printflagsfinal/</code>.
+      </p>
+    </section>
+
+    <section aria-labelledby="taxonomy-heading">
+      <h2 id="taxonomy-heading">Canonical taxonomy</h2>
+      <p>
+        <code>catalog-taxonomy.json</code> defines every shared domain, category, and subcategory
+        (<code>id</code>, <code>label</code>, <code>parent</code>). Each <code>java-*.json</code> must
+        contain the same container node set; only flag nodes differ by release.
+        <code>CatalogTaxonomy</code> loads this file and <code>JvmFlagCatalogTaxonomyTest</code> compares
+        it to every version graph.
+      </p>
+    </section>
+
+    <section aria-labelledby="java-api-heading">
+      <h2 id="java-api-heading">Java classes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Class</th>
+              <th scope="col">Package / path</th>
+              <th scope="col">Responsibility</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>JvmFlagCatalog</code></td>
+              <td><code>info.jab.jvmflag</code></td>
+              <td>Load <code>java-N.json</code>; extract flag entries for verification</td>
+            </tr>
+            <tr>
+              <td><code>JvmFlagCatalogGraph</code></td>
+              <td><code>info.jab.jvmflag</code></td>
+              <td>Read-only graph; orphan flags, empty subcategories, taxonomy violations</td>
+            </tr>
+            <tr>
+              <td><code>CatalogTaxonomy</code></td>
+              <td><code>info.jab.jvmflag</code></td>
+              <td>Load <code>catalog-taxonomy.json</code></td>
+            </tr>
+            <tr>
+              <td><code>JvmFlag</code> / <code>JvmFlagEntry</code></td>
+              <td><code>info.jab.jvmflag</code></td>
+              <td>Flag identity + paired test spec</td>
+            </tr>
+            <tr>
+              <td><code>JvmFlagVerifier</code></td>
+              <td><code>info.jab.jvmflag</code></td>
+              <td>Execute <code>java</code> subprocess for acceptance checks</td>
+            </tr>
+            <tr>
+              <td><code>JvmFlagTest</code></td>
+              <td><code>src/test/java/…</code></td>
+              <td>Parameterized live-JVM test per testable flag</td>
+            </tr>
+            <tr>
+              <td><code>JvmFlagCatalog*Test</code></td>
+              <td><code>src/test/java/…</code></td>
+              <td>Structure, taxonomy, orphans, description uniqueness</td>
+            </tr>
+            <tr>
+              <td><code>PrintFlagsFinalCatalogTest</code></td>
+              <td><code>src/test/java/…</code></td>
+              <td>Align catalog with <code>-XX:+PrintFlagsFinal</code> snapshots</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Key loader entry points:</p>
+      <pre><code>JvmFlagCatalog.loadForJavaVersion(25)
+JvmFlagCatalogGraph.loadForJavaVersion(25)
+CatalogTaxonomy.load()</code></pre>
+    </section>
+
+    <section aria-labelledby="workflow-heading">
+      <h2 id="workflow-heading">End-to-end workflow</h2>
+      <ol class="steps">
+        <li>
+          <strong style="color: var(--text);">Capture ground truth.</strong>
+          Run <code>./scripts/regenerate-printflagsfinal.sh</code> on JDK 8/11/17/21/25 to refresh
+          <code>json-graph-generator/src/test/resources/printflagsfinal/java-N-hotspot.md</code> from
+          <code>java -XX:+PrintFlagsFinal</code>.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Maintain catalogs.</strong>
+          Edit <code>json-graph-generator/src/main/resources/java-N.json</code>: add or move flag nodes, wire
+          <code>edges</code>, set descriptions, and verification fields. Optional Python helpers under
+          <code>scripts/</code> (for example <code>add-pending-java8-flags.py</code>,
+          <code>enrich-java8-flag-test-values.py</code>) assist bulk updates.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Keep taxonomy aligned.</strong>
+          Update <code>catalog-taxonomy.json</code> when adding domains, categories, or subcategories;
+          replicate container nodes in every version file.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Verify on the matching JDK.</strong>
+          <code>cd json-graph-generator &amp;&amp; ./mvnw test</code> (or <code>./scripts/test-with-jdk.sh N</code>) runs structure tests
+          for all versions plus live <code>JvmFlagTest</code> for the catalog that matches the running
+          feature release.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Publish to the site.</strong>
+          <code>cd json-graph-generator &amp;&amp; ./mvnw clean install -Psync-docs-json</code> copies
+          <code>json-graph-generator/src/main/resources/</code> → <code>docs/json/</code>.
+        </li>
+        <li>
+          <strong style="color: var(--text);">Browse.</strong>
+          Serve <code>docs/</code> with <code>jwebserver</code>; pages load
+          <code>json/java-N.json</code> for D3 graphs and tables.
+        </li>
+      </ol>
+    </section>
+
+    <section aria-labelledby="commands-heading">
+      <h2 id="commands-heading">Maintainer commands</h2>
+      <pre><code># Verify catalog on current JDK (needs matching java-N.json)
+cd json-graph-generator &amp;&amp; ./mvnw test
+
+# Verify on a specific JDK
+./scripts/test-with-jdk.sh 17
+
+# Refresh PrintFlagsFinal snapshots
+./scripts/regenerate-printflagsfinal.sh
+
+# Publish JSON to the static site
+cd json-graph-generator &amp;&amp; ./mvnw clean install -Psync-docs-json
+
+# Serve locally (from repository root)
+jwebserver -d docs -p 8080</code></pre>
+      <p>
+        See also <a href="about.html">About</a> for site features and
+        <a href="https://github.com/jabrena/jvm-flags" target="_blank" rel="noopener noreferrer">GitHub</a>
+        for the full repository.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Built with ❤️ from
+      <a
+        href="https://www.google.com/maps/place/Community+of+Madrid,+Madrid/@40.4983324,-6.3162283,8z/data=!3m1!4b1!4m6!3m5!1s0xd41817a40e033b9:0x10340f3be4bc880!8m2!3d40.4167088!4d-3.5812692!16zL20vMGo0eGc?entry=ttu&amp;g_ep=EgoyMDI1MDgxOC4wIKXMDSoASAFQAw%3D%3D"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Madrid</a>
+      <a
+        class="site-footer__github"
+        href="https://github.com/jabrena/jvm-flags"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="View source on GitHub"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </p>
+  </footer>
+
+  <script>
+    (function () {
+      const toggle = document.getElementById("nav-menu-toggle");
+      const panel = document.getElementById("nav-menu-panel");
+      if (!toggle || !panel) return;
+
+      function setOpen(open) {
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.hidden = !open;
+      }
+
+      function close() {
+        setOpen(false);
+      }
+
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setOpen(toggle.getAttribute("aria-expanded") !== "true");
+      });
+
+      panel.addEventListener("click", (e) => {
+        if (e.target.closest("a")) close();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".nav-menu")) close();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+    })();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag("js", new Date());
+    gtag("config", "G-2035DNSSEF");
+  </script>
+</body>
+</html>

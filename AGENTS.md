@@ -9,12 +9,12 @@ You are a **Java developer and technical writer** helping maintain the JVM flag 
 - Prefer accurate, Oracle-aligned flag names, categories, and version availability.
 - Keep JSON catalogs, HTML pages, and Java verification logic consistent.
 - Run tests on the same Java feature release you are validating when changing catalog data.
-- Treat `docs/json/` as published output derived from `src/main/resources/`, not a second source of truth.
+- Treat `docs/json/` as published output derived from `json-graph-generator/src/main/resources/`, not a second source of truth.
 
 ## Tech stack
 
 - **Language:** Java 8 (`maven.compiler.release`); CI also builds on JDK 8, 11, 17, 21, and 25.
-- **Build:** Maven (`./mvnw`), wrapper included.
+- **Build:** Maven (`json-graph-generator/mvnw`), wrapper included.
 - **Libraries:** Jackson (JSON parsing), JUnit 5 + AssertJ + Logback (tests).
 - **Site:** Static HTML/CSS/JS in `docs/` (D3.js graphs); served locally with `jwebserver`.
 - **CI:** GitHub Actions (`.github/workflows/maven.yaml`) — matrix `test` on multiple JDKs.
@@ -23,29 +23,29 @@ You are a **Java developer and technical writer** helping maintain the JVM flag 
 
 | Path | Purpose |
 |------|---------|
-| `src/` | **WRITE here** — test to verify that jvm flag information is true. |
-| `docs/` | **WRITE here**  — static website. |
+| `json-graph-generator/` | **WRITE here** — Maven project: catalog JSON, verification tests, sync to `docs/json/`. |
+| `docs/` | **WRITE here** — static website. |
 
 ## Commands
 
 ```bash
 # Run unit/integration tests (uses current JDK; needs matching java-*.json resource)
-./mvnw test
+cd json-graph-generator && ./mvnw test
 
-# Copy src/main/resources/*.json into docs/json/ for the static site
-./mvnw clean install -Psync-docs-json
+# Copy json-graph-generator/src/main/resources/*.json into docs/json/ for the static site
+cd json-graph-generator && ./mvnw clean install -Psync-docs-json
 
-# Serve the site locally (from project root)
+# Serve the site locally (from repository root)
 jwebserver -d docs -p 8080
 
 # Full local workflow (serve + sync JSON)
 jwebserver -d docs -p 8080
-./mvnw clean install -Psync-docs-json
+cd json-graph-generator && ./mvnw clean install -Psync-docs-json
 ```
 
 ## Catalog verification metadata
 
-`JvmFlagTest` runs `java [requires…] [testArgs | testValue | flag] -version` for each catalog flag where `testable` is true (default). Optional fields on flag nodes in `src/main/resources/java-*.json`:
+`JvmFlagTest` runs `java [requires…] [testArgs | testValue | flag] -version` for each catalog flag where `testable` is true (default). Optional fields on flag nodes in `json-graph-generator/src/main/resources/java-*.json`:
 
 | Field | Purpose |
 |-------|---------|
@@ -68,14 +68,14 @@ Do not mark a flag `testable: false` only because the display name has placehold
 
 - **Commit messages:** [Conventional Commits](https://www.conventionalcommits.org/) — e.g. `feat(docs): …`, `fix(catalog): …`, `test(flags): …`.
 - **Scope examples:** `docs` (HTML/UI), `catalog` or `json` (flag data), `site`, `test`.
-- **PR checklist:** What changed? Why? Any catalog or UI behavior change? Did you run `./mvnw test` on a relevant JDK and sync JSON if needed?
+- **PR checklist:** What changed? Why? Any catalog or UI behavior change? Did you run `json-graph-generator/mvnw test` on a relevant JDK and sync JSON if needed?
 - **Comments:** Prefer complete sentences in code review and non-trivial inline comments.
 
 ## Boundaries
 
 - ✅ **Always do:**
-  - Edit catalog data in `src/main/resources/java-*.json`, then run `./mvnw clean install -Psync-docs-json` when the site should reflect changes.
-  - Run `./mvnw test` on a JDK version that has a matching `java-<feature>.json` before proposing catalog changes.
+  - Edit catalog data in `json-graph-generator/src/main/resources/java-*.json`, then run `cd json-graph-generator && ./mvnw clean install -Psync-docs-json` when the site should reflect changes.
+  - Run `cd json-graph-generator && ./mvnw test` on a JDK version that has a matching `java-<feature>.json` before proposing catalog changes.
   - Keep flag names and descriptions aligned with Oracle HotSpot documentation (see `README.md` references).
   - Remove JVM test artifacts (`.log`, `.jfr`) — tests already clean these; do not commit them.
 
@@ -87,7 +87,7 @@ Do not mark a flag `testable: false` only because the display name has placehold
   - New dependencies, Maven plugins, or CI workflow changes.
 
 - 🚫 **Never do:**
-  - Edit `docs/json/*.json` directly without updating `src/main/resources/` and syncing.
+  - Edit `docs/json/*.json` directly without updating `json-graph-generator/src/main/resources/` and syncing.
   - Commit secrets, credentials, or local `.env` files.
   - Commit `target/`, `*.log`, `*.jfr`, or `__pycache__/`.
   - Skip tests when changing flag definitions or verifier logic.

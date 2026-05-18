@@ -52,12 +52,106 @@
 
     header h1 span { color: var(--accent); }
 
-    .header-title-row .btn-graph {
-      width: auto;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       flex-shrink: 0;
+    }
+
+    .header-actions .btn-graph {
+      width: auto;
       white-space: nowrap;
       padding: 0.5rem 0.85rem;
       font-size: 0.85rem;
+    }
+
+    .nav-menu {
+      position: relative;
+    }
+
+    .nav-menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      padding: 0;
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .nav-menu-toggle:hover,
+    .nav-menu-toggle[aria-expanded="true"] {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .nav-menu-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 1rem;
+    }
+
+    .nav-menu-icon span {
+      display: block;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+    }
+
+    .nav-menu-panel {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      min-width: 11rem;
+      padding: 0.35rem;
+      margin: 0;
+      list-style: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 100;
+    }
+
+    .nav-menu-panel[hidden] {
+      display: none;
+    }
+
+    .nav-menu-panel a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-menu-panel a:hover {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .header-separator {
@@ -426,7 +520,7 @@
         font-size: 1.65rem;
       }
 
-      .header-title-row .btn-graph {
+      .header-actions .btn-graph {
         padding: 0.65rem 1rem;
         font-size: 0.9rem;
       }
@@ -490,7 +584,28 @@
   <header>
     <div class="header-title-row">
       <h1><span>JVM</span> Flags</h1>
-      <a class="btn-graph" href="quiz-game.html">Quiz Game</a>
+      <div class="header-actions">
+        <a class="btn-graph" href="quiz-game.html">Quiz Game</a>
+        <nav class="nav-menu" aria-label="Site">
+          <button
+            type="button"
+            class="nav-menu-toggle"
+            id="nav-menu-toggle"
+            aria-expanded="false"
+            aria-controls="nav-menu-panel"
+          >
+            <span class="sr-only">Menu</span>
+            <span class="nav-menu-icon" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+          </button>
+          <div class="nav-menu-panel" id="nav-menu-panel" role="menu" hidden>
+            <a href="methodology.html" role="menuitem">Methodology</a>
+            <a href="concepts.html" role="menuitem">Concepts</a>
+            <a href="about.html" role="menuitem">About</a>
+          </div>
+        </nav>
+      </div>
     </div>
     <div class="header-separator" aria-hidden="true"></div>
     <p>
@@ -817,6 +932,39 @@
 
     draw();
     window.addEventListener("resize", d3.debounce(draw, 150));
+  </script>
+  <script>
+    (function () {
+      const toggle = document.getElementById("nav-menu-toggle");
+      const panel = document.getElementById("nav-menu-panel");
+      if (!toggle || !panel) return;
+
+      function setOpen(open) {
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.hidden = !open;
+      }
+
+      function close() {
+        setOpen(false);
+      }
+
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setOpen(toggle.getAttribute("aria-expanded") !== "true");
+      });
+
+      panel.addEventListener("click", (e) => {
+        if (e.target.closest("a")) close();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".nav-menu")) close();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+    })();
   </script>
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>

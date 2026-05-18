@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVM Flags - Concepts</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #f59e0b;
+      --card: #15202b;
+      --flag: #34d399;
+      --category: #3b82f6;
+      --domain-memory: #34d399;
+      --domain-gc: #a78bfa;
+      --domain-execution: #f472b6;
+      --domain-classes: #60a5fa;
+      --domain-concurrency: #fbbf24;
+      --domain-operations: #fb923c;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 1rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .header-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-title-row .title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    header h1 { font-size: 1.35rem; font-weight: 600; letter-spacing: -0.02em; }
+    header h1 span { color: var(--accent); }
+    .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+    .nav-menu { position: relative; }
+
+    .nav-menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      padding: 0;
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .nav-menu-toggle:hover,
+    .nav-menu-toggle[aria-expanded="true"] {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .nav-menu-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 1rem;
+    }
+
+    .nav-menu-icon span {
+      display: block;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+    }
+
+    .nav-menu-panel {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      min-width: 11rem;
+      padding: 0.35rem;
+      list-style: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 100;
+    }
+
+    .nav-menu-panel[hidden] { display: none; }
+
+    .nav-menu-panel a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-menu-panel a:hover { background: var(--bg); color: var(--accent); }
+    .nav-menu-panel a[aria-current="page"] { background: var(--bg); color: var(--accent); }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    header > p {
+      margin-top: 0.55rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 52rem;
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 46rem;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    .intro {
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .intro a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .intro a:hover { text-decoration: underline; }
+
+    .intro code {
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.85em;
+      color: var(--text);
+      background: var(--card);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .toc {
+      margin-bottom: 2rem;
+      padding: 0.85rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .toc-title {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .toc ul {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.65rem;
+    }
+
+    .toc a {
+      display: inline-block;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .toc a:hover { border-color: var(--accent); color: var(--accent); }
+
+    .domain-block {
+      margin-bottom: 2.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .domain-block:first-of-type { border-top: none; padding-top: 0; }
+
+    .domain-block h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    #domain-memory h2 { color: var(--domain-memory); }
+    #domain-gc h2 { color: var(--domain-gc); }
+    #domain-execution h2 { color: var(--domain-execution); }
+    #domain-classes h2 { color: var(--domain-classes); }
+    #domain-concurrency h2 { color: var(--domain-concurrency); }
+    #domain-operations h2 { color: var(--domain-operations); }
+
+    .domain-intro {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .category-block {
+      margin-bottom: 1.5rem;
+      padding: 0.85rem 0 0 0.65rem;
+      border-left: 2px solid var(--border);
+    }
+
+    .category-block h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--category);
+      margin-bottom: 0.4rem;
+    }
+
+    .category-intro {
+      font-size: 0.85rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .subcategory-list {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .subcategory-block {
+      padding: 0.65rem 0.75rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .subcategory-block h4 {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .subcategory-block p {
+      font-size: 0.8rem;
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      padding: 0.85rem 1rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .site-footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .site-footer a:hover { text-decoration: underline; }
+
+    .site-footer p {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    .site-footer__github { display: inline-flex; align-items: center; line-height: 0; }
+    .site-footer__github:hover { text-decoration: none; }
+    .site-footer__github svg { width: 1.1rem; height: 1.1rem; fill: currentColor; }
+
+    
+    main { max-width: 50rem; }
+
+    .sub-detail {
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: var(--muted);
+      margin: 0.4rem 0 0.65rem;
+    }
+
+    .sub-detail code {
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.9em;
+      color: var(--text);
+      background: var(--bg);
+      padding: 0.08rem 0.3rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .popular-flags {
+      margin-top: 0.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--border);
+    }
+
+    .popular-title {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+
+    .popular-flags ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .popular-flags li {
+      font-size: 0.8rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-top: 0.35rem;
+      padding-left: 0.65rem;
+      border-left: 2px solid var(--border);
+    }
+
+    .popular-flags li code,
+    .popular-flags li a code {
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.92em;
+      color: var(--flag);
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    .popular-flags li a {
+      color: var(--flag);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .popular-flags li a:hover code { text-decoration: underline; }
+
+    .popular-flags .muted-note {
+      border-left-color: transparent;
+      padding-left: 0;
+      font-style: italic;
+    }
+
+    .category-intro em { font-style: italic; color: var(--muted); }
+
+    @media (min-width: 640px) {
+      header { padding: 1.25rem 1.5rem 0.75rem; }
+      header h1 { font-size: 1.5rem; }
+      header > p { font-size: 0.9rem; }
+      main { padding: 1.5rem 1.5rem 2.5rem; }
+    }
+  </style>
+  <link rel="icon" type="image/png" href="images/java-icon.png">
+</head>
+<body>
+  <header>
+    <div class="header-title-row">
+      <div class="title-group">
+        <a class="back-link" href="index.html">← Back</a>
+        <h1><span>Concepts</span></h1>
+      </div>
+      <div class="header-actions">
+        <nav class="nav-menu" aria-label="Site">
+          <button type="button" class="nav-menu-toggle" id="nav-menu-toggle" aria-expanded="false" aria-controls="nav-menu-panel">
+            <span class="sr-only">Menu</span>
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+          <div class="nav-menu-panel" id="nav-menu-panel" role="menu" hidden>
+            <a href="methodology.html" role="menuitem">Methodology</a>
+            <a href="concepts.html" role="menuitem" aria-current="page">Concepts</a>
+            <a href="about.html" role="menuitem">About</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <p>Why HotSpot groups JVM flags into domains, categories, and subcategories—and what each group is for.</p>
+  </header>
+
+  <main>
+    <p class="intro">
+      This reference explains <strong style="color: var(--text); font-weight: 600;">why</strong> each taxonomy group exists
+      and which JVM flags operators reach for most often. Taxonomy is defined in
+      <code>catalog-taxonomy.json</code> (6 domains, 15 categories, 88 subcategories) and shared across
+      <code>java-8.json</code> … <code>java-25.json</code>. Flag examples below come from the
+      <strong style="color: var(--text); font-weight: 600;">Java 25</strong> catalog; availability varies by release—use the
+      <a href="java-version.html?java=25">interactive graph</a> or
+      <a href="jvm-flag-evolution.html?java=25">evolution view</a> for other versions.
+      See <a href="methodology.html">methodology</a> for how catalogs are built and verified.
+    </p>
+<nav class="toc" aria-label="Table of contents">
+<p class="toc-title">Jump to domain</p><ul>
+<li><a href="#domain-memory">Memory &amp; layout</a></li>
+<li><a href="#domain-gc">Garbage collection</a></li>
+<li><a href="#domain-execution">Execution &amp; code</a></li>
+<li><a href="#domain-classes">Classes &amp; modules</a></li>
+<li><a href="#domain-concurrency">Concurrency</a></li>
+<li><a href="#domain-operations">Operations &amp; platform</a></li>
+</ul></nav>
+<section id="domain-memory" class="domain-block" aria-labelledby="domain-memory-heading">
+<h2 id="domain-memory-heading">Memory &amp; layout</h2>
+<p class="domain-intro">Every Java object lives in the heap; class metadata in metaspace; each thread has a stack. Sizing these regions is usually the first production tuning step. Too small causes <code>OutOfMemoryError</code> or excessive GC; too large wastes RAM and can lengthen pauses. Layout flags (compressed pointers, alignment) trade address space for density on 64-bit JVMs.</p>
+<article id="heap" class="category-block" aria-labelledby="heap-heading">
+<h3 id="heap-heading">Heap</h3>
+<p class="category-intro">The object heap is where instances and arrays reside. Capacity flags set hard limits; generational flags split young vs old generations for copying collectors. Separate from choosing <em>which</em> GC algorithm runs (see Garbage Collection).</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="heap-direct-memory">
+<h4>Direct Memory</h4>
+<p class="sub-detail">Direct byte buffers allocate outside the object heap in native memory. NIO, Netty, and many frameworks use them heavily. The limit is separate from <code>-Xmx</code> and can cause <code>OutOfMemoryError: Direct buffer memory</code>.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=4df7f661-277d-5ca3-b1b3-b6933bf1fa82"><code>-XX:MaxDirectMemorySize=&lt;n&gt;</code></a> — Cap on direct buffer memory (often set explicitly in Netty services).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-layout">
+<h4>Heap Layout &amp; Footprint</h4>
+<p class="sub-detail">Layout flags control compressed class pointers, heap region geometry, and overall footprint. They interact with object reference compression and maximum heap addressability on 64-bit VMs.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>UseCompressedClassPointers</code> — Compress class pointers to save space (on by default for most heaps).</li>
+<li><code>UseCompressedOops</code> — 32-bit references in a 64-bit heap up to ~32 GB (compressed oops).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=ae4d9c52-275d-5105-a2a4-f60d4c99aae2"><code>-XX:HeapBaseMinAddress=&lt;n&gt;</code></a> — OS specific low limit for heap base address.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-resize">
+<h4>Heap Resize Heuristics</h4>
+<p class="sub-detail">Unless min equals max, the JVM can grow or shrink the heap based on utilization heuristics. Resize causes allocation stalls and RSS changes visible to container limits.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=e2550f3b-a128-5ab8-8358-ab9141bffe10"><code>-XX:+ShrinkHeapInSteps</code></a> — Grow/shrink heap gradually rather than in one large step.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=fff87205-d79e-5623-bbbf-6aa939dddc86"><code>-XX:AllocateHeapAt=&lt;value&gt;</code></a> — Path to a directory where a temporary file is created as backing store for the Java heap.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=10e02bba-506d-5ec1-83d0-518956b2aa54"><code>-XX:HeapSearchSteps=&lt;n&gt;</code></a> — Heap allocation steps through preferred address regions to find where it can allocate the heap. Number of steps to ta…</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=f2ff2fe3-eb39-547d-aa8c-1e94e5df6d93"><code>-XX:MaxHeapFreeRatio=&lt;n&gt;</code></a> — The maximum percentage of heap free after GC to avoid shrinking. For most GCs this applies to the old generation. In …</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-size">
+<h4>Heap Size</h4>
+<p class="sub-detail">Heap size flags set the minimum and maximum memory the JVM may use for Java objects. Setting <code>-Xms</code> equal to <code>-Xmx</code> avoids resize work during steady state but commits memory up front. Ergonomics on server-class machines derive defaults from available RAM unless you override them.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=80713948-fc40-522d-9175-4cc55652beef"><code>-XX:MaxHeapSize=&lt;size&gt;</code></a> — Maximum heap (<code>-Xmx</code>). Most common production flag; caps object allocation.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=5ae3f3d3-f0c6-5e4b-85c8-c038b76391e3"><code>-XX:InitialHeapSize=&lt;size&gt;</code></a> — Starting heap (<code>-Xms</code>). Match <code>-Xmx</code> to avoid growth churn.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=0a6b2e34-810c-5e97-9780-eb5e0121cb32"><code>-XX:SoftMaxHeapSize=&lt;size&gt;</code></a> — Soft upper bound used by some collectors before harder limits apply.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-large-pages">
+<h4>Large Pages</h4>
+<p class="sub-detail">Huge pages (2 MB or 1 GB) reduce TLB misses for very large, long-running heaps. Requires OS configuration (<code>hugetlbfs</code>, <code>vm.nr_hugepages</code>) and often reserving memory at boot.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=f8b0d46d-291b-5d41-81ee-ea6c35687bdd"><code>-XX:+UseLargePages</code></a> — Request large pages for the Java heap where the OS supports them.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=3c962109-d264-5599-8b47-3450d38af55c"><code>-XX:LargePageHeapSizeThreshold=&lt;n&gt;</code></a> — Use large pages if maximum heap is at least this big.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=502fe1cb-53f9-56bc-a947-be4a817064d2"><code>-XX:LargePageSizeInBytes=&lt;n&gt;</code></a> — Large page size (0 to let VM choose the page size).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-numa">
+<h4>NUMA</h4>
+<p class="sub-detail">On multi-socket hosts, NUMA policies place heap pages near the CPU allocating them. Interleaving spreads memory across nodes; local allocation reduces remote memory access latency.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=85292f1e-752d-5323-8663-d7258533458e"><code>-XX:+UseNUMA</code></a> — Enable NUMA-aware memory allocation for the heap.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=14c0743f-e85b-5622-851e-2d30b462b868"><code>-XX:+UseNUMAInterleaving</code></a> — Interleave heap pages across NUMA nodes.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-ram-sizing">
+<h4>RAM-Based Sizing</h4>
+<p class="sub-detail">On server-class machines the JVM picks default heap fractions from physical memory (<code>MaxRAMPercentage</code>, ergonomics). Container-aware versions read cgroup limits instead.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=19693250-84d4-551f-a275-10d567837ba7"><code>-XX:MaxRAMPercentage=&lt;n&gt;</code></a> — Fraction of recognized RAM for max heap (common in containers).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=9a4d43d6-2f93-539f-b3f3-3a9101c9a2a3"><code>-XX:InitialRAMPercentage=&lt;n&gt;</code></a> — Fraction of RAM for initial heap when using percentage sizing.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-survivor">
+<h4>Survivor Spaces</h4>
+<p class="sub-detail">Survivor spaces buffer objects between Eden and the old generation. Copying collectors move live objects between From and To survivor spaces during minor GC. Too-small survivors force premature promotion to old gen.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=79f4a73c-97db-5c7a-8a04-27511c350969"><code>-XX:InitialSurvivorRatio=&lt;n&gt;</code></a> — Eden-to-survivor ratio (default often 8).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=331e7207-eb1f-5150-8146-f3e2d4196a4a"><code>-XX:MinSurvivorRatio=&lt;n&gt;</code></a> — Minimum ratio of young generation/survivor space size.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=6342646e-48d8-5e15-a364-3ec51e851e50"><code>-XX:SurvivorPadding=&lt;n&gt;</code></a> — How much buffer to keep for survivor overflow.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=7f1c1af7-cf70-5416-90a8-660d35430459"><code>-XX:SurvivorRatio=&lt;n&gt;</code></a> — Ratio of eden/survivor space size.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-tenured-gen">
+<h4>Tenured Generation</h4>
+<p class="sub-detail">The tenured (old) generation stores long-lived objects. When it fills, a major or full collection runs—often the dominant pause for generational collectors. Sizing old gen relative to young gen affects promotion failure and fragmentation.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>NewRatio</code> — Indirectly sizes old gen via young/old ratio.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=f236cab4-2da1-5214-a8e0-87c44bef9de4"><code>-XX:TenuredGenerationSizeIncrement=&lt;n&gt;</code></a> — Adaptive size percentage change in tenured generation.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a47b84d1-8bf0-529c-9973-1ffa77c286d1"><code>-XX:TenuredGenerationSizeSupplement=&lt;n&gt;</code></a> — Supplement to TenuredGenerationSizeIncrement used at startup.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=db5df4f3-7594-50d1-98df-8766fda4a708"><code>-XX:TenuredGenerationSizeSupplementDecay=&lt;n&gt;</code></a> — Decay factor to TenuredGenerationSizeIncrement.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-tenuring">
+<h4>Tenuring &amp; Promotion</h4>
+<p class="sub-detail">Objects survive a number of minor collections before promotion. The tenuring threshold and survivor copying policy filter short-lived garbage from long-lived data. Tuning reduces unnecessary promotion and old-gen pressure.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=6430939d-b182-5013-b5ca-6f95b332d6dc"><code>-XX:MaxTenuringThreshold=&lt;n&gt;</code></a> — Maximum GC ages before promotion to old gen.</li>
+<li><code>TargetSurvivorRatio</code> — Target survivor space utilization after minor GC.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=8494477c-db3d-58fb-8103-bf46596df9e2"><code>-XX:+AlwaysTenure</code></a> — Always tenure objects in eden (ParallelGC only).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=fd0f16db-c3ce-5607-a5ac-08765df3f969"><code>-XX:InitialTenuringThreshold=&lt;n&gt;</code></a> — Initial value for tenuring threshold.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=487d3690-93b6-5b24-998a-5fc2c3c3715d"><code>-XX:+NeverTenure</code></a> — Never tenure objects in eden, may tenure on overflow (ParallelGC only).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="heap-young-gen">
+<h4>Young Generation</h4>
+<p class="sub-detail">The young generation holds newly allocated objects. Minor collections copy survivors to tenured space or another survivor space. A young gen that is too small causes frequent minor GC; too large delays major collections and can waste copying work.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=60caee88-2c7a-5fbc-bbdc-bdfaa4ae2baf"><code>-XX:NewRatio=&lt;n&gt;</code></a> — Ratio of old-to-young generation size (e.g. <code>-XX:NewRatio=2</code>).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=9e041358-d632-5057-b7e5-c335cd46bfbe"><code>-XX:MaxNewSize=&lt;n&gt;</code></a> — Fixed young generation size when not using ratio-based sizing.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="metaspace" class="category-block" aria-labelledby="metaspace-heading">
+<h3 id="metaspace-heading">Metaspace</h3>
+<p class="category-intro">Since Java 8, class metadata lives in native metaspace—not the Java heap and not PermGen. Frameworks that generate many classes (Spring, Hibernate, agents) need metaspace caps and reclaim policy.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="metaspace-large-pages">
+<h4>Large Pages</h4>
+<p class="sub-detail">Large pages for metadata reduce TLB pressure in class-heavy JVMs (big Spring apps, application servers with many deployments).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>UseLargePagesInMetaspace</code> — Use huge pages for metaspace when configured on the host.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="metaspace-sizing">
+<h4>Metaspace Sizing</h4>
+<p class="sub-detail">Metaspace grows with loaded classes. Without a cap, class-loader leaks exhaust native memory. Set a max to fail fast; initial size avoids repeated expansion during startup.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=26aedd03-480c-5c63-a985-9f022bbd7587"><code>-XX:MaxMetaspaceSize=&lt;size&gt;</code></a> — Hard cap on metaspace (critical for apps with dynamic class generation).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=8f8ba20f-204a-51dc-82fd-981fe0d69ce6"><code>-XX:MetaspaceSize=&lt;size&gt;</code></a> — Initial metaspace committed at startup.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="metaspace-policy">
+<h4>Reclaim Policy</h4>
+<p class="sub-detail">When classes unload, metaspace chunks may return to the OS or stay reserved. Reclaim policy affects RSS after redeployments and framework hot-reload scenarios.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>MinMetaspaceFreeRatio</code> — Trigger metaspace GC when free ratio drops below this level.</li>
+<li><code>MaxMetaspaceFreeRatio</code> — Stop expanding when free ratio exceeds this level.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="object-layout" class="category-block" aria-labelledby="object-layout-heading">
+<h3 id="object-layout-heading">Object Layout</h3>
+<p class="category-intro">Object headers, reference width, and compression determine how many objects fit per gigabyte. These are usually left at defaults unless you run very large heaps or specialized benchmarks.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="object-layout-alignment">
+<h4>Alignment</h4>
+<p class="sub-detail">Objects align to 8-byte (or wider) boundaries for atomic access and SIMD. Alignment padding is invisible in source but shows up in heap dumps as overhead.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=33df3568-510e-5818-b649-18bb2af9bef8"><code>-XX:ObjectAlignmentInBytes=&lt;n&gt;</code></a> — Default object alignment in bytes, 8 is minimum.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="object-layout-compression">
+<h4>Compression</h4>
+<p class="sub-detail">Compressed oops and compressed class pointers shrink references and headers on 64-bit JVMs. Disabling compression is rare and increases heap footprint; required only for heaps above roughly 32 GB with compressed oops or specific benchmarks.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=848c1fa4-2d68-520f-bb14-8575ba840204"><code>-XX:+UseCompressedOops</code></a> — Enable 32-bit object references in the heap (default below ~32 GB).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=405ab49c-732b-5b87-9c00-beca36cb3792"><code>-XX:+UseCompressedClassPointers</code></a> — Compress class metadata pointers in object headers.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="stack" class="category-block" aria-labelledby="stack-heading">
+<h3 id="stack-heading">Stack</h3>
+<p class="category-intro">Each thread stack holds frames for Java calls and native transitions. Deep recursion or heavy JNI needs larger <code>-Xss</code>; thousands of threads need smaller stacks to fit in RAM.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="stack-fpu">
+<h4>FPU</h4>
+<p class="sub-detail">x86 FPU/SSE mode flags matter mainly for legacy numeric code and strict FP semantics.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=1d6a39a8-7ec5-5369-b893-3a3c51605a8a"><code>-XX:+AlwaysRestoreFPU</code></a> — Restore the FPU control word after every JNI call (expensive).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=6fa41aad-7285-5d55-919e-3e76aba27106"><code>-XX:+UseFPUForSpilling</code></a> — Spill integer registers to FPU instead of stack when possible.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="stack-general">
+<h4>General Stack</h4>
+<p class="sub-detail">Miscellaneous stack-related VM behavior not covered by OSR or trace generation.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=2c485b4a-d37e-5163-b92e-b2c75e191cb3"><code>-XX:+RestrictReservedStack</code></a> — Restrict @ReservedStackAccess to trusted classes.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=0b546777-b1ec-55ba-b2dd-950de659f7c8"><code>-XX:StackReservedPages=&lt;n&gt;</code></a> — Number of reserved zone (reserved to annotated methods) pages of size 4KB. If pages are bigger reserved zone is align…</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="stack-osr">
+<h4>On-Stack Replacement</h4>
+<p class="sub-detail">On-stack replacement compiles a method while an invocation is still active on the stack. OSR bails out hot loops in interpreted code without waiting for method exit.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>TieredCompilation</code> — Enables OSR compilations between interpreter and full optimization.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=fb013e0e-3155-532a-8b95-91e3ad5beb6e"><code>-XX:+UseOnStackReplacement</code></a> — Use on stack replacement, calls runtime if invoc. counter overflows in loop.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="stack-sizing">
+<h4>Stack Sizing</h4>
+<p class="sub-detail">Each platform thread consumes a fixed or growable stack. Default is often 1 MB on Linux. Deep XML/JSON parsing, recursion, or Scala implicit chains may need more; massive thread pools need less per thread to fit container memory.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=79cf06dd-bc0b-5002-867d-4075fa5a67ba"><code>-XX:ThreadStackSize=&lt;kb&gt;</code></a> — Stack size per thread (<code>-Xss</code>).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=b3378820-29d3-501e-b5a9-cab871913c10"><code>-XX:VMThreadStackSize=&lt;kb&gt;</code></a> — Stack size for VM internal threads.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=349ab36b-7790-5b0f-b871-c4d4516c2d44"><code>-XX:CompilerThreadStackSize=&lt;kb&gt;</code></a> — Stack size for JIT compiler threads.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=41120a81-0bd6-5f90-807c-d8744546a300"><code>-XX:StackRedPages=&lt;n&gt;</code></a> — Number of red zone (unrecoverable overflows) pages.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="stack-traces">
+<h4>Stack Traces</h4>
+<p class="sub-detail">Controls how stack traces are collected and printed on errors, and hidden frames in reflective/agent stacks.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=2cd9ced5-b623-589e-bca9-d34d4fb12489"><code>-XX:+StackTraceInThrowable</code></a> — Include stack traces when creating exceptions (disable only in micro-benchmarks).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=25e1718b-c4a9-54a9-aa4c-2652bdd97ce9"><code>-XX:+JavaMonitorsInStackTrace</code></a> — Print information about Java monitor locks when the stacks are dumped.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=09069435-981d-5654-905f-318752a0f4bd"><code>-XX:MaxJavaStackTraceDepth=&lt;n&gt;</code></a> — The maximum number of lines in the stack trace for Java exceptions (0 means all).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=16acd51b-7329-5dc5-8d25-1f6d6be1616c"><code>-XX:+OmitStackTraceInFastThrow</code></a> — Omit backtraces for some &#x27;hot&#x27; exceptions in optimized code.</li>
+</ul></div>
+</div>
+</div></article>
+</section>
+<section id="domain-gc" class="domain-block" aria-labelledby="domain-gc-heading">
+<h2 id="domain-gc-heading">Garbage collection</h2>
+<p class="domain-intro">Garbage collectors reclaim unreachable objects so applications rarely call <code>free</code>. Collector choice dominates latency profiles: G1 balances throughput and pauses; ZGC and Shenandoah target sub-millisecond pauses on large heaps; Parallel optimizes batch throughput. Tuning flags adjust worker threads, region sizes, pause goals, and incremental steps.</p>
+<article id="garbage-collection" class="category-block" aria-labelledby="garbage-collection-heading">
+<h3 id="garbage-collection-heading">Garbage Collection</h3>
+<p class="category-intro">One category holds all collector implementations and cross-cutting GC mechanics: allocation, references, explicit GC, logging, and legacy CMS/Serial options.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="gc-adaptive-policy">
+<h4>Adaptive Size Policy</h4>
+<p class="sub-detail">Adaptive sizing resizes generations to meet pause or throughput goals automatically. Common with Parallel GC and older ergonomics.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=65b700ed-0d9f-5429-9305-9c4a5428ab0f"><code>-XX:+UseAdaptiveSizePolicy</code></a> — Let JVM resize generations automatically.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=fb00a165-fe14-5cf7-8056-cd051bf77f9b"><code>-XX:AdaptiveSizeDecrementScaleFactor=&lt;n&gt;</code></a> — Adaptive size scale down factor for shrinking.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=688a3616-0db3-5664-a9fa-2836e887c730"><code>-XX:AdaptiveSizeMajorGCDecayTimeScale=&lt;n&gt;</code></a> — Time scale over which major costs decay.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=6070205d-8b7b-51b3-a1dc-8814ab0ccdf7"><code>-XX:AdaptiveSizePolicyInitializingSteps=&lt;n&gt;</code></a> — Number of steps where heuristics is used before data is used.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-allocation">
+<h4>Allocation</h4>
+<p class="sub-detail">Thread-local allocation buffers (TLABs) and fast-path allocation reduce synchronization on hot allocation sites. Failure handling triggers GC or expansion.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=ab273a1d-fdb4-5faa-8d84-6138f62ed42f"><code>-XX:TLABSize=&lt;bytes&gt;</code></a> — Thread-local allocation buffer size.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=36f96145-ef0f-5964-8783-f012198c73d3"><code>-XX:+ResizeTLAB</code></a> — Allow dynamic TLAB resizing.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-cms">
+<h4>CMS</h4>
+<p class="sub-detail">Concurrent Mark Sweep was the low-pause collector before G1. Removed in recent JDKs but flags remain in older catalogs. Avoid for new deployments.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>UseConcMarkSweepGC</code> — Enable CMS (legacy; removed in modern JDKs).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-card-table">
+<h4>Card Table</h4>
+<p class="sub-detail">Write barriers mark card tables when references cross regions or generations, enabling incremental old-gen scanning without scanning the entire heap.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=33a7cad2-9292-5223-8bf1-b9af0b2e627b"><code>-XX:+ReduceInitialCardMarks</code></a> — When initializing fields, try to avoid needless card marks.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=3a01c5d3-eaeb-5a3b-b2b1-f9b751eb49a1"><code>-XX:+UseCondCardMark</code></a> — Check for already marked card before updating card table.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-default">
+<h4>Default</h4>
+<p class="sub-detail">Selects which garbage collector the JVM uses. This is the highest-impact GC decision: G1 is default on many server releases; ZGC and Shenandoah target low latency; Parallel targets throughput; Serial suits small heaps.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=74f63ed2-0073-55bb-ace3-21d05103d494"><code>-XX:+UseG1GC</code></a> — Enable G1 (Garbage-First) collector.</li>
+<li><code>UseZGC</code> — Enable ZGC for low-latency, scalable heaps.</li>
+<li><code>UseShenandoahGC</code> — Enable Shenandoah concurrent collector.</li>
+<li><code>UseParallelGC</code> — Enable Parallel (throughput) collector.</li>
+<li><code>UseSerialGC</code> — Enable single-threaded Serial collector.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=9ac60020-819a-5133-990d-a5d05277b67a"><code>-XX:AdaptiveTimeWeight=&lt;n&gt;</code></a> — Weight given to time in adaptive policy, between 0 and 100.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=7e50d332-5fd3-55cb-9b86-9a0e1870b65e"><code>-XX:PromotedPadding=&lt;n&gt;</code></a> — How much buffer to keep for promotion failure.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=5425ab04-cf56-5420-86f4-bb91c935f507"><code>-XX:ThresholdTolerance=&lt;n&gt;</code></a> — Allowed collection cost difference between generations.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-explicit">
+<h4>Explicit GC</h4>
+<p class="sub-detail"><code>System.gc()</code> and <code>Runtime.gc()</code> request a collection. Libraries sometimes call them defensively; disabling avoids full STW surprises but may hide memory pressure.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=1e734b64-40ab-5e78-b241-0c0292c2f533"><code>-XX:+DisableExplicitGC</code></a> — Ignore explicit GC requests.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=b3e1b0f3-ffbb-55d3-b090-6b328a244700"><code>-XX:+ExplicitGCInvokesConcurrent</code></a> — Run explicit GC concurrently when supported.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-free-list">
+<h4>Free List &amp; Compaction</h4>
+<p class="sub-detail">CMS and similar collectors used free lists for old-gen blocks. Fragmentation and promotion failures were common tuning pain points.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=2ec6edeb-0051-52cc-ab1f-f1ffa2629565"><code>-XX:HeapMaximumCompactionInterval=&lt;n&gt;</code></a> — How often should we maximally compact the heap (not allowing any dead space).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-full-gc">
+<h4>Full GC Behavior</h4>
+<p class="sub-detail">Full collections compact the entire heap and collect all generations. Triggers include metaspace pressure, promotion failure, and diagnostic requests.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=8803cad1-df64-529d-a861-636bbc9c7649"><code>-XX:+HeapDumpAfterFullGC</code></a> — Dump heap to file after any major stop-the-world GC.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=21009a8f-4e73-5721-a0bc-4c83fb8aa887"><code>-XX:+HeapDumpBeforeFullGC</code></a> — Dump heap to file before any major stop-the-world GC.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-g1-tuning">
+<h4>G1 Tuning</h4>
+<p class="sub-detail">G1 divides the heap into regions and collects incrementally toward a pause-time goal. Tuning sets region size, IHOP (initiating heap occupancy), mixed GC cadence, and humongous object handling.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>UseG1GC</code> — Enable G1.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=f18a201f-f963-506a-bdce-9fede7a59d29"><code>-XX:MaxGCPauseMillis=&lt;ms&gt;</code></a> — Target max pause time (soft goal for G1).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=03922884-d779-5b65-85bc-8f33db417ccc"><code>-XX:G1HeapRegionSize=&lt;size&gt;</code></a> — Size of G1 regions (power of two).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=d9d77338-6d0a-50b3-92bf-73284e868a69"><code>-XX:InitiatingHeapOccupancyPercent=&lt;n&gt;</code></a> — Old-gen occupancy to start concurrent marking (IHOP).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-gclocker">
+<h4>GC Locker</h4>
+<p class="sub-detail">JNI critical regions can pin objects and delay GC (GC Locker). Long critical sections cause "GC locker" stalls visible in logs.</p>
+
+</div>
+<div class="subcategory-block" id="gc-overhead">
+<h4>GC Overhead &amp; Time Limits</h4>
+<p class="sub-detail">Limits how much wall-clock time may be spent in GC before throwing <code>OutOfMemoryError: GC overhead limit exceeded</code>.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=fd0764df-c8ae-5586-9535-cb72b9874c57"><code>-XX:GCTimeRatio=&lt;n&gt;</code></a> — Throughput goal ratio (e.g. 99 means 1% GC time).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=2bb05667-5c68-5163-a42a-b436daa82f1f"><code>-XX:GCHeapFreeLimit=&lt;n&gt;</code></a> — Minimum percentage of free space after a full GC before an OutOfMemoryError is thrown (used with GCTimeLimit).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=5b8c215a-4c4c-5f54-a350-0c5fa0f0eb30"><code>-XX:GCTimeLimit=&lt;n&gt;</code></a> — Limit of the proportion of time spent in GC before an OutOfMemoryError is thrown (used with GCHeapFreeLimit).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=86377edc-4844-5fb5-a9e6-35b94795c51b"><code>-XX:+UseGCOverheadLimit</code></a> — Use policy to limit of proportion of time spent in GC before an OutOfMemory error is thrown.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-threads">
+<h4>GC Threads</h4>
+<p class="sub-detail">Parallel and concurrent collectors use dedicated threads. Count should align with container CPU quota—not always equal to host cores.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=41742589-1b00-5b6f-8c4d-4433297f5c83"><code>-XX:ParallelGCThreads=&lt;n&gt;</code></a> — Parallel worker threads.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=8a703edf-6bdc-51f1-9e4c-517eaf0f190c"><code>-XX:ConcGCThreads=&lt;n&gt;</code></a> — Concurrent GC threads (G1 marking, CMS, etc.).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-general">
+<h4>General GC</h4>
+<p class="sub-detail">Cross-collector switches: ergonomics, heap occupancy reporting, and global behaviors that apply regardless of G1 vs ZGC.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>DisableExplicitGC</code> — Ignore <code>System.gc()</code> from libraries (use with care).</li>
+<li><code>PrintFlagsFinal</code> — Print all flag values at startup (diagnostic).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=bb148a79-08d1-5eb9-b0ec-88e187d2a29d"><code>-XX:+CompactStrings</code></a> — Enable Strings to use single byte chars in backing store.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=7649a690-993b-5e4a-8157-e47669099050"><code>-XX:GCCardSizeInBytes=&lt;n&gt;</code></a> — Card table card size in bytes for GC remembered sets.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=079bd9f9-8285-5011-bd6d-e01161e53602"><code>-XX:StartAggressiveSweepingAt=&lt;n&gt;</code></a> — Start aggressive sweeping if X[%] of the code cache is free. Segmented code cache: X[%] of the non-profiled heap. Non…</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-legacy-sizing">
+<h4>Legacy Heap Sizing</h4>
+<p class="sub-detail">Pre-G1 flags for fixed young/old sizes persist for migration scripts. Prefer G1 region tuning or percentage-based sizing on new systems.</p>
+
+</div>
+<div class="subcategory-block" id="gc-logging">
+<h4>Logging GC</h4>
+<p class="sub-detail">GC logs are essential for pause analysis. Prefer unified logging <code>-Xlog:gc*</code> on modern JDKs over legacy <code>PrintGCDetails</code>.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=06545ad9-02d7-528b-9213-2861d022a96a"><code>-XX:+PrintGC</code></a> — Basic GC logging (legacy).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=06519055-1af8-539f-9b53-ae9f6798c719"><code>-XX:+PrintGCDetails</code></a> — Detailed GC logging (legacy).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-mark-stack">
+<h4>Mark Stack</h4>
+<p class="sub-detail">During marking, the GC traces object graphs using mark stacks. Depth and chunk sizing affect pause times and peak native memory during GC.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=2cfd77dc-9416-5861-a318-b46f89b06912"><code>-XX:MarkStackSize=&lt;n&gt;</code></a> — Size of marking stack.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=59308508-0eef-5dd1-81ad-65fbd36c618c"><code>-XX:MarkStackSizeMax=&lt;n&gt;</code></a> — Maximum size of marking stack.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-nmethod-sweep">
+<h4>NMethod Sweep</h4>
+<p class="sub-detail">Compiled methods (nmethods) interact with GC sweeps when code cache pressure and unloading coincide.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=ccc110a1-81ed-5ef4-8278-71ca5d5af125"><code>-XX:NmethodSweepActivity=&lt;n&gt;</code></a> — Removes cold nmethods from code cache if &gt; 0. Higher values result in more aggressive sweeping.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-parallel">
+<h4>ParallelGC</h4>
+<p class="sub-detail">Parallel GC uses multiple threads for young and old collections. Best for batch workloads tolerating longer pauses in exchange for raw throughput.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=9f57a959-13a3-53a1-8959-63b43b9e806d"><code>-XX:+UseParallelGC</code></a> — Select Parallel collector.</li>
+<li><code>ParallelGCThreads</code> — Number of parallel GC worker threads.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=2fc8320c-46a8-550b-ac66-9ec545461809"><code>-XX:+PSChunkLargeArrays</code></a> — Process large arrays in chunks.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=58e3fd79-76c4-59e0-9a66-6de2cf362c05"><code>-XX:ParGCArrayScanChunk=&lt;n&gt;</code></a> — Scan a subset of object array and push remainder, if array is bigger than this.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=12666407-3e56-59cc-a9c1-36ce4670ddca"><code>-XX:ParallelGCBufferWastePct=&lt;n&gt;</code></a> — Wasted fraction of parallel allocation buffer.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-references">
+<h4>References</h4>
+<p class="sub-detail">Soft, weak, and phantom references and finalization queues are processed during GC. Mis-tuning can delay cleanup of class loaders or off-heap wrappers.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>MaxSoftRefLRUPolicyMsPerMB</code> — Soft reference clearing policy vs free heap.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=6ad3f9d4-681e-5cc1-ae8d-beec8bb394fb"><code>-XX:SoftRefLRUPolicyMSPerMB=&lt;n&gt;</code></a> — Number of milliseconds per MB of free space in the heap.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-serial">
+<h4>SerialGC</h4>
+<p class="sub-detail">Serial GC runs stop-the-world collections on one thread. Suitable for small heaps and client-style apps with minimal footprint.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=5f183c89-013e-5eeb-b905-c88e92153919"><code>-XX:+UseSerialGC</code></a> — Select Serial collector.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=91a704f6-7545-5631-ae7e-da0e35feb6de"><code>-XX:MarkSweepAlwaysCompactCount=&lt;n&gt;</code></a> — How often should we fully compact the heap (ignoring the dead space parameters).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=ad92bec8-99f9-5c0e-9d3d-8b1a2b04719d"><code>-XX:MarkSweepDeadRatio=&lt;n&gt;</code></a> — Percentage (0-100) of the old gen allowed as dead wood. Serial mark sweep treats this as both the minimum and maximum…</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-shenandoah">
+<h4>Shenandoah</h4>
+<p class="sub-detail">Shenandoah is another low-pause concurrent collector with Brooks pointers. Popular where ZGC is unavailable; tuning includes heuristics and uncommit delay.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=02a2a07b-97f7-57fa-93dc-b40009ea430d"><code>-XX:+UseShenandoahGC</code></a> — Enable Shenandoah.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=fb21b3a7-04db-5f8c-a8a4-dea25bc25106"><code>-XX:ShenandoahGCHeuristics=&lt;mode&gt;</code></a> — Heuristic mode (e.g. adaptive, aggressive).</li>
+<li><code>ShenandoahUncommitDelay</code> — Delay before returning idle heap pages to OS.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-string-dedup">
+<h4>String Deduplication</h4>
+<p class="sub-detail">G1 can deduplicate identical <code>char[]</code> backings for Strings during GC, saving heap on text-heavy workloads (logs, XML, JSON).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=685c4540-2661-5a62-827c-4bf40626313a"><code>-XX:+UseStringDeduplication</code></a> — Enable string deduplication (G1, requires unlock on some releases).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=cffd6e9a-435c-58e7-834d-8cb85fadfb99"><code>-XX:StringDeduplicationAgeThreshold=&lt;n&gt;</code></a> — Minimum age of a string before it is considered for deduplication.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="gc-zgc">
+<h4>ZGC</h4>
+<p class="sub-detail">ZGC performs most work concurrently with load barriers. Aims for sub-millisecond pauses on multi-TB heaps. Requires recent JDK and often larger CPU budget for concurrent workers.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=84fee307-3df1-57fc-902c-8db6bc1f2fd8"><code>-XX:+UseZGC</code></a> — Enable ZGC.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=0ac3dc58-b9ee-502f-a566-7e0ef4699a45"><code>-XX:ZCollectionInterval=&lt;n&gt;</code></a> — Maximum time between ZGC cycles (when applicable).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=b776f7de-0ebf-571b-b1c2-e671209aaac1"><code>-XX:ZUncommitDelay=&lt;seconds&gt;</code></a> — Return unused heap memory to the OS (Java 15+ behavior).</li>
+</ul></div>
+</div>
+</div></article>
+</section>
+<section id="domain-execution" class="domain-block" aria-labelledby="domain-execution-heading">
+<h2 id="domain-execution-heading">Execution &amp; code</h2>
+<p class="domain-intro">HotSpot starts in the interpreter, profiles hot methods, then compiles them to native code in the code cache. JIT flags control when compilation happens, how aggressively methods are inlined, and whether intrinsics replace JDK methods. Runtime flags cover JNI, signals, and fatal-error behavior on the execution path outside pure Java bytecode.</p>
+<article id="jit-compiler" class="category-block" aria-labelledby="jit-compiler-heading">
+<h3 id="jit-compiler-heading">JIT Compiler</h3>
+<p class="category-intro">C1 (client) and C2 (server) compilers turn bytecode into machine code. Tiered mode uses both. Disabling compilation or limiting inlining is mainly for debugging, not production.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="jit-compilation">
+<h4>Compilation</h4>
+<p class="sub-detail">Background compilation threads compile hot methods asynchronously. Queue backlog means methods stay in slower tiers longer after warmup.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=e4ee1f94-2750-5c77-ae8c-75ad56da49f2"><code>-XX:CompileThreshold=&lt;n&gt;</code></a> — Invocation threshold for compilation (product builds).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=6aacedf1-9318-5c1c-b0d4-4a709b3b9897"><code>-XX:CICompilerCount=&lt;n&gt;</code></a> — Number of C1/C2 compiler threads.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="jit-escape-analysis">
+<h4>Escape Analysis</h4>
+<p class="sub-detail">Escape analysis stack-allocates or scalar-replaces objects that do not escape a thread. Can eliminate locks on non-shared objects.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=121d4fc7-3cc3-5bf1-8593-4ba5e556304f"><code>-XX:+DoEscapeAnalysis</code></a> — Enable escape analysis.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=680fcd1d-ae2b-53c6-8fcb-f0d57fdc17f1"><code>-XX:+EliminateAllocations</code></a> — Removes heap allocations for non-escaping objects when escape analysis succeeds.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=b6cd7b67-6360-5744-ac06-8d6ab6c22682"><code>-XX:+EliminateLocks</code></a> — Removes lock operations on objects proven not to escape.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=8d6f319c-3780-56cc-ab9c-571b56eae0e7"><code>-XX:EliminateAllocationArraySizeLimit=&lt;n&gt;</code></a> — Array size (number of elements) limit for scalar replacement.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="jit-execution-modes">
+<h4>Execution Modes</h4>
+<p class="sub-detail">Force interpreter-only or limit compilation for debugging miscompiled code or reproducing issues before C2 optimization.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>Xint</code> — Interpreter only—no JIT (<code>-Xint</code>).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=0e202e54-d29e-5f17-a59e-cd366c79d968"><code>-XX:+PreferInterpreterNativeStubs</code></a> — Use always interpreter stubs for native methods invoked via interpreter.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a27df676-85e3-53fa-a3ea-796da9551120"><code>-XX:+UseInterpreter</code></a> — Use interpreter for non-compiled methods.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="jit-inlining">
+<h4>Inlining</h4>
+<p class="sub-detail">Inlining replaces callee invocations with copied bytecode, removing call overhead. Excessive inlining increases code size; too little leaves performance on the table.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=72289a0c-579a-5221-9fc8-08641083fae0"><code>-XX:MaxInlineSize=&lt;n&gt;</code></a> — Maximum bytecode size of inlined method.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=f260d67f-8198-5eb6-b9c0-1658357bd32b"><code>-XX:FreqInlineSize=&lt;n&gt;</code></a> — Size limit for hot methods inlined by frequency.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="jit-intrinsics">
+<h4>Intrinsics</h4>
+<p class="sub-detail">Intrinsics replace known methods (<code>System.arraycopy</code>, math, unsafe) with hand-tuned machine code.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=8fa73f97-5e52-577d-b6f5-81497c852545"><code>-XX:+UseAES</code></a> — Enables hardware-accelerated AES cipher implementations when available.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=53608a69-c922-5bd6-81bc-c3e40e76b8b0"><code>-XX:+UseSHA</code></a> — Enables hardware-accelerated SHA implementations when available.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=805a3aa1-20d2-59b6-9d0b-6d45406a02b3"><code>-XX:ArrayCopyLoadStoreMaxElem=&lt;n&gt;</code></a> — Maximum number of arraycopy elements inlined as a sequence of loads/stores.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=1667782f-0bf4-5ad9-b20a-035cab86da58"><code>-XX:+UseBASE64Intrinsics</code></a> — Use intrinsics for java.util.Base64.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="jit-tiered">
+<h4>Tiered Compilation</h4>
+<p class="sub-detail">Tiered compilation uses interpreter → C1 → C2 progression. C1 profiles quickly; C2 optimizes aggressively. Disabling tiers is for troubleshooting only.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=c7c6756e-03f5-5c09-b997-00e0d2707e61"><code>-XX:+TieredCompilation</code></a> — Enable tiered compilation (default on server).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=b965be57-35c0-5481-939e-9962ba9de46f"><code>-XX:Tier4InvocationThreshold=&lt;n&gt;</code></a> — Invocation count before C2 compile.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="code-cache" class="category-block" aria-labelledby="code-cache-heading">
+<h3 id="code-cache-heading">Code Cache</h3>
+<p class="category-intro">Compiled code is stored off-heap in the code cache. When full, the JVM stops compiling or sweeps old methods, which can cause sudden performance cliffs.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="code-cache-behavior">
+<h4>Code Cache Behavior</h4>
+<p class="sub-detail">Sweeper reclaims dead nmethods. Behavior flags control unloading aggressiveness and interaction with GC.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=324ca236-ab5b-532c-bf6b-4c5d1333f089"><code>-XX:+UseCodeCacheFlushing</code></a> — Allows unused compiled code to be flushed when the code cache is full.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=cbd09761-62e8-5cfa-997a-f7d9b1d401e7"><code>-XX:+SegmentedCodeCache</code></a> — Divides the code cache into distinct segments for different code types.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="code-cache-sizing">
+<h4>Code Cache Sizing</h4>
+<p class="sub-detail">Reserved and non-reserved code cache segments hold C1 and C2 code. Exhaustion triggers sweeps or disables compilation—watch for "CodeCache is full" in logs.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=0002e587-348a-5b71-af0d-cf20b0db33ea"><code>-XX:ReservedCodeCacheSize=&lt;size&gt;</code></a> — Reserved code cache size.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=85567628-0fd8-50e7-a869-7ba84151116d"><code>-XX:InitialCodeCacheSize=&lt;size&gt;</code></a> — Initial code cache allocation.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="runtime" class="category-block" aria-labelledby="runtime-heading">
+<h3 id="runtime-heading">Runtime</h3>
+<p class="category-intro">Core VM services: parsing options, interpreter, JNI bridges, OS signals, and low-level memory-model barriers. Many flags are diagnostic or expert-only.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="runtime-cli">
+<h4>CLI &amp; JVM Options</h4>
+<p class="sub-detail">Startup parsing of <code>-X</code>, <code>-XX</code>, and advanced options. <code>PrintFlagsFinal</code> dumps effective values—essential when scripts set many flags.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=ffec9684-d685-586c-a10b-143f041357e2"><code>-XX:+PrintFlagsFinal</code></a> — Print final flag values and exit.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=c5099453-e153-5c59-aee2-b149aed27598"><code>-XX:+PrintVMOptions</code></a> — Print JVM options at startup.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-contended">
+<h4>Contended &amp; Monitors</h4>
+<p class="sub-detail">Biased locking, monitor inflation, and contended lock optimizations reduce synchronization overhead on hot locks.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>UseBiasedLocking</code> — Enable biased locking (legacy; removed in JDK 15+ by default path).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=71988dd1-f116-522d-ad46-03bdb6aea6ce"><code>-XX:+EnableContended</code></a> — Enable @Contended annotation support.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=ed8ecf27-568e-59b5-8a7d-8ec59a297764"><code>-XX:+RestrictContended</code></a> — Restrict @Contended to trusted classes.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-fatal-error">
+<h4>Fatal Error &amp; VM Output</h4>
+<p class="sub-detail">On VM fatal errors, HotSpot writes <code>hs_err_pid</code> files and may heap-dump. Flags control detail level and default dump paths.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>CreateCoredumpOnCrash</code> — Write core dump on fatal error.</li>
+<li><code>ErrorFile</code> — Path for <code>hs_err</code> log file.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=bee402e6-99b1-5ec5-8555-fd2f7fd2223f"><code>-XX:+DisplayVMOutputToStderr</code></a> — If DisplayVMOutput is true, display all VM output to stderr.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=81ccd6bf-c5d1-532d-8919-8872063fbcb6"><code>-XX:+DisplayVMOutputToStdout</code></a> — If DisplayVMOutput is true, display all VM output to stdout.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=1f11d9c3-2192-59a3-8140-3ade7c28f216"><code>-XX:+DumpReplayDataOnError</code></a> — Record replay data for crashing compiler threads.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=6a39fbff-0bf5-5959-a0af-a9cd8ea69163"><code>-XX:+EnableDynamicAgentLoading</code></a> — Allow tools to load agents with the attach mechanism.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-interpreter">
+<h4>Interpreter</h4>
+<p class="sub-detail">Template interpreter executes bytecode before compilation. Profiling counters here drive tier promotion decisions.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=3dfcc43c-b730-51a5-92cd-978bf2e1fff4"><code>-XX:InterpreterProfilePercentage=&lt;n&gt;</code></a> — NON_TIERED number of method invocations/branches (expressed as % of CompileThreshold) before profiling in the interpr…</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=feb7ce73-f748-5a10-b316-116d68b138a4"><code>-XX:+ProfileInterpreter</code></a> — Profile at the bytecode level during interpretation.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=dc16ca97-08c4-5b05-9760-e8c7d4d897be"><code>-XX:+RewriteFrequentPairs</code></a> — Rewrite frequently used bytecode pairs into a single bytecode.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-jni">
+<h4>JNI</h4>
+<p class="sub-detail">JNI transitions between Java and native code have cost and safepoint implications. Checking modes catch binding errors early in development.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=596f73f3-f64b-5a9b-8dae-acd3d789d402"><code>-XX:+CheckJNICalls</code></a> — Validate JNI calls (debugging).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=354d9a0a-aaff-5dd5-b225-d11f6853d717"><code>-XX:MaxJNILocalCapacity=&lt;n&gt;</code></a> — Maximum allowable local JNI handle capacity to EnsureLocalCapacity() and PushLocalFrame(), where &lt;= 0 is unlimited, d…</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=25b6ee18-d9fc-53d8-be4b-13fec85ccf3f"><code>-XX:+RestoreMXCSROnJNICalls</code></a> — Restore MXCSR when returning from JNI calls.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-memory-model">
+<h4>Memory Model &amp; Barriers</h4>
+<p class="sub-detail">Barriers implementing the Java Memory Model for volatile, final, and atomic operations. Rarely tuned outside JVM development.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=a8bcfd69-da59-5323-9b99-46ab6fda47f8"><code>-XX:+UseSystemMemoryBarrier</code></a> — Use operating-system memory barriers where applicable.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-object-init">
+<h4>Object Initialization &amp; Strings</h4>
+<p class="sub-detail">Fast paths for object allocation, array copy, and string concatenation in the runtime.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=10115002-6a43-5ffd-8268-6d83e8ad8721"><code>-XX:AutoBoxCacheMax=&lt;n&gt;</code></a> — Sets max value cached by the java.lang.Integer autobox cache.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=d0a84637-09e1-5e97-9612-f218d2e6d472"><code>-XX:MultiArrayExpandLimit=&lt;n&gt;</code></a> — Maximum number of individual allocations in an inline-expanded multianewarray instruction.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=491a4c35-c2de-5357-8bb8-85f8361b9452"><code>-XX:+OptimizeFill</code></a> — Convert fill/copy loops into intrinsic.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=2a29a7fd-bbec-528b-a39f-21715fd1ab31"><code>-XX:+OptimizeStringConcat</code></a> — Optimize the construction of Strings by StringBuilder.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-platform">
+<h4>Platform &amp; Hardware</h4>
+<p class="sub-detail">CPU feature detection (AVX, AES-NI), unaligned access, and vendor-specific paths.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=c3bff04c-6009-54d5-99a9-0d9f399ec943"><code>-XX:+AlwaysPreTouch</code></a> — Force all freshly committed pages to be pre-touched.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=98abc4e3-b180-58a9-8a9a-1b1a6518ef09"><code>-XX:+AvoidUnalignedAccesses</code></a> — Avoid generating unaligned memory accesses on architectures where they are costly.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=0d033693-8b7c-5c69-8a02-193152e76638"><code>-XX:MaxLabelRootDepth=&lt;n&gt;</code></a> — Maximum times call Label_Root to prevent stack overflow.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=45a3b570-11dd-5e23-b990-e658dfec0a03"><code>-XX:+PreserveFramePointer</code></a> — Use the FP register for holding the frame pointer and not as a general purpose register.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-signals-os">
+<h4>Signals &amp; OS Integration</h4>
+<p class="sub-detail">Signal handlers for crash reporting (<code>SIGSEGV</code>), graceful shutdown, and thread dump on <code>SIGQUIT</code> (<code>kill -3</code>).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=bd3113c3-ae4e-5024-955e-faad0deec3a0"><code>-XX:+AllowUserSignalHandlers</code></a> — Do not complain if the application installs signal handlers (Solaris &amp; Linux only).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=65a16365-5845-5051-8f41-262a33411a3f"><code>-XX:+EagerXrunInit</code></a> — Eagerly initialize -Xrun libraries; allows startup profiling, but not all -Xrun libraries may support the state of th…</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=7b076b42-3ea5-5e29-9be6-39e644bb338d"><code>-XX:+ExtensiveErrorReports</code></a> — Error reports are more extensive.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=c172ad77-215c-519a-b7e0-89057575e264"><code>-XX:+ForceTimeHighResolution</code></a> — Using high time resolution (for Win32 only).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="runtime-symbols">
+<h4>Symbols &amp; Annotations</h4>
+<p class="sub-detail">Symbol table and constant pool storage for classes and dynamic language support.</p>
+
+</div>
+<div class="subcategory-block" id="runtime-tracing">
+<h4>Tracing &amp; Profiling</h4>
+<p class="sub-detail">Low-level tracing hooks for profilers and diagnostic agents (JVMTI, DTrace where supported).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=3ce1a6ba-efa3-519a-a5b1-ced3597a971d"><code>-XX:+CITime</code></a> — Collect timing information for compilation.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=c488f55d-49be-5ff5-8a12-c14b58087d35"><code>-XX:+UsePerfData</code></a> — Flag to disable jvmstat instrumentation for performance testing and problem isolation purposes.</li>
+</ul></div>
+</div>
+</div></article>
+</section>
+<section id="domain-classes" class="domain-block" aria-labelledby="domain-classes-heading">
+<h2 id="domain-classes-heading">Classes &amp; modules</h2>
+<p class="domain-intro">Classes are loaded on demand, verified for bytecode safety, and optionally loaded from shared archives (CDS) for faster startup. Mis-tuned class loading shows up as long startup, metaspace growth, or <code>ClassNotFoundException</code> in modular applications.</p>
+<article id="class-loading" class="category-block" aria-labelledby="class-loading-heading">
+<h3 id="class-loading-heading">Class Loading</h3>
+<p class="category-intro">Controls verification, shared archives, parallel loading, and tracing. CDS in particular cuts startup time for CLI tools and microservices.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="class-boot-loader">
+<h4>Boot Class Loader</h4>
+<p class="sub-detail">Bootstrap loader loads core <code>java.*</code> classes. Flags affect module path and platform class discovery on modular JDKs.</p>
+
+</div>
+<div class="subcategory-block" id="class-cds">
+<h4>Class Data Sharing (CDS)</h4>
+<p class="sub-detail">Class Data Sharing writes read-only class metadata to an archive for faster startup and lower RSS when multiple JVMs share the same image (containers, CLI tools).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=272e963e-e1ea-5429-8673-f3ffdfb92b9a"><code>-XX:SharedArchiveFile=&lt;file&gt;</code></a> — Path to shared class archive.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=d9e80946-ce15-5052-8930-a2d56d51e8d4"><code>-XX:ArchiveClassesAtExit=&lt;file&gt;</code></a> — Write CDS archive on JVM exit (training run).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="class-loader">
+<h4>Class Loader Behavior</h4>
+<p class="sub-detail">Application class loaders delegate parent-first or child-first. Parallel loading speeds startup on multi-core hosts.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>ClassUnloadingWithConcurrentMark</code> — Unload classes with concurrent marking (G1).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=e9cea3e0-6e7b-5e44-aa74-fa60cd48e4c6"><code>-XX:+AllowParallelDefineClass</code></a> — Allow parallel defineClass requests for class loaders registering as parallel capable.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=2536d291-dea3-5b65-bb25-2ca8fc8db04f"><code>-XX:+AllowRedefinitionToAddDeleteMethods</code></a> — Allow redefinition to add or delete private static or final methods.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a1fc3e57-506e-55a5-b2d2-7382350d8daf"><code>-XX:+IgnoreEmptyClassPaths</code></a> — Ignore empty path elements in -classpath.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="class-unloading">
+<h4>Class Unloading</h4>
+<p class="sub-detail">Classes unload when their loader is collectible. OSGi and hot-redeploy need this; leaks keep metaspace pinned.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=2e4cd0a7-fa9d-5d5b-ab19-1ce08cd7554d"><code>-XX:+ClassUnloading</code></a> — Do unloading of classes.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a3297fc1-d448-5bbe-b7bc-534299c2f6ab"><code>-XX:+ClassUnloadingWithConcurrentMark</code></a> — Do unloading of classes with a concurrent marking cycle.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="class-tracing">
+<h4>Loading &amp; Unloading Diagnostics</h4>
+<p class="sub-detail">Trace class loading and unloading to stdout or unified log—useful for <code>NoClassDefFoundError</code> and classpath debugging.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>TraceClassLoading</code> — Log each class load.</li>
+<li><code>TraceClassUnloading</code> — Log each class unload.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=170ab592-e238-581c-ab52-895d22af8136"><code>-XX:LogClassLoadingCauseFor=&lt;value&gt;</code></a> — Enable -Xlog:class+load+cause for classes whose name contains this string.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=82d0458b-aa42-5742-80a5-7d79f5121e36"><code>-XX:+PrintClassHistogram</code></a> — Print a histogram of class instances.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="class-server-policy">
+<h4>Server-Class Machine Policy</h4>
+<p class="sub-detail">Server-class machine detection picks ergonomic defaults (heap, GC, JIT) when hardware looks like a server (2+ CPUs, sufficient RAM).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=1e511904-97c2-5f94-904d-b64cc5bd8034"><code>-XX:+AlwaysActAsServerClassMachine</code></a> — Always act like a server-class machine.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=dc9e2f4f-5493-50e9-bf47-71a4e64ea51c"><code>-XX:+NeverActAsServerClassMachine</code></a> — Never act like a server-class machine.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="class-verification">
+<h4>Verification &amp; Bytecode</h4>
+<p class="sub-detail">Bytecode verification proves type safety before execution. Split verification and relaxations affect startup in trusted environments.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>VerifyBytecode</code> — Enable bytecode verification.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=c743e2e1-5527-5c54-8d92-9bc4400e9a78"><code>-XX:PerBytecodeRecompilationCutoff=&lt;n&gt;</code></a> — Per-BCI limit on repeated recompilation (-1=&gt;&#x27;Inf&#x27;).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=73014e0b-7b83-53d5-bbb1-d405c16bb064"><code>-XX:PerBytecodeTrapLimit=&lt;n&gt;</code></a> — Limit on traps (of one kind) at a particular BCI.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=01ee6e00-fd2c-5ba7-b7a2-a888fd1d11ea"><code>-XX:+RelaxAccessControlCheck</code></a> — Relax the access control checks in the verifier.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=8eb06cba-913e-5499-8f82-176f98e078ae"><code>-XX:+RewriteBytecodes</code></a> — Allow rewriting of bytecodes (bytecodes are not immutable).</li>
+</ul></div>
+</div>
+</div></article>
+</section>
+<section id="domain-concurrency" class="domain-block" aria-labelledby="domain-concurrency-heading">
+<h2 id="domain-concurrency-heading">Concurrency</h2>
+<p class="domain-intro">Java threads map to OS threads (or virtual threads on modern JDKs). Safepoints stop mutator threads so GC and deoptimization can run. Monitor and scheduling flags affect lock contention, time-to-safepoint, and how thread priorities map to the kernel scheduler.</p>
+<article id="threads-synchronization" class="category-block" aria-labelledby="threads-synchronization-heading">
+<h3 id="threads-synchronization-heading">Threads and Synchronization</h3>
+<p class="category-intro">Safepoints coordinate stop-the-world phases. Monitor flags tune biased locking and inflation. Poor safepoint behavior shows up as long GC pauses or JVM STW metrics in APM tools.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="sync-monitors">
+<h4>Monitors</h4>
+<p class="sub-detail">Synchronized blocks use monitors. Inflation promotes lightweight locks to heavyweight when contention appears.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=310d523f-36e7-59aa-8635-0f1b09a09783"><code>-XX:ContendedPaddingWidth=&lt;n&gt;</code></a> — How many bytes to pad the fields/classes marked @Contended with.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a5adfe4c-ec80-543c-bb75-cfb9529a3e2c"><code>-XX:LockingMode=&lt;n&gt;</code></a> — Select locking mode: 0 monitors only, 1 legacy stack-locking, 2 lightweight locking.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="sync-safepoints">
+<h4>Safepoints</h4>
+<p class="sub-detail">Safepoints stop all Java threads at known points for GC roots, deoptimization, and some JVMTI operations. Long "time to safepoint" delays app threads before STW work begins.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>GuaranteedSafepointInterval</code> — Maximum time between safepoint polls.</li>
+<li><code>LogSafepointStatistics</code> — Log safepoint duration and reasons.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=2fe8c421-dce7-5307-a471-350929d4b378"><code>-XX:+SafepointTimeout</code></a> — Logs or handles JVM threads that fail to reach a safepoint within the delay.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=c933a692-4668-5c2b-9df6-ea8e15c9096a"><code>-XX:SafepointTimeoutDelay=&lt;ms&gt;</code></a> — Milliseconds a thread may be late to a safepoint before timeout handling.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=c5ea5507-2048-5637-acb3-6c40bc31858c"><code>-XX:PausePadding=&lt;n&gt;</code></a> — How much buffer to keep for pause time.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=e13e60cf-7e39-545b-b478-912e655e658a"><code>-XX:VMThreadPriority=&lt;n&gt;</code></a> — The native priority at which the VM thread should run (-1 means no change).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="sync-thread-priority">
+<h4>Thread Priority</h4>
+<p class="sub-detail">Maps Java thread priorities 1–10 to OS priorities. Rarely fixes performance issues; can starve GC or compiler threads if misused.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=32d1b416-f466-52a7-910a-4b4163ee80c3"><code>-XX:JavaPriority10_To_OSPriority=&lt;n&gt;</code></a> — Maps Java thread priority 10 to the corresponding OS priority.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=7ff3d43e-3ed5-5b20-84cc-3839f9985e41"><code>-XX:JavaPriority1_To_OSPriority=&lt;n&gt;</code></a> — Maps Java thread priority 1 to the corresponding OS priority.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=5dde0388-5523-5c59-b146-6278b8a96ff9"><code>-XX:JavaPriority2_To_OSPriority=&lt;n&gt;</code></a> — Maps Java thread priority 2 to the corresponding OS priority.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a4501abc-c2d0-5a22-9a7f-c3ded665d8db"><code>-XX:JavaPriority3_To_OSPriority=&lt;n&gt;</code></a> — Maps Java thread priority 3 to the corresponding OS priority.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="sync-thread-scheduling">
+<h4>Thread Scheduling</h4>
+<p class="sub-detail">Hints to the OS scheduler for JVM-created threads. Effects vary by platform and kernel.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=f0de1ce0-3a7f-535c-ad3d-3d9b669b719f"><code>-XX:+UseDynamicNumberOfCompilerThreads</code></a> — Dynamically choose the number of parallel compiler threads.</li>
+</ul></div>
+</div>
+</div></article>
+</section>
+<section id="domain-operations" class="domain-block" aria-labelledby="domain-operations-heading">
+<h2 id="domain-operations-heading">Operations &amp; platform</h2>
+<p class="domain-intro">Production systems need observability: JFR, heap dumps, unified logging, and cgroup-aware defaults in containers. Flags here expose serviceability hooks, security boundaries, and startup properties without changing application code.</p>
+<article id="diagnostics" class="category-block" aria-labelledby="diagnostics-heading">
+<h3 id="diagnostics-heading">Diagnostics</h3>
+<p class="category-intro">Serviceability: Flight Recorder, heap dumps on OOM, attach API, native memory tracking, and PerfData for <code>jstat</code>. Essential for incident response.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="diag-attach">
+<h4>Attach &amp; JMX</h4>
+<p class="sub-detail">Dynamic attach loads agents and connects JMX without restart. Disable in hardened environments to reduce attack surface.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=d7c07036-fcb3-5f53-a7e0-eae17c81f3ea"><code>-XX:+DisableAttachMechanism</code></a> — Block attach API.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=38e45d23-590c-5ad1-9ba8-9ab7f6cfd521"><code>-XX:+ManagementServer</code></a> — Create JMX Management Server.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=756c7a55-5ea7-5511-84e6-712ac4988ee2"><code>-XX:+StartAttachListener</code></a> — Always start Attach Listener at VM startup.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-dtrace">
+<h4>DTrace</h4>
+<p class="sub-detail">DTrace probes on Solaris/macOS for kernel-level correlation with JVM events.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=cbdbe6e6-4c47-5a5c-a3d3-452bf7db79e4"><code>-XX:+DTraceAllocProbes</code></a> — Enable dtrace probes for object allocation.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=584bbf2f-5b8f-5df5-8a67-f0c5b0c4499e"><code>-XX:+DTraceMethodProbes</code></a> — Enable dtrace probes for method-entry and method-exit.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=8a54f646-3389-5210-8851-36951927e7d3"><code>-XX:+DTraceMonitorProbes</code></a> — Enable dtrace probes for monitor events.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-error-handling">
+<h4>Error Handling</h4>
+<p class="sub-detail">Assert and error reporting behavior in diagnostic builds and when recovering from recoverable VM errors.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=e8358128-334c-50da-99aa-c589b22b152b"><code>-XX:ErrorFile=&lt;file&gt;</code></a> — File where fatal error reports (hs_err_pid files) are written.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=ce1d242c-543f-5ef8-9942-56529c4158e7"><code>-XX:OnError=&lt;cmd&gt;</code></a> — Command or script to run when the JVM encounters a fatal error.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=b9d86108-6973-5d8b-ad85-2de2a19b4ea8"><code>-XX:OnOutOfMemoryError=&lt;cmd&gt;</code></a> — Command or script to run when an OutOfMemoryError occurs.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=41f7755d-443c-54d5-a53e-9657b841d674"><code>-XX:+ExitOnOutOfMemoryError</code></a> — Exits the JVM immediately when an OutOfMemoryError is thrown.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-flight-recorder">
+<h4>Flight Recorder</h4>
+<p class="sub-detail">Java Flight Recorder records low-overhead events (CPU, allocation, locks, I/O) into buffer files for JDK Mission Control and async-profiler correlation.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=7370f0f0-a568-59ab-9427-9c5f46d675fb"><code>-XX:StartFlightRecording=&lt;options&gt;</code></a> — Start JFR at launch.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=58715b01-b89b-5d5b-8f0d-c7bd35129dfc"><code>-XX:FlightRecorderOptions=&lt;options&gt;</code></a> — Buffer and dump settings.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-jfr">
+<h4>Flight Recorder</h4>
+<p class="sub-detail">Additional JFR tuning overlapping flight recorder: stack depth, sample periods, and repository paths.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>FlightRecorderOptions</code> — Configure JFR buffers and dumps.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=a9d728a2-6a0e-5b33-99be-77cb6e606f5b"><code>-XX:+FlightRecorder</code></a> — Enable Flight Recorder.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-general">
+<h4>General Diagnostics</h4>
+<p class="sub-detail">Broad diagnostics: version info, flag dumps, and VM state useful in support tickets.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><code>PrintFlagsFinal</code> — Dump all flags at startup.</li>
+<li><code>ShowMessageBoxOnError</code> — GUI message on error (desktop).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=23c76613-a0a8-573e-8872-9d3032b113cf"><code>-XX:+PrintExtendedThreadInfo</code></a> — Print more information in thread dump.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=7fd56344-cc75-5d3c-bcf3-4a695b93fd47"><code>-XX:+PrintFlagsRanges</code></a> — Print valid ranges for all JVM flags when used with -XX:+PrintFlagsFinal.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-heap-dumps">
+<h4>Heap Dumps</h4>
+<p class="sub-detail">Heap dumps capture object graphs for Eclipse MAT, VisualVM, or jcmd analysis. On-OOM dumps are critical for production memory leaks.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=87bd44f2-18fe-5628-af78-9405f42e04cc"><code>-XX:+HeapDumpOnOutOfMemoryError</code></a> — Write HPROF dump on OOM (very common in production).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=f419fac1-1c00-5107-8d3e-c7526ad6ce5b"><code>-XX:HeapDumpPath=&lt;path&gt;</code></a> — Directory for heap dump files.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-native-memory">
+<h4>Native Memory</h4>
+<p class="sub-detail">Native Memory Tracking (NMT) accounts malloc outside the heap—metaspace, code cache, thread stacks, direct buffers, GC internal structures.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=6abbb61e-358d-5b52-8861-4d0b3b37c533"><code>-XX:NativeMemoryTracking=off|summary|detail</code></a> — Enable NMT (<code>summary</code> or <code>detail</code>).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=37f12ae7-5471-51d1-a1b5-5d56fa2ce6e9"><code>-XX:TrimNativeHeapInterval=&lt;n&gt;</code></a> — Interval in ms to trim the native heap (0 disables trimming).</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-perfdata">
+<h4>PerfData</h4>
+<p class="sub-detail">PerfData exposes counters to <code>jstat</code> and monitoring tools (heap usage, GC counts).</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=7da7fbd2-e099-5e1c-b343-fcefa34e16ab"><code>-XX:+PerfDisableSharedMem</code></a> — Disable shared memory perf data (security/isolation).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=549f5a97-6429-52f3-aa0f-13ff64b20e90"><code>-XX:+PerfAllowAtExitRegistration</code></a> — Allow registration of atexit() methods.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=24a5f15c-da5a-5da4-bef3-5eec4bd6fd2a"><code>-XX:+PerfBypassFileSystemCheck</code></a> — Bypass Win32 file system criteria checks (Windows Only).</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=4d672e2b-4fae-54bf-ab8c-afbb27a85281"><code>-XX:PerfDataMemorySize=&lt;n&gt;</code></a> — Size of performance data memory region. Will be rounded up to a multiple of the native os page size.</li>
+</ul></div>
+</div>
+<div class="subcategory-block" id="diag-tracing">
+<h4>Tracing &amp; Diagnostics</h4>
+<p class="sub-detail">Unified tracing framework hooks beyond GC logging—JFR events, DTrace probes, diagnostic commands.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=96d2fffe-6ff3-5c84-b436-02fdefc79678"><code>-XX:+PrintConcurrentLocks</code></a> — Print java.util.concurrent locks in thread dump.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=918f0d4b-718f-511b-9018-677d20cf826d"><code>-XX:+PrintTieredEvents</code></a> — Print tiered events notifications.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=88e52cff-4f31-51f6-8b31-e6e061e9c25f"><code>-XX:TraceJVMTI=&lt;value&gt;</code></a> — Trace flags for JVMTI functions and events.</li>
+<li><a href="jvm-flag.html?java=25&amp;flag=9cd59436-1f74-550c-88f5-d539644e965a"><code>-XX:+TraceTraps</code></a> — Trace traps handled by the signal handler (diagnostic).</li>
+</ul></div>
+</div>
+</div></article>
+<article id="logging" class="category-block" aria-labelledby="logging-heading">
+<h3 id="logging-heading">Logging</h3>
+<p class="category-intro">Unified JVM logging (<code>-Xlog</code>) replaced many legacy <code>-XX:+Print*</code> switches. Async logging reduces overhead when diagnostic volume is high.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="logging-async">
+<h4>Async Logging</h4>
+<p class="sub-detail">Unified logging (<code>-Xlog</code>) can use async writers so application threads do not block on disk I/O during high log volume.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=23ed62bd-526b-57d7-a0e7-225a5aefec08"><code>-XX:AsyncLogBufferSize=&lt;size&gt;</code></a> — Size of each buffer in the async log buffer set.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="containers" class="category-block" aria-labelledby="containers-heading">
+<h3 id="containers-heading">Containers</h3>
+<p class="category-intro">In Docker/Kubernetes, cgroups report CPU and memory limits. The JVM reads them to size heap ergonomics and GC parallelism instead of assuming full host RAM.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="containers-cpu">
+<h4>CPU Limits</h4>
+<p class="sub-detail">In cgroups v1/v2 environments, CPU quota limits how many GC and compiler threads ergonomics should use. Prevents over-threading on small Kubernetes limits.</p>
+<div class="popular-flags">
+<p class="popular-title">Popular flags</p>
+<ul>
+<li><a href="jvm-flag.html?java=25&amp;flag=65f5e3b4-0d1d-545c-aedd-b8522a0acfad"><code>-XX:ActiveProcessorCount=&lt;n&gt;</code></a> — Override detected CPU count in containers.</li>
+</ul></div>
+</div>
+</div></article>
+<article id="system-properties" class="category-block" aria-labelledby="system-properties-heading">
+<h3 id="system-properties-heading">System Properties</h3>
+<p class="category-intro">Some behavioral switches are exposed as flags because they must be set before the VM fully starts.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="sysprop-jvm">
+<h4>JVM Properties</h4>
+<p class="sub-detail">VM flags mirroring important system properties that must be set at launch (encoding, locale, agent paths).</p>
+
+</div>
+</div></article>
+<article id="security" class="category-block" aria-labelledby="security-heading">
+<h3 id="security-heading">Security</h3>
+<p class="category-intro">Legacy security manager and agent constraints. Fewer flags apply on modern JDKs but remain in catalogs for compatibility.</p>
+<div class="subcategory-list">
+<div class="subcategory-block" id="security-jvm">
+<h4>JVM Security</h4>
+<p class="sub-detail">Security manager, policy files, and agent restrictions. Deprecated for removal but cataloged for legacy enterprise deployments.</p>
+
+</div>
+</div></article>
+</section></main>
+
+  <footer class="site-footer">
+    <p>
+      Built with ❤️ from
+      <a href="https://www.google.com/maps/place/Community+of+Madrid,+Madrid/@40.4983324,-6.3162283,8z/data=!3m1!4b1!4m6!3m5!1s0xd41817a40e033b9:0x10340f3be4bc880!8m2!3d40.4167088!4d-3.5812692!16zL20vMGo0eGc?entry=ttu&amp;g_ep=EgoyMDI1MDgxOC4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noopener noreferrer">Madrid</a>
+      <a class="site-footer__github" href="https://github.com/jabrena/jvm-flags" target="_blank" rel="noopener noreferrer" aria-label="View source on GitHub">
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+    </p>
+  </footer>
+
+  <script>
+    (function () {
+      const toggle = document.getElementById("nav-menu-toggle");
+      const panel = document.getElementById("nav-menu-panel");
+      if (!toggle || !panel) return;
+      function setOpen(open) {
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.hidden = !open;
+      }
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setOpen(toggle.getAttribute("aria-expanded") !== "true");
+      });
+      panel.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+      document.addEventListener("click", (e) => { if (!e.target.closest(".nav-menu")) setOpen(false); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    })();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag("js", new Date());
+    gtag("config", "G-2035DNSSEF");
+  </script>
+</body>
+</html>

@@ -19,4 +19,5 @@ jobs:
           distribution: temurin
           java-version: ${{ matrix.java-version }}
       - name: Maven build
-        run: ./mvnw --batch-mode --no-transfer-progress test --file pom.xml
+        working-directory: json-graph-generator
+        run: ./mvnw --batch-mode --no-transfer-progress test

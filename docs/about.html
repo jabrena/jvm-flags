@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVM Flags - About</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --border: #2d3a4f;
+      --text: #e7ecf3;
+      --muted: #8b9cb3;
+      --accent: #f59e0b;
+      --lts: #fbbf24;
+      --card: #15202b;
+      --flag: #34d399;
+      --category: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "SF Pro Text", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 1rem 0.75rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .header-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    .header-title-row .title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      min-width: 0;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-decoration: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      white-space: nowrap;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .back-link:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    header h1 span { color: var(--accent); }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .nav-menu {
+      position: relative;
+    }
+
+    .nav-menu-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.35rem;
+      height: 2.35rem;
+      padding: 0;
+      font: inherit;
+      color: var(--text);
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .nav-menu-toggle:hover,
+    .nav-menu-toggle[aria-expanded="true"] {
+      border-color: var(--accent);
+      background: var(--bg);
+    }
+
+    .nav-menu-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      width: 1rem;
+    }
+
+    .nav-menu-icon span {
+      display: block;
+      height: 2px;
+      background: currentColor;
+      border-radius: 1px;
+    }
+
+    .nav-menu-panel {
+      position: absolute;
+      top: calc(100% + 0.35rem);
+      right: 0;
+      min-width: 11rem;
+      padding: 0.35rem;
+      margin: 0;
+      list-style: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 100;
+    }
+
+    .nav-menu-panel[hidden] {
+      display: none;
+    }
+
+    .nav-menu-panel a {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .nav-menu-panel a:hover {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .nav-menu-panel a[aria-current="page"] {
+      background: var(--bg);
+      color: var(--accent);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    header > p {
+      margin-top: 0.55rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 52rem;
+    }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 44rem;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 2rem;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    section h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+      color: var(--text);
+    }
+
+    section p,
+    section li {
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    section p + p {
+      margin-top: 0.65rem;
+    }
+
+    section ul {
+      margin: 0.5rem 0 0 1.15rem;
+    }
+
+    section li + li {
+      margin-top: 0.35rem;
+    }
+
+    section a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    section a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.82em;
+      color: var(--text);
+      background: var(--card);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    pre {
+      margin-top: 0.75rem;
+      padding: 0.85rem 1rem;
+      font-family: "SF Mono", "Fira Code", ui-monospace, monospace;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    .version-table-wrap {
+      margin-top: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th,
+    td {
+      padding: 0.55rem 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    td {
+      color: var(--muted);
+      background: var(--card);
+    }
+
+    td a {
+      color: var(--flag);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+
+    .lts-badge {
+      display: inline-block;
+      margin-left: 0.35rem;
+      padding: 0.08rem 0.35rem;
+      font-size: 0.62rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: var(--lts);
+      color: var(--bg);
+      border-radius: 4px;
+      vertical-align: middle;
+    }
+
+    .feature-grid {
+      display: grid;
+      gap: 0.65rem;
+      margin-top: 0.75rem;
+    }
+
+    .feature-card {
+      padding: 0.85rem 1rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: border-color 0.15s;
+    }
+
+    .feature-card:hover {
+      border-color: var(--category);
+    }
+
+    .feature-card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .feature-card h3 a {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .feature-card h3 a:hover {
+      color: var(--accent);
+    }
+
+    .feature-card p {
+      font-size: 0.82rem;
+      margin: 0;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      padding: 0.85rem 1rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .site-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .site-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .site-footer p {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    .site-footer__github {
+      display: inline-flex;
+      align-items: center;
+      line-height: 0;
+    }
+
+    .site-footer__github:hover {
+      text-decoration: none;
+    }
+
+    .site-footer__github svg {
+      width: 1.1rem;
+      height: 1.1rem;
+      fill: currentColor;
+    }
+
+    @media (min-width: 640px) {
+      header {
+        padding: 1.25rem 1.5rem 0.75rem;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      header > p {
+        font-size: 0.9rem;
+      }
+
+      main {
+        padding: 1.5rem 1.5rem 2.5rem;
+      }
+    }
+  </style>
+  <link rel="icon" type="image/png" href="images/java-icon.png">
+</head>
+<body>
+  <header>
+    <div class="header-title-row">
+      <div class="title-group">
+        <a class="back-link" href="index.html">← Back</a>
+        <h1><span>About</span> JVM Flags</h1>
+      </div>
+      <div class="header-actions">
+        <nav class="nav-menu" aria-label="Site">
+          <button
+            type="button"
+            class="nav-menu-toggle"
+            id="nav-menu-toggle"
+            aria-expanded="false"
+            aria-controls="nav-menu-panel"
+          >
+            <span class="sr-only">Menu</span>
+            <span class="nav-menu-icon" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </span>
+          </button>
+          <div class="nav-menu-panel" id="nav-menu-panel" role="menu" hidden>
+            <a href="methodology.html" role="menuitem">Methodology</a>
+            <a href="concepts.html" role="menuitem">Concepts</a>
+            <a href="about.html" role="menuitem" aria-current="page">About</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <p>
+      An interactive catalog and learning site for HotSpot JVM command-line options across
+      long-term support (LTS) Java releases.
+    </p>
+  </header>
+
+  <main>
+    <section aria-labelledby="purpose-heading">
+      <h2 id="purpose-heading">Purpose</h2>
+      <p>
+        <strong style="color: var(--text); font-weight: 600;">JVM Flags</strong> helps developers,
+        operators, and students discover, compare, and understand JVM flags without digging through
+        long manual pages for every release. The site maps each flag to a taxonomy of domains and
+        categories (memory, garbage collection, JIT, diagnostics, and more) and shows how the option
+        surface changes between Java versions.
+      </p>
+      <p>
+        The project pairs a static website in <code>docs/</code> with a Maven test suite that
+        verifies catalog entries against a real JDK. Flag data lives in versioned JSON graphs
+        under <code>json-graph-generator/src/main/resources/</code> and is published to <code>docs/json/</code> for the
+        browser.
+      </p>
+    </section>
+
+    <section aria-labelledby="versions-heading">
+      <h2 id="versions-heading">Supported Java versions</h2>
+      <p>
+        Catalogs target Oracle HotSpot on these feature releases. LTS releases are highlighted on
+        the home timeline and are the primary focus for learning and production tuning.
+      </p>
+      <div class="version-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Release</th>
+              <th scope="col">Flags in catalog</th>
+              <th scope="col">Explore</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Java 8 <span class="lts-badge">LTS</span></td>
+              <td>723</td>
+              <td><a href="java-version.html?java=8">Flag graph</a></td>
+            </tr>
+            <tr>
+              <td>Java 11 <span class="lts-badge">LTS</span></td>
+              <td>654</td>
+              <td><a href="java-version.html?java=11">Flag graph</a></td>
+            </tr>
+            <tr>
+              <td>Java 17 <span class="lts-badge">LTS</span></td>
+              <td>542</td>
+              <td><a href="java-version.html?java=17">Flag graph</a></td>
+            </tr>
+            <tr>
+              <td>Java 21 <span class="lts-badge">LTS</span></td>
+              <td>520</td>
+              <td><a href="java-version.html?java=21">Flag graph</a></td>
+            </tr>
+            <tr>
+              <td>Java 25 <span class="lts-badge">LTS</span></td>
+              <td>505</td>
+              <td><a href="java-version.html?java=25">Flag graph</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Vendor builds (GraalVM, Eclipse Temurin, etc.) may differ slightly; always confirm critical
+        flags on the JDK you run in production.
+      </p>
+    </section>
+
+    <section aria-labelledby="explore-heading">
+      <h2 id="explore-heading">What you can do on the site</h2>
+      <div class="feature-grid">
+        <article class="feature-card">
+          <h3><a href="index.html">Release timeline</a></h3>
+          <p>
+            Scroll the Java history from 1.0 to current releases. Select an LTS milestone to open
+            its flag graph or evolution view.
+          </p>
+        </article>
+        <article class="feature-card">
+          <h3><a href="java-version.html?java=25">Interactive flag graph</a></h3>
+          <p>
+            Zoom and pan a D3 tree of domains, categories, and flags. Switch to table view, expand
+            or collapse branches, and open any flag for a short description.
+          </p>
+        </article>
+        <article class="feature-card">
+          <h3><a href="jvm-flag-evolution.html?java=25">Flag evolution</a></h3>
+          <p>
+            Pick a flag and see which Java versions recognize it, with availability and category
+            changes over time.
+          </p>
+        </article>
+        <article class="feature-card">
+          <h3><a href="jvm-flag.html?java=25&amp;flag=-Xmx">Flag detail</a></h3>
+          <p>
+            Read the catalog description and copy a research prompt to look up deeper documentation
+            in your preferred assistant or search tool.
+          </p>
+        </article>
+        <article class="feature-card">
+          <h3><a href="quiz-game.html">Quiz game</a></h3>
+          <p>
+            Practice with twenty random questions drawn from the Java 25 catalog. Score at least
+            70% to pass and review missed flags afterward.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="quality-heading">
+      <h2 id="quality-heading">Catalog quality</h2>
+      <p>
+        Flag names, categories, and descriptions are aligned with Oracle’s official HotSpot
+        documentation for each release (the <code>java</code> command reference, GC tuning guide,
+        and troubleshooting guides). The Maven module <code>jvmflags</code> runs parameterized
+        tests that launch <code>java … -version</code> with each testable flag so the catalog
+        reflects what the running JDK actually accepts.
+      </p>
+      <ul>
+        <li>Structure tests enforce a consistent graph taxonomy (domains, categories, subcategories).</li>
+        <li>Placeholder flags use <code>testValue</code> and <code>requires</code> metadata so verification stays accurate.</li>
+        <li>CI builds on JDK 8, 11, 17, 21, and 25 to keep each <code>java-*.json</code> file honest.</li>
+      </ul>
+      <p>
+        Source code and issue tracking:
+        <a href="https://github.com/jabrena/jvm-flags" target="_blank" rel="noopener noreferrer">github.com/jabrena/jvm-flags</a>.
+      </p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Built with ❤️ from
+      <a
+        href="https://www.google.com/maps/place/Community+of+Madrid,+Madrid/@40.4983324,-6.3162283,8z/data=!3m1!4b1!4m6!3m5!1s0xd41817a40e033b9:0x10340f3be4bc880!8m2!3d40.4167088!4d-3.5812692!16zL20vMGo0eGc?entry=ttu&amp;g_ep=EgoyMDI1MDgxOC4wIKXMDSoASAFQAw%3D%3D"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Madrid</a>
+      <a
+        class="site-footer__github"
+        href="https://github.com/jabrena/jvm-flags"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="View source on GitHub"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+      </a>
+    </p>
+  </footer>
+
+  <script>
+    (function () {
+      const toggle = document.getElementById("nav-menu-toggle");
+      const panel = document.getElementById("nav-menu-panel");
+      if (!toggle || !panel) return;
+
+      function setOpen(open) {
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.hidden = !open;
+      }
+
+      function close() {
+        setOpen(false);
+      }
+
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setOpen(toggle.getAttribute("aria-expanded") !== "true");
+      });
+
+      panel.addEventListener("click", (e) => {
+        if (e.target.closest("a")) close();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".nav-menu")) close();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+    })();
+  </script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2035DNSSEF"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag("js", new Date());
+    gtag("config", "G-2035DNSSEF");
+  </script>
+</body>
+</html>
