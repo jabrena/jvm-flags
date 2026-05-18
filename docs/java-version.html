@@ -71,6 +71,36 @@
 
     .view-toggle:hover { color: var(--text); }
 
+    .jvm-filter {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 0;
+      padding: 0;
+      border: none;
+      font-size: 0.75rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .jvm-filter-option {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .jvm-filter-option:hover { color: var(--text); }
+
+    .jvm-filter-option input {
+      width: 0.9rem;
+      height: 0.9rem;
+      accent-color: var(--category);
+      cursor: pointer;
+      margin: 0;
+    }
+
     .tree-controls {
       display: inline-flex;
       gap: 0.35rem;
@@ -371,6 +401,16 @@
       <input type="checkbox" id="table-view" aria-controls="table-wrap flags-table">
       Table
     </label>
+    <fieldset class="jvm-filter" aria-label="JVM implementation">
+      <label class="jvm-filter-option">
+        <input type="radio" name="jvm-filter" value="hotspot" checked>
+        HotSpot
+      </label>
+      <label class="jvm-filter-option">
+        <input type="radio" name="jvm-filter" value="graalvm">
+        GraalVM
+      </label>
+    </fieldset>
     <div class="stats" id="stats">Loading graph…</div>
     <div class="legend">
       <div class="legend-item"><span class="legend-dot" style="background:var(--root)"></span>Root</div>
@@ -417,6 +457,8 @@
     };
 
     const DEFAULT_LTS = "25";
+    const DEFAULT_JVM = "hotspot";
+    const JVM_FILTER_VALUES = ["hotspot", "graalvm"];
 
     function resolveJavaVersion() {
       const java = new URLSearchParams(window.location.search).get("java");
@@ -429,11 +471,79 @@
       return `json/java-${version}.json`;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
     const JAVA_VERSION = resolveJavaVersion();
     const DATA_URL = dataUrlForVersion(JAVA_VERSION);
 
-    document.getElementById("title-version").textContent = `Java ${JAVA_VERSION}`;
-    document.title = `Java ${JAVA_VERSION} JVM Flags — Graph`;
+    const jvmParam = urlParams.get("jvm");
+    let JVM_FILTER =
+      jvmParam != null && JVM_FILTER_VALUES.includes(String(jvmParam).trim().toLowerCase())
+        ? String(jvmParam).trim().toLowerCase()
+        : DEFAULT_JVM;
+
+    let rawCatalogData = null;
+    const jvmFilterRadios = document.querySelectorAll('input[name="jvm-filter"]');
+
+    function jvmFilterLabel() {
+      return JVM_FILTER === "graalvm" ? "GraalVM" : "HotSpot";
+    }
+
+    function flagSupportsJvm(node) {
+      const implementations = node.jvm;
+      if (!implementations || !Array.isArray(implementations)) {
+        return JVM_FILTER === "hotspot";
+      }
+      return implementations.includes(JVM_FILTER);
+    }
+
+    function updateJvmTitle() {
+      document.getElementById("title-version").textContent =
+        `Java ${JAVA_VERSION} · ${jvmFilterLabel()}`;
+      document.title = `Java ${JAVA_VERSION} · ${jvmFilterLabel()} JVM Flags — Graph`;
+    }
+
+    function syncJvmToUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (JVM_FILTER === DEFAULT_JVM) {
+        params.delete("jvm");
+      } else {
+        params.set("jvm", JVM_FILTER);
+      }
+      const query = params.toString();
+      const next = query
+        ? `${window.location.pathname}?${query}`
+        : window.location.pathname;
+      window.history.replaceState(null, "", next);
+    }
+
+    function setJvmFilterRadios() {
+      for (const radio of jvmFilterRadios) {
+        radio.checked = radio.value === JVM_FILTER;
+      }
+    }
+
+    function applyJvmFilter() {
+      updateJvmTitle();
+      syncJvmToUrl();
+      if (rawCatalogData) {
+        const tableView = tableViewCb.checked;
+        initGraph(rawCatalogData);
+        if (tableView) {
+          setTableView(true);
+        }
+      }
+    }
+
+    setJvmFilterRadios();
+    updateJvmTitle();
+
+    for (const radio of jvmFilterRadios) {
+      radio.addEventListener("change", () => {
+        if (!radio.checked) return;
+        JVM_FILTER = radio.value;
+        applyJvmFilter();
+      });
+    }
 
     const svg = d3.select("#graph");
     const tooltip = d3.select("#tooltip");
@@ -654,7 +764,14 @@
 
     function flagDetailUrl(d) {
       const flagId = d.flagId || d.id;
-      return `jvm-flag.html?java=${encodeURIComponent(JAVA_VERSION)}&flag=${encodeURIComponent(flagId)}`;
+      const params = new URLSearchParams({
+        java: JAVA_VERSION,
+        flag: flagId
+      });
+      if (JVM_FILTER !== DEFAULT_JVM) {
+        params.set("jvm", JVM_FILTER);
+      }
+      return `jvm-flag.html?${params}`;
     }
 
     function hideTooltip() {
@@ -667,6 +784,24 @@
         parent.set(e.target, e.source);
       }
       return parent;
+    }
+
+    /** Keep only flag nodes supported by the active JVM filter (HotSpot by default). */
+    function filterCatalogByJvm(data) {
+      const nodesById = new Map(data.nodes.map(n => [n.id, n]));
+      const keepFlagIds = new Set(
+        data.nodes
+          .filter(n => n.type === "flag" && flagSupportsJvm(n))
+          .map(n => n.id)
+      );
+      return {
+        ...data,
+        nodes: data.nodes.filter(n => n.type !== "flag" || keepFlagIds.has(n.id)),
+        edges: data.edges.filter(e => {
+          const target = nodesById.get(e.target);
+          return target?.type !== "flag" || keepFlagIds.has(e.target);
+        })
+      };
     }
 
     /** Drop domains/categories/subcategories with no flags on this Java version. */
@@ -832,12 +967,13 @@
     function initGraph(data) {
       errorEl.hidden = true;
 
-      const fullData = pruneEmptyContainers(data);
+      const fullData = pruneEmptyContainers(filterCatalogByJvm(data));
       cachedGraphData = fullData;
 
       const version = fullData.metadata?.version || JAVA_VERSION;
-      document.getElementById("title-version").textContent = `Java ${version}`;
-      document.title = `${fullData.metadata?.title || `Java ${version} JVM Flags`} — Graph`;
+      document.getElementById("title-version").textContent =
+        `Java ${version} · ${jvmFilterLabel()}`;
+      document.title = `${fullData.metadata?.title || `Java ${version} · ${jvmFilterLabel()} JVM Flags`} — Graph`;
 
       const width = window.innerWidth;
       const height = window.innerHeight - 52;
@@ -1015,6 +1151,7 @@
     d3.json(DATA_URL)
       .then(data => {
         if (!data?.nodes?.length) throw new Error("Invalid graph data");
+        rawCatalogData = data;
         initGraph(data);
       })
       .catch(err => {

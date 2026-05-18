@@ -74,15 +74,62 @@
     }
 
     .select-star-label {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.5rem;
       font-size: 0.8rem;
       font-weight: 600;
       letter-spacing: 0.04em;
       color: var(--accent);
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .select-star-label .sql-token {
+      white-space: nowrap;
+    }
+
+    .select-star-label .sql-token--where {
+      margin-left: 0.15rem;
+    }
+
+    .select-jvm-inline {
+      width: 100px;
+      min-width: 100px;
+      max-width: 100px;
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 0.22rem 1.35rem 0.22rem 0.45rem;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%238b9cb3' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.4rem center;
+    }
+
+    .select-jvm-inline option {
+      text-transform: uppercase;
+    }
+
+    .select-jvm-inline:hover,
+    .select-jvm-inline:focus {
+      border-color: var(--accent);
+      outline: none;
     }
 
     .select-controls {
       margin-bottom: 1.25rem;
+    }
+
+    .select-controls .select-level-row {
+      padding-left: 0.35rem;
     }
 
     .control-row {
@@ -371,10 +418,17 @@
   </header>
   <main>
     <p id="intro">
-      Explore HotSpot JVM flag catalogs across Java LTS releases.
+      Explore JVM flag catalogs across LTS releases.
     </p>
     <div class="select-controls" role="group" aria-labelledby="select-star-label">
-      <p class="select-star-label" id="select-star-label">SELECT COUNT(*) WHERE</p>
+      <p class="select-star-label" id="select-star-label">
+        <span class="sql-token">SELECT COUNT(*) FROM</span>
+        <select id="filter-jvm" class="select-jvm-inline" aria-label="JVM implementation">
+          <option value="hotspot" selected>HotSpot</option>
+          <option value="graalvm">GraalVM</option>
+        </select>
+        <span class="sql-token sql-token--where">WHERE</span>
+      </p>
       <div class="control-row select-level-row" data-level="domain">
         <label class="level-check">
           <input type="checkbox" id="check-domain" checked aria-controls="filter-domain">
@@ -428,6 +482,8 @@
   </main>
   <script>
     const DEFAULT_JAVA = "25";
+    const DEFAULT_JVM = "hotspot";
+    const JVM_FILTER_VALUES = ["hotspot", "graalvm"];
     const CATALOG_VERSIONS = ["8", "11", "17", "21", "25"];
 
     const DOMAIN_ORDER = [
@@ -478,11 +534,18 @@
       };
     }
 
-    const java = new URLSearchParams(window.location.search).get("java");
+    const urlParams = new URLSearchParams(window.location.search);
+    const java = urlParams.get("java");
     const version =
       java != null && /^\d+$/.test(String(java).trim())
         ? String(java).trim()
         : DEFAULT_JAVA;
+
+    const jvmParam = urlParams.get("jvm");
+    let jvmFilter =
+      jvmParam != null && JVM_FILTER_VALUES.includes(String(jvmParam).trim().toLowerCase())
+        ? String(jvmParam).trim().toLowerCase()
+        : DEFAULT_JVM;
 
     document.getElementById("title-version").textContent = `Java ${version}`;
     document.title = `Java ${version} JVM Flag Evolution`;
@@ -502,6 +565,8 @@
       category: document.getElementById("filter-category"),
       subcategory: document.getElementById("filter-subcategory")
     };
+    const jvmSelect = document.getElementById("filter-jvm");
+    jvmSelect.value = jvmFilter;
     const flagsPanel = document.getElementById("flags-panel");
     const flagsPanelTitle = document.getElementById("flags-panel-title");
     const flagsPanelMeta = document.getElementById("flags-panel-meta");
@@ -516,6 +581,32 @@
     let activeSelectLevel = "domain";
     const selectValues = { domain: "-", category: "-", subcategory: "-" };
     let colorForKey = () => "#64748b";
+
+    function flagSupportsJvm(node) {
+      const implementations = node.jvm;
+      if (!implementations || !Array.isArray(implementations)) {
+        return jvmFilter === "hotspot";
+      }
+      return implementations.includes(jvmFilter);
+    }
+
+    function jvmFilterLabel() {
+      return jvmFilter === "graalvm" ? "GraalVM" : "HotSpot";
+    }
+
+    function syncJvmToUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (jvmFilter === DEFAULT_JVM) {
+        params.delete("jvm");
+      } else {
+        params.set("jvm", jvmFilter);
+      }
+      const query = params.toString();
+      const next = query
+        ? `${window.location.pathname}?${query}`
+        : window.location.pathname;
+      window.history.replaceState(null, "", next);
+    }
 
     function catalogGraphMaps(catalog) {
       const byId = new Map(catalog.nodes.map((n) => [n.id, n]));
@@ -659,6 +750,8 @@
       allOpt.textContent = "-";
       select.appendChild(allOpt);
       for (const label of sortLabelsAlpha(labels)) {
+        const count = counts[label];
+        if (count === 0 && label !== value) continue;
         const opt = document.createElement("option");
         opt.value = label;
         opt.textContent = formatSelectOptionLabel(label, counts);
@@ -769,6 +862,7 @@
       const counts = {};
       for (const node of catalog.nodes) {
         if (node.type !== "flag") continue;
+        if (!flagSupportsJvm(node)) continue;
         let matches = true;
         for (const filter of ancestorFilters) {
           if (ancestorLabel(node.id, filter.type) !== filter.label) {
@@ -887,7 +981,14 @@
     }
 
     function flagDetailUrl(flagId) {
-      return `jvm-flag.html?java=${encodeURIComponent(version)}&flag=${encodeURIComponent(flagId)}`;
+      const params = new URLSearchParams({
+        java: version,
+        flag: flagId
+      });
+      if (jvmFilter !== DEFAULT_JVM) {
+        params.set("jvm", jvmFilter);
+      }
+      return `jvm-flag.html?${params}`;
     }
 
     function flagsMatchingFilters(catalog, ancestorFilters) {
@@ -895,6 +996,7 @@
       const flags = [];
       for (const node of catalog.nodes) {
         if (node.type !== "flag") continue;
+        if (!flagSupportsJvm(node)) continue;
         let matches = true;
         for (const filter of ancestorFilters) {
           if (ancestorLabel(node.id, filter.type) !== filter.label) {
@@ -971,10 +1073,12 @@
       const flags = flagsMatchingFilters(catalog, ancestorFilters);
 
       flagsPanel.hidden = false;
+      const whereHtml = formatWhereClauseHtml();
       flagsPanelTitle.innerHTML =
-        `SELECT COUNT(*) WHERE <span>${formatWhereClauseHtml()}</span>`;
+        `SELECT COUNT(*) FROM <span>${escapeHtml(jvmFilterLabel())}</span> WHERE ` +
+        `<span>${whereHtml}</span>`;
       flagsPanelMeta.textContent =
-        `Java ${version} catalog — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
+        `Java ${version} catalog · ${jvmFilterLabel()} — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
       renderFlagListTable(flags);
     }
 
@@ -1094,7 +1198,11 @@
         .attr("x", -innerHeight / 2)
         .attr("y", -40)
         .attr("text-anchor", "middle")
-        .text(focusFilter !== "-" ? "Flags in selection" : "Flags in catalog");
+        .text(
+          focusFilter !== "-"
+            ? `Flags in selection (${jvmFilterLabel()})`
+            : `Flags in catalog (${jvmFilterLabel()})`
+        );
 
       const versionGroups = root
         .selectAll(".bar-group")
@@ -1195,6 +1303,17 @@
           );
         });
     }
+
+    jvmSelect.addEventListener("change", () => {
+      jvmFilter = jvmSelect.value;
+      syncJvmToUrl();
+      selectValues.domain = "-";
+      selectValues.category = "-";
+      selectValues.subcategory = "-";
+      refreshCascadeOptions("domain");
+      syncSelectsToState();
+      refreshChart();
+    });
 
     for (const level of SELECT_LEVELS) {
       levelCheckboxes[level].addEventListener("change", () => {

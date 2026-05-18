@@ -207,6 +207,51 @@
       min-height: 1.1em;
     }
 
+    .jvm-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+
+    .jvm-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.55rem;
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      background: var(--surface);
+    }
+
+    .jvm-badge.active {
+      color: var(--bg);
+      border-color: transparent;
+    }
+
+    .jvm-badge--hotspot.active {
+      background: var(--category);
+    }
+
+    .jvm-badge--graalvm.active {
+      background: var(--subcategory);
+    }
+
+    .jvm-notice {
+      font-size: 0.8rem;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.08);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+
     .breadcrumb-mobile { display: none; }
 
     @media (max-width: 768px) {
@@ -234,6 +279,8 @@
 
   <script>
     const DEFAULT_JAVA = "25";
+    const DEFAULT_JVM = "hotspot";
+    const JVM_FILTER_VALUES = ["hotspot", "graalvm"];
 
     function resolveJavaVersion() {
       const java = new URLSearchParams(window.location.search).get("java");
@@ -247,13 +294,34 @@
       return flag == null ? "" : String(flag).trim();
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
     const JAVA_VERSION = resolveJavaVersion();
     const FLAG_ID = resolveFlagId();
     const DATA_URL = `json/java-${JAVA_VERSION}.json`;
 
-    document.getElementById("title-version").textContent = `Java ${JAVA_VERSION}`;
-    document.getElementById("back-graph").href =
-      `java-version.html?java=${encodeURIComponent(JAVA_VERSION)}`;
+    const jvmParam = urlParams.get("jvm");
+    const JVM_FILTER =
+      jvmParam != null && JVM_FILTER_VALUES.includes(String(jvmParam).trim().toLowerCase())
+        ? String(jvmParam).trim().toLowerCase()
+        : DEFAULT_JVM;
+
+    function jvmFilterLabel() {
+      return JVM_FILTER === "graalvm" ? "GraalVM" : "HotSpot";
+    }
+
+    function graphBackHref() {
+      const params = new URLSearchParams();
+      params.set("java", JAVA_VERSION);
+      if (JVM_FILTER !== DEFAULT_JVM) {
+        params.set("jvm", JVM_FILTER);
+      }
+      const query = params.toString();
+      return `java-version.html?${query}`;
+    }
+
+    document.getElementById("title-version").textContent =
+      `Java ${JAVA_VERSION} · ${jvmFilterLabel()}`;
+    document.getElementById("back-graph").href = graphBackHref();
 
     function escapeHtml(text) {
       return String(text)
@@ -296,10 +364,56 @@
       document.getElementById("content").innerHTML = `<p class="error">${html}</p>`;
     }
 
+    function flagJvmImplementations(flag) {
+      const jvm = flag.jvm;
+      if (!Array.isArray(jvm) || jvm.length === 0) {
+        return [DEFAULT_JVM];
+      }
+      return jvm.filter(id => JVM_FILTER_VALUES.includes(id));
+    }
+
+    function flagSupportsJvm(flag, implementation) {
+      return flagJvmImplementations(flag).includes(implementation);
+    }
+
+    function findFlagNode(nodes, flagParam) {
+      const needle = String(flagParam).trim();
+      if (!needle) return null;
+      return nodes.find(n => {
+        if (n.type !== "flag") return false;
+        if (n.flagId === needle || n.id === needle) return true;
+        const display = n.flag || n.label;
+        return display === needle;
+      }) || null;
+    }
+
+    function buildJvmBadgesHtml(flag) {
+      const implementations = flagJvmImplementations(flag);
+      const badges = JVM_FILTER_VALUES.map(id => {
+        const supported = implementations.includes(id);
+        const label = id === "graalvm" ? "GraalVM" : "HotSpot";
+        const active = supported ? " active" : "";
+        const muted = supported ? "" : ' style="opacity:0.45"';
+        return `<span class="jvm-badge jvm-badge--${id}${active}"${muted} title="${supported ? "Supported" : "Not in catalog for this flag"}">${label}</span>`;
+      });
+      return `<div class="jvm-badges" aria-label="JVM implementations">${badges.join("")}</div>`;
+    }
+
+    function buildJvmNoticeHtml(flag) {
+      if (flagSupportsJvm(flag, JVM_FILTER)) return "";
+      const supported = flagJvmImplementations(flag)
+        .map(id => (id === "graalvm" ? "GraalVM" : "HotSpot"))
+        .join(" and ");
+      return `<p class="jvm-notice" role="status">This flag is cataloged for <strong>${escapeHtml(supported || "other JVMs")}</strong>, not ${escapeHtml(jvmFilterLabel())}. You opened the page with <code>jvm=${escapeHtml(JVM_FILTER)}</code>.</p>`;
+    }
+
     function buildSearchPrompt(flag, breadcrumb) {
       const name = flag.flag || flag.label;
+      const jvmLine = flagJvmImplementations(flag)
+        .map(id => (id === "graalvm" ? "GraalVM" : "HotSpot"))
+        .join(", ");
       const lines = [
-        `I need detailed information about the following JVM flag for Java ${JAVA_VERSION}:`,
+        `I need detailed information about the following JVM flag for Java ${JAVA_VERSION} (${jvmLine}):`,
         "",
         `Flag: ${name}`,
       ];
@@ -365,17 +479,19 @@
     }
 
     function renderFlag(flag, breadcrumb, subcategoryLabel) {
-      document.title = `${flag.flag || flag.label} — Java ${JAVA_VERSION}`;
+      document.title = `${flag.flag || flag.label} — Java ${JAVA_VERSION} · ${jvmFilterLabel()}`;
       const desc = flag.description
         ? `<p class="description">${escapeHtml(flag.description)}</p>`
         : `<p class="description empty">No description available for this flag.</p>`;
       const prompt = buildSearchPrompt(flag, breadcrumb);
-      const backHref = `java-version.html?java=${encodeURIComponent(JAVA_VERSION)}`;
+      const backHref = graphBackHref();
 
       document.getElementById("content").innerHTML = `
         ${breadcrumb ? `<p class="breadcrumb breadcrumb-full">${escapeHtml(breadcrumb)}</p>` : ""}
         ${subcategoryLabel ? `<p class="breadcrumb breadcrumb-mobile">${escapeHtml(subcategoryLabel)}</p>` : ""}
         <p class="flag-name">${escapeHtml(flag.flag || flag.label)}</p>
+        ${buildJvmBadgesHtml(flag)}
+        ${buildJvmNoticeHtml(flag)}
         <h2 class="section-title">Description</h2>
         ${desc}
         <section class="research" aria-labelledby="research-title">
@@ -403,10 +519,10 @@
         .then(data => {
           const nodes = data.nodes || [];
           const edges = data.edges || [];
-          const flag = nodes.find(n => n.type === "flag" && n.flagId === FLAG_ID);
+          const flag = findFlagNode(nodes, FLAG_ID);
           if (!flag) {
             showError(
-              `Flag not found for <code>flag=${escapeHtml(FLAG_ID)}</code> in Java ${JAVA_VERSION}.`
+              `Flag not found for <code>flag=${escapeHtml(FLAG_ID)}</code> in Java ${JAVA_VERSION} (${escapeHtml(jvmFilterLabel())}).`
             );
             return;
           }

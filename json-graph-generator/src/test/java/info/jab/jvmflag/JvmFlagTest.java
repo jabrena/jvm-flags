@@ -41,7 +41,13 @@ class JvmFlagTest {
     }
 
     private static boolean shouldVerify(JvmFlagEntry entry) {
-        return entry.testSpec().testable() && entry.supportsJvm(JvmImplementation.current());
+        if (!entry.testSpec().testable() || !entry.supportsJvm(JvmImplementation.current())) {
+            return false;
+        }
+        if (JvmImplementation.GRAALVM.equals(JvmImplementation.current())) {
+            return GraalvmInapplicableFlags.isVerifiable(entry);
+        }
+        return true;
     }
 
     @ParameterizedTest(name = "{0}")
