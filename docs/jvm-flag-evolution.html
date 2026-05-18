@@ -368,10 +368,10 @@
   </header>
   <main>
     <p id="intro">
-      Stacked catalog size across supported LTS releases — each bar is one Java version; segments are HotSpot flags from <code>-XX:+PrintFlagsFinal</code> (one catalog entry per internal flag). Use <strong>SELECT *</strong> like a query: pick one taxonomy level (Domain, Category, or Subcategory), choose <code>-</code> for all groups at that level, or pick one value to drill into the next level. Results appear in the table below the chart.
+      Explore HotSpot JVM flag catalogs across Java LTS releases. Use <strong>SELECT COUNT(*)</strong> to group and filter, compare counts in the stacked bar chart, and browse matching flags in the table below.
     </p>
     <div class="select-controls" role="group" aria-labelledby="select-star-label">
-      <p class="select-star-label" id="select-star-label">SELECT *</p>
+      <p class="select-star-label" id="select-star-label">SELECT COUNT(*)</p>
       <div class="control-row select-level-row" data-level="domain">
         <label class="level-check">
           <input type="checkbox" id="check-domain" checked aria-controls="filter-domain">
@@ -932,7 +932,7 @@
 
       flagsPanel.hidden = false;
       flagsPanelTitle.innerHTML =
-        `SELECT * — <span>${formatWhereClauseHtml()}</span>`;
+        `SELECT COUNT(*) — <span>${formatWhereClauseHtml()}</span>`;
       flagsPanelMeta.textContent =
         `Java ${version} catalog — ${flags.length.toLocaleString()} flag${flags.length === 1 ? "" : "s"}`;
       renderFlagListTable(flags);
