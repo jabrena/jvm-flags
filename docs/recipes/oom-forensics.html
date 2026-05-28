@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - OOM Forensics</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Crash</span> and OOM Forensics</h1>
+    </div>
+    <p>Capture useful artifacts at the moment a process runs out of Java heap or the VM fails.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+HeapDumpOnOutOfMemoryError</span><span class="flag-pill">-XX:HeapDumpPath</span><span class="flag-pill">-XX:ErrorFile</span></div>
+      <p>
+        <code>-XX:+HeapDumpOnOutOfMemoryError</code> writes an HPROF heap dump when Java heap is
+        exhausted. <code>-XX:ErrorFile</code> controls where the VM writes fatal error logs such as
+        <code>hs_err_pid</code> files.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+HeapDumpOnOutOfMemoryError</dt>
+        <dd>Writes a heap dump when the JVM throws an <code>OutOfMemoryError</code> due to Java heap exhaustion. The dump captures object graphs for offline leak analysis.</dd>
+        <dt>-XX:HeapDumpPath=/var/log/myapp/dumps</dt>
+        <dd>Chooses the output directory or file for heap dumps. The JVM process must have write permission and enough disk space.</dd>
+        <dt>-XX:ErrorFile=/var/log/myapp/hs_err_pid%p.log</dt>
+        <dd>Chooses where fatal JVM error logs are written. <code>%p</code> expands to the process ID, which prevents multiple crashes from overwriting the same file.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this in production services, batch jobs, and staging systems where a failure should
+        leave enough evidence for later analysis with tools such as Eclipse MAT, JDK Mission
+        Control, or VisualVM.
+      </p>
+      <div class="callout">Make sure the dump path has enough disk space. A heap dump can be close to the live heap size.</div>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>-XX:+HeapDumpOnOutOfMemoryError</code>, <code>-XX:HeapDumpPath</code>, and
+        <code>-XX:ErrorFile</code> are longstanding HotSpot diagnostic options and apply across the
+        cataloged Java versions.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>These crash and heap-dump flags predate the modern JEP process and do not have a dedicated feature JEP.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+HeapDumpOnOutOfMemoryError \
+  -XX:HeapDumpPath=/var/log/myapp/dumps \
+  -XX:ErrorFile=/var/log/myapp/hs_err_pid%p.log \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use absolute paths in production so dumps land on a volume with known retention and capacity.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Confirm write permissions and retention policy for dump directories before relying on the flags during an incident.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flags: <a href="../java-version.html?java=25">Diagnostics graph</a>.</footer>
+</body>
+</html>

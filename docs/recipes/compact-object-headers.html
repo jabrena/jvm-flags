@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Compact Object Headers</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Compact</span> Object Headers</h1>
+    </div>
+    <p>Use Java 25 compact object headers to reduce per-object heap overhead in object-dense workloads.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+UseCompactObjectHeaders</span><span class="flag-pill">-Xlog:gc*</span></div>
+      <p>
+        <code>-XX:+UseCompactObjectHeaders</code> enables the Java 25 compact object header layout.
+        The goal is to reduce the memory used by each Java object header, which can lower heap
+        footprint when an application keeps many small objects alive.
+      </p>
+    </section>
+
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+UseCompactObjectHeaders</dt>
+        <dd>Enables compact object headers. In Java 25 this is a product feature, so the Java 24 experimental unlock pattern is no longer required for the Java 25 recipe.</dd>
+        <dt>-Xlog:gc*</dt>
+        <dd>Records heap occupancy and GC behavior so you can compare memory pressure before and after changing the object header layout.</dd>
+      </dl>
+    </section>
+
+    <section>
+      <h2>How it works</h2>
+      <p>
+        Every Java object has a header that stores VM metadata such as locking state, identity hash
+        information, age, and class information. On 64-bit HotSpot, traditional object headers use
+        more space than many tiny application objects need for their actual fields.
+      </p>
+      <p>
+        Compact Object Headers reduce the object header footprint to 64 bits. The largest benefit
+        appears in object-dense heaps: maps, graph structures, ASTs, caches, deserialized records,
+        messaging payloads, and domain models with many small objects.
+      </p>
+      <div class="callout">
+        This is a memory-layout flag, not a garbage collector. It can be combined with G1, ZGC, or
+        another collector, but you should benchmark the exact workload before rolling it out.
+      </div>
+    </section>
+
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this when heap histograms, JFR allocation data, or object-layout tools show that the
+        application retains many small Java objects. It is especially interesting when memory cost
+        is driven by object count rather than large arrays or byte buffers.
+      </p>
+      <p>
+        It is less likely to help workloads dominated by large primitive arrays, direct buffers,
+        off-heap memory, or a few large object graphs where header overhead is a small fraction of
+        total memory.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        Compact Object Headers were experimental in Java 24 and required
+        <code>-XX:+UnlockExperimentalVMOptions</code>. In Java 25 they are a product feature and can
+        be enabled directly with <code>-XX:+UseCompactObjectHeaders</code>. They are not the default
+        object-header layout in Java 25.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/450" target="_blank" rel="noopener noreferrer">JEP 450</a> - Compact Object Headers experimental, delivered in JDK 24.</li>
+        <li><a href="https://openjdk.org/jeps/519" target="_blank" rel="noopener noreferrer">JEP 519</a> - Compact Object Headers product feature, delivered in JDK 25.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <h3>Enable compact object headers on Java 25</h3>
+      <pre><code>java -XX:+UseCompactObjectHeaders \
+  -Xlog:gc*:file=logs/gc-compact-headers.log:time,uptime,level,tags \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this for a staging run against the same traffic profile as the baseline.</p>
+
+      <h3>Compare with a normal memory-footprint launch</h3>
+      <pre><code>java -Xmx2g \
+  -Xlog:gc*:file=logs/gc-baseline.log:time,uptime,level,tags \
+  -jar app.jar
+
+java -Xmx2g -XX:+UseCompactObjectHeaders \
+  -Xlog:gc*:file=logs/gc-compact-headers.log:time,uptime,level,tags \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Keep heap size and traffic constant so the comparison isolates the object-header layout.</p>
+
+      <h3>Combine with a collector choice</h3>
+      <pre><code>java -XX:+UseG1GC -XX:+UseCompactObjectHeaders -Xmx4g \
+  -jar object-dense-service.jar</code></pre>
+      <p class="example-caption">The compact-header flag changes object layout; the GC flag still controls collection policy.</p>
+    </section>
+
+    <section>
+      <h2>Verify</h2>
+      <ul>
+        <li>Compare live-set size after full or old-generation collection, not only startup RSS.</li>
+        <li>Check p95 and p99 latency because changing layout can shift cache behavior and GC timing.</li>
+        <li>Use JFR, heap histograms, or object layout tools to confirm the workload is object-dense.</li>
+        <li>Run the same workload with and without the flag before changing production defaults.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>References</h2>
+      <p>
+        See <a href="https://openjdk.org/jeps/519" target="_blank" rel="noopener noreferrer">JEP 519: Compact Object Headers</a>
+        and the Oracle Java 25 GC tuning guide section on compact object headers.
+      </p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:+UseCompactObjectHeaders">UseCompactObjectHeaders</a>.</footer>
+</body>
+</html>

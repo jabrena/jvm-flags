@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Runtime Reproducibility</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Stable</span> Runtime Defaults</h1>
+    </div>
+    <p>Pin process-wide defaults that otherwise depend on host configuration.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-Dfile.encoding</span><span class="flag-pill">-Duser.timezone</span><span class="flag-pill">-Duser.language</span><span class="flag-pill">-Duser.country</span></div>
+      <p>
+        <code>-D</code> options set system properties before application code starts. Encoding,
+        timezone, and locale affect logs, parsing, formatting, tests, serialized data, and
+        integrations.
+      </p>
+    </section>
+    <section>
+      <h2>Option details</h2>
+      <dl>
+        <dt>-Dfile.encoding=UTF-8</dt>
+        <dd>Sets the default charset used by APIs that rely on the process default. Prefer explicit charsets in code, but this avoids host-dependent surprises.</dd>
+        <dt>-Duser.timezone=UTC</dt>
+        <dd>Sets the default JVM timezone. This keeps timestamps, scheduled calculations, and log formatting stable across hosts.</dd>
+        <dt>-Duser.language=en</dt>
+        <dd>Sets the default language part of the JVM locale.</dd>
+        <dt>-Duser.country=US</dt>
+        <dd>Sets the default country part of the JVM locale. Together with language, it affects formatting, parsing, collation, and localized messages.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for services, batch jobs, CI tests, and data pipelines that must behave the same
+        across laptops, containers, and servers.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>-D</code> system properties apply across all Java versions. Java 18 made UTF-8 the
+        default charset, but setting <code>-Dfile.encoding=UTF-8</code> can still document intent and
+        stabilize older runtimes. Locale and timezone properties remain useful across releases.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/400" target="_blank" rel="noopener noreferrer">JEP 400</a> - UTF-8 by Default, delivered in JDK 18.</li>
+        <li><a href="https://openjdk.org/jeps/252" target="_blank" rel="noopener noreferrer">JEP 252</a> - Use CLDR Locale Data by Default, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -Dfile.encoding=UTF-8 -Duser.timezone=UTC \
+  -Duser.language=en -Duser.country=US \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this in services and batch jobs that exchange data across machines or regions.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Log <code>Charset.defaultCharset()</code>, <code>ZoneId.systemDefault()</code>, and <code>Locale.getDefault()</code> during startup.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog area: <a href="../concepts.html#system-properties">System properties</a>.</footer>
+</body>
+</html>

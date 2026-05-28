@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Module Access Workaround</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Module Access</span> Workaround</h1>
+    </div>
+    <p>Bridge reflective library access while migrating to Java's strong encapsulation model.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">--add-opens</span><span class="flag-pill">--add-exports</span></div>
+      <p>
+        <code>--add-opens</code> opens a package for deep reflection. <code>--add-exports</code>
+        exports a package for compile-time or runtime access. Both should be treated as explicit
+        migration bridges, not broad tuning flags.
+      </p>
+    </section>
+    <section>
+      <h2>Option details</h2>
+      <dl>
+        <dt>--add-opens java.base/java.lang=ALL-UNNAMED</dt>
+        <dd>Allows unnamed classpath code to use deep reflection on <code>java.lang</code>. This is commonly needed by older frameworks or agents that access private JDK internals.</dd>
+        <dt>--add-exports java.base/sun.nio.ch=ALL-UNNAMED</dt>
+        <dd>Exports an internal package so classpath code can access its public types. This is narrower than opening for deep reflection, but it still couples the application to JDK internals.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this when a framework, agent, serializer, or legacy library still needs access to an
+        internal JDK package and upgrading the dependency is not immediately possible.
+      </p>
+      <div class="callout">Prefer a library upgrade over accumulating module opens. Each option documents a compatibility debt.</div>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>--add-opens</code> and <code>--add-exports</code> are module-system options introduced
+        with Java 9. They are most often used when moving Java 8-era libraries onto Java 9+ strong
+        encapsulation, especially Java 16 and Java 17+.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/261" target="_blank" rel="noopener noreferrer">JEP 261</a> - Module System, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/396" target="_blank" rel="noopener noreferrer">JEP 396</a> - Strongly Encapsulate JDK Internals by Default, delivered in JDK 16.</li>
+        <li><a href="https://openjdk.org/jeps/403" target="_blank" rel="noopener noreferrer">JEP 403</a> - Strongly Encapsulate JDK Internals, delivered in JDK 17.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java --add-opens java.base/java.lang=ALL-UNNAMED \
+  -jar legacy-app.jar</code></pre>
+      <p class="example-caption">Use this only for the package reported by the reflective-access failure.</p>
+      <pre><code>java --add-exports java.base/sun.nio.ch=ALL-UNNAMED \
+  -jar legacy-app.jar</code></pre>
+      <p class="example-caption">Use this when code directly links to an internal exported type.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Search startup logs for illegal-access or reflective-access failures and remove the option after the dependency is fixed.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog area: <a href="../concepts.html#domain-classes">Classes and modules</a>.</footer>
+</body>
+</html>

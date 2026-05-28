@@ -8,6 +8,7 @@ Interactive website about JVM flags by Java version.
 
 ```bash
 cd json-graph-generator && ./mvnw clean install -Psync-docs-json
+lsof -ti :8080 | xargs kill -9
 jwebserver -d docs -p 8080
 open http://localhost:8080/
 ```

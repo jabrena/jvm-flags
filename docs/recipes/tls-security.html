@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - TLS and Module Security</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>TLS</span> and Module Security</h1>
+    </div>
+    <p>Configure TLS trust, client certificates, weak-algorithm policy, and module-access exceptions deliberately.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags and properties</h2>
+      <div class="flag-list"><span class="flag-pill">-Djavax.net.ssl.trustStore</span><span class="flag-pill">-Djavax.net.ssl.keyStore</span><span class="flag-pill">-Djdk.tls.disabledAlgorithms</span><span class="flag-pill">--add-opens</span></div>
+      <p>
+        These options affect TLS identity, trust decisions, protocol selection, cryptographic
+        policy, and module encapsulation. Treat them as deployment security controls, not generic
+        tuning flags.
+      </p>
+    </section>
+
+    <section>
+      <h2>Option details</h2>
+      <dl>
+        <dt>-Djavax.net.ssl.trustStore=/etc/ssl/app/truststore.p12</dt>
+        <dd>Points JSSE-based clients and servers to trusted certificate authorities or pinned partner certificates.</dd>
+        <dt>-Djavax.net.ssl.trustStoreType=PKCS12</dt>
+        <dd>Declares the truststore format. PKCS#12 is the usual modern choice.</dd>
+        <dt>-Djavax.net.ssl.keyStore=/etc/ssl/app/keystore.p12</dt>
+        <dd>Points the JVM to the private-key material and certificate chain used for client authentication or server identity.</dd>
+        <dt>-Djavax.net.ssl.keyStoreType=PKCS12</dt>
+        <dd>Declares the keystore format.</dd>
+        <dt>-Djdk.tls.client.protocols=TLSv1.3,TLSv1.2</dt>
+        <dd>Limits TLS client protocol negotiation to modern versions when older protocols must be excluded explicitly.</dd>
+        <dt>-Djdk.tls.disabledAlgorithms=...</dt>
+        <dd>Overrides the disabled algorithm policy. Prefer editing a controlled <code>java.security</code> overlay instead of putting a long policy directly on the command line.</dd>
+        <dt>--add-opens / --add-exports</dt>
+        <dd>Weakens Java module encapsulation for compatibility. Keep these options narrow, temporary, and tied to a tracked dependency upgrade.</dd>
+      </dl>
+      <div class="callout">Avoid passing keystore or truststore passwords directly as command-line flags. Use protected files, environment-to-config integration, or platform secret managers.</div>
+    </section>
+
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this recipe when a JVM process must trust a private CA, present a client certificate,
+        disable weak TLS behavior, or document module-access exceptions needed by legacy libraries.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        JSSE truststore and keystore system properties are longstanding Java options. TLS 1.3 is
+        available from Java 11. Module access options such as <code>--add-opens</code> and
+        <code>--add-exports</code> are available from Java 9.
+      </p>
+    </section>
+
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/332" target="_blank" rel="noopener noreferrer">JEP 332</a> - Transport Layer Security (TLS) 1.3, delivered in JDK 11.</li>
+        <li><a href="https://openjdk.org/jeps/261" target="_blank" rel="noopener noreferrer">JEP 261</a> - Module System, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/396" target="_blank" rel="noopener noreferrer">JEP 396</a> - Strongly Encapsulate JDK Internals by Default, delivered in JDK 16.</li>
+        <li><a href="https://openjdk.org/jeps/403" target="_blank" rel="noopener noreferrer">JEP 403</a> - Strongly Encapsulate JDK Internals, delivered in JDK 17.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Examples</h2>
+      <h3>Trust a private certificate authority</h3>
+      <pre><code>java -Djavax.net.ssl.trustStore=/etc/ssl/app/truststore.p12 \
+  -Djavax.net.ssl.trustStoreType=PKCS12 \
+  -Djdk.tls.client.protocols=TLSv1.3,TLSv1.2 \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Mount the truststore as a file and keep the password outside the process argument list.</p>
+
+      <h3>Use a client certificate for mTLS</h3>
+      <pre><code>java -Djavax.net.ssl.keyStore=/etc/ssl/app/client-keystore.p12 \
+  -Djavax.net.ssl.keyStoreType=PKCS12 \
+  -Djavax.net.ssl.trustStore=/etc/ssl/app/truststore.p12 \
+  -Djavax.net.ssl.trustStoreType=PKCS12 \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use secret-mounted files for the keystore, truststore, and passwords.</p>
+
+      <h3>Load a controlled security-policy overlay</h3>
+      <pre><code>java -Djava.security.properties=/etc/java/app-security.properties \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this for disabled algorithm policy instead of hard-coding a long policy in startup flags.</p>
+
+      <h3>Document a narrow module exception</h3>
+      <pre><code>java --add-opens java.base/java.lang=ALL-UNNAMED \
+  -jar legacy-app.jar</code></pre>
+      <p class="example-caption">Keep module exceptions rare and remove them after the dependency is upgraded.</p>
+    </section>
+
+    <section>
+      <h2>Verify</h2>
+      <ul>
+        <li>Confirm TLS protocol and cipher negotiation with application logs, JFR, or endpoint testing.</li>
+        <li>Check certificate expiry and trust-chain rotation before deployment.</li>
+        <li>Inspect process arguments to ensure secrets are not visible.</li>
+        <li>Track every <code>--add-opens</code> or <code>--add-exports</code> option to a dependency issue.</li>
+      </ul>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog area: <a href="../concepts.html#security">Security flags</a>.</footer>
+</body>
+</html>

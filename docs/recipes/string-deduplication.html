@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - String Deduplication</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Many</span> Duplicate Strings</h1>
+    </div>
+    <p>Reduce duplicate string backing storage in allocation-heavy text workloads.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+UseStringDeduplication</span><span class="flag-pill">-XX:+UseG1GC</span></div>
+      <p>
+        <code>-XX:+UseStringDeduplication</code> asks G1 to identify strings with equal contents and
+        share their backing storage where possible. It is useful only when duplicates are common
+        enough to justify the extra GC work.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+UseG1GC</dt>
+        <dd>Selects G1, the collector that supports HotSpot string deduplication in this recipe.</dd>
+        <dt>-XX:+UseStringDeduplication</dt>
+        <dd>Enables a G1 feature that looks for different <code>String</code> objects with identical character contents and shares backing storage where possible.</dd>
+        <dt>-Xlog:gc*,stringdedup=info</dt>
+        <dd>Logs both GC activity and string deduplication statistics so you can see whether the feature is saving memory or just adding overhead.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>How G1 string deduplication works</h2>
+      <p>
+        G1 can inspect candidate strings during GC work and place their backing arrays into a
+        deduplication table. When another string has the same contents, the JVM can make both
+        strings share the same backing storage. The <code>String</code> objects still exist; the
+        saving comes from avoiding duplicate character storage.
+      </p>
+      <p>
+        This is useful only when repeated text is common enough to offset the CPU and bookkeeping
+        cost. It often helps text-heavy heaps with repeated keys, identifiers, codes, and labels.
+      </p>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for JSON/XML processing, log aggregation, catalogs, caches, indexing systems, and
+        services with many repeated names, keys, IDs, or status values.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        G1 String Deduplication is available with G1 in Java 8 update releases and later. The recipe
+        examples use Java 9+ unified logging for the <code>stringdedup</code> tag.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/192" target="_blank" rel="noopener noreferrer">JEP 192</a> - String Deduplication in G1, delivered in JDK 8 update releases.</li>
+        <li><a href="https://openjdk.org/jeps/248" target="_blank" rel="noopener noreferrer">JEP 248</a> - Make G1 the Default Garbage Collector, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener noreferrer">JEP 271</a> - Unified GC Logging, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+UseG1GC -XX:+UseStringDeduplication \
+  -Xmx4g \
+  -Xlog:gc*,stringdedup=info:file=logs/stringdedup.log:time,uptime,level,tags \
+  -jar text-heavy-app.jar</code></pre>
+      <p class="example-caption">Use the log tag while evaluating the feature; remove extra logging later if it is too noisy.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Compare heap retained size and GC CPU before and after enabling the flag. It is not free, so keep it only when memory savings are visible.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:+UseStringDeduplication">UseStringDeduplication</a>.</footer>
+</body>
+</html>

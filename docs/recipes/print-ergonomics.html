@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Print JVM Ergonomics</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Print</span> JVM Ergonomics</h1>
+    </div>
+    <p>Show what the JVM selected at startup so support and tuning conversations start with facts.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+PrintCommandLineFlags</span><span class="flag-pill">-XshowSettings:vm</span></div>
+      <p>
+        <code>-XX:+PrintCommandLineFlags</code> prints important command-line and ergonomically
+        selected VM flags. <code>-XshowSettings:vm</code> prints VM settings such as estimated max
+        heap and VM mode.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+PrintCommandLineFlags</dt>
+        <dd>Prints selected VM flags at startup, including flags supplied by the user and important ergonomic choices made by the JVM.</dd>
+        <dt>-XshowSettings:vm</dt>
+        <dd>Prints VM settings such as estimated maximum heap, VM name, and related runtime information before the application starts.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this in support scripts, CI smoke tests, container debugging, and migration checks to
+        confirm heap sizing, selected collector, and VM interpretation of the launch environment.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>-XX:+PrintCommandLineFlags</code> and <code>-XshowSettings:vm</code> are diagnostic
+        startup options available on modern HotSpot JVMs. They are safe support tools for checking
+        the JVM's selected ergonomics before deeper tuning.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>These startup diagnostics do not have a dedicated feature JEP.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+PrintCommandLineFlags -XshowSettings:vm \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this in a real launch command when you want startup logs to capture JVM decisions.</p>
+      <pre><code>java -XX:+PrintCommandLineFlags -version</code></pre>
+      <p class="example-caption">Use this quick check to inspect defaults for a JDK installation without starting the app.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Save the startup output with application logs so later incidents can be tied to the exact VM configuration.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:+PrintCommandLineFlags">PrintCommandLineFlags</a>.</footer>
+</body>
+</html>

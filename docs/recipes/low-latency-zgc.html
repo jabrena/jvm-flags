@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Low-Latency ZGC</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Low-Latency</span> API with ZGC</h1>
+    </div>
+    <p>Choose ZGC when short GC pauses are more important than maximum throughput.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+UseZGC</span><span class="flag-pill">-Xmx</span><span class="flag-pill">-Xlog:gc*</span></div>
+      <p>
+        <code>-XX:+UseZGC</code> selects the Z Garbage Collector. ZGC performs most GC work
+        concurrently with application threads, making it attractive for services with strict tail
+        latency goals and larger heaps.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+UseZGC</dt>
+        <dd>Selects ZGC, a scalable low-latency collector. In Java 25, ZGC uses generational behavior by default, so young objects can be collected more efficiently than old long-lived objects.</dd>
+        <dt>-Xmx8g</dt>
+        <dd>Gives ZGC a maximum heap budget. ZGC needs enough free space to collect concurrently while the application keeps allocating.</dd>
+        <dt>-XX:+AlwaysPreTouch</dt>
+        <dd>Touches heap pages at startup so physical memory is committed early. This can make latency more predictable after startup, but increases startup time and commits memory immediately.</dd>
+        <dt>-Xlog:gc*</dt>
+        <dd>Shows ZGC cycles, allocation stalls, heap capacity changes, relocation activity, and whether concurrent collection is keeping up.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>How ZGC works</h2>
+      <p>
+        ZGC is designed to keep GC pauses very short by doing marking, relocation, and reference
+        processing work concurrently with application threads. It uses load barriers so application
+        code can safely access objects while the collector is moving them.
+      </p>
+      <p>
+        Generational ZGC separates young and old objects. Since most objects die young, collecting
+        the young generation more often reduces CPU and memory pressure compared with treating the
+        whole heap uniformly. ZGC still needs CPU headroom; if allocation outruns concurrent
+        collection, the application can see allocation stalls.
+      </p>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for latency-sensitive APIs, trading platforms, real-time-ish request processing,
+        and services where occasional long G1 pauses are unacceptable. Give ZGC enough CPU and heap
+        headroom so concurrent collection can keep up with allocation.
+      </p>
+      <div class="callout">On modern JDKs, ZGC requires little manual tuning. Start with <code>-XX:+UseZGC</code>, heap limits, and logs.</div>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        ZGC arrived as an experimental collector in Java 11 and became production-ready in Java 15.
+        Generational ZGC arrived in Java 21, became the default ZGC mode in Java 23, and the old
+        non-generational mode was removed in Java 24. On Java 25, <code>-XX:+UseZGC</code> means
+        generational ZGC.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/333" target="_blank" rel="noopener noreferrer">JEP 333</a> - ZGC experimental, delivered in JDK 11.</li>
+        <li><a href="https://openjdk.org/jeps/351" target="_blank" rel="noopener noreferrer">JEP 351</a> - ZGC uncommits unused memory, delivered in JDK 13.</li>
+        <li><a href="https://openjdk.org/jeps/364" target="_blank" rel="noopener noreferrer">JEP 364</a> - ZGC on macOS, delivered in JDK 14.</li>
+        <li><a href="https://openjdk.org/jeps/365" target="_blank" rel="noopener noreferrer">JEP 365</a> - ZGC on Windows, delivered in JDK 14.</li>
+        <li><a href="https://openjdk.org/jeps/376" target="_blank" rel="noopener noreferrer">JEP 376</a> - ZGC concurrent thread-stack processing, delivered in JDK 16.</li>
+        <li><a href="https://openjdk.org/jeps/377" target="_blank" rel="noopener noreferrer">JEP 377</a> - ZGC production, delivered in JDK 15.</li>
+        <li><a href="https://openjdk.org/jeps/439" target="_blank" rel="noopener noreferrer">JEP 439</a> - Generational ZGC, delivered in JDK 21.</li>
+        <li><a href="https://openjdk.org/jeps/474" target="_blank" rel="noopener noreferrer">JEP 474</a> - Generational ZGC by default, delivered in JDK 23.</li>
+        <li><a href="https://openjdk.org/jeps/490" target="_blank" rel="noopener noreferrer">JEP 490</a> - Remove non-generational ZGC mode, delivered in JDK 24.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+UseZGC -Xmx8g \
+  -Xlog:gc*:file=logs/zgc.log:time,uptime,level,tags \
+  -jar latency-api.jar</code></pre>
+      <p class="example-caption">Use this as the first ZGC production experiment: one collector flag, heap limit, and logs.</p>
+      <pre><code>java -XX:+UseZGC -Xms4g -Xmx4g \
+  -XX:+AlwaysPreTouch \
+  -jar latency-api.jar</code></pre>
+      <p class="example-caption">Use this when startup can be slower but you want heap pages committed before traffic arrives.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Look for allocation stalls, GC cycle frequency, CPU saturation, and request tail latency under realistic load.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:+UseZGC">UseZGC</a>.</footer>
+</body>
+</html>

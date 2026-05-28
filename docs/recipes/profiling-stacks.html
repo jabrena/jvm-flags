@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Profiling Stacks</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Better</span> Linux Profiling Stacks</h1>
+    </div>
+    <p>Preserve frame pointers so native profilers can produce more reliable stack traces.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+PreserveFramePointer</span></div>
+      <p>
+        <code>-XX:+PreserveFramePointer</code> keeps the frame pointer available instead of using
+        that register for general-purpose work. This helps tools such as Linux <code>perf</code>,
+        async-profiler, and eBPF profilers unwind stacks more accurately.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+PreserveFramePointer</dt>
+        <dd>Keeps the native frame pointer chain intact for JIT-compiled Java frames. This can make profiler stack unwinding more reliable, especially for mixed Java/native CPU profiles.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for production services where CPU profiling matters, especially when you need
+        complete mixed Java/native flame graphs during incidents or load tests.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>-XX:+PreserveFramePointer</code> is a HotSpot profiling option for platforms where frame
+        pointers matter for native stack walking. Use it when your production profiling stack depends
+        on frame-pointer based unwinding.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>This profiling option does not have a dedicated feature JEP; it is part of HotSpot runtime/profiling support.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+PreserveFramePointer \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this as a default for services where production CPU profiling is part of normal operations.</p>
+      <pre><code>java -XX:+PreserveFramePointer -XX:+UseZGC -Xmx8g \
+  -jar latency-api.jar</code></pre>
+      <p class="example-caption">Combine it with collector and heap choices; it does not select or tune GC.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Run your profiler before and after enabling the flag and compare how many stack frames are unresolved.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:+PreserveFramePointer">PreserveFramePointer</a>.</footer>
+</body>
+</html>

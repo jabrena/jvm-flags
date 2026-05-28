@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JVM Flags - Recipes</title>
+  <link rel="stylesheet" href="css/site.css">
+  <link rel="icon" type="image/png" href="images/java-icon.png">
+</head>
+<body class="page-recipes">
+  <header>
+    <div class="header-title-row">
+      <div class="title-group">
+        <a class="back-link" href="index.html">&larr; Back</a>
+        <h1><span>JVM Flag</span> Recipes</h1>
+      </div>
+      <div class="header-actions">
+        <nav class="nav-menu" aria-label="Site">
+          <button type="button" class="nav-menu-toggle" id="nav-menu-toggle" aria-expanded="false" aria-controls="nav-menu-panel">
+            <span class="sr-only">Menu</span>
+            <span class="nav-menu-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+          <div class="nav-menu-panel" id="nav-menu-panel" role="menu" hidden>
+            <a href="recipes.html" role="menuitem" aria-current="page">Recipes</a>
+            <a href="methodology.html" role="menuitem">Methodology</a>
+            <a href="concepts.html" role="menuitem">Concepts</a>
+            <a href="about.html" role="menuitem">About</a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    <p>
+      Practical launch recipes for common JVM scenarios in 2026. Start here when you know the
+      operational goal, then open a recipe for the flags, tradeoffs, and command examples.
+    </p>
+  </header>
+
+  <main>
+    <p class="intro">
+      These recipes favor modern HotSpot ergonomics: set the few flags that express a real
+      requirement, observe with GC logs or JFR, and tune from evidence.
+    </p>
+
+    <section class="recipe-grid" aria-label="JVM flag recipes">
+      <a class="recipe-card" href="recipes/default-production-service.html">
+        <h2>Default Production Service</h2>
+        <p>Baseline heap sizing and GC logging for normal server processes on a current JDK.</p>
+        <div class="flag-list"><span class="flag-pill">-Xms</span><span class="flag-pill">-Xmx</span><span class="flag-pill">-Xlog:gc*</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/container-kubernetes.html">
+        <h2>Container or Kubernetes Service</h2>
+        <p>Size heap from cgroup limits and inspect what the JVM detects inside the container.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:MaxRAMPercentage</span><span class="flag-pill">-XX:ActiveProcessorCount</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/low-latency-zgc.html">
+        <h2>Low-Latency API</h2>
+        <p>Use ZGC when short pauses matter more than squeezing out every last point of throughput.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+UseZGC</span><span class="flag-pill">-Xmx</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/throughput-batch.html">
+        <h2>Throughput-Heavy Batch Job</h2>
+        <p>Favor total completion time for ETL, indexing, reporting, and compiler-style workloads.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+UseParallelGC</span><span class="flag-pill">-Xms</span><span class="flag-pill">-Xmx</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/g1-pause-target.html">
+        <h2>Predictable G1 Pauses</h2>
+        <p>Stay with G1 and give the collector an explicit pause-time target to optimize toward.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+UseG1GC</span><span class="flag-pill">-XX:MaxGCPauseMillis</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/memory-footprint.html">
+        <h2>Memory-Constrained Service</h2>
+        <p>Reduce unused heap slack when process footprint matters more than peak throughput.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:MaxHeapFreeRatio</span><span class="flag-pill">-XX:MinHeapFreeRatio</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/compact-object-headers.html">
+        <h2>Compact Object Headers</h2>
+        <p>Reduce per-object heap overhead for object-dense Java 25 workloads.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+UseCompactObjectHeaders</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/class-data-sharing.html">
+        <h2>Class Data Sharing</h2>
+        <p>Improve startup and memory footprint by reusing archived class metadata.</p>
+        <div class="flag-list"><span class="flag-pill">-Xshare:on</span><span class="flag-pill">-XX:ArchiveClassesAtExit</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/string-deduplication.html">
+        <h2>Many Duplicate Strings</h2>
+        <p>Reduce heap pressure in workloads with repeated identifiers, JSON fields, and log values.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+UseStringDeduplication</span><span class="flag-pill">-XX:+UseG1GC</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/oom-forensics.html">
+        <h2>Crash and OOM Forensics</h2>
+        <p>Collect heap dumps and JVM fatal-error files when production failures happen.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+HeapDumpOnOutOfMemoryError</span><span class="flag-pill">-XX:ErrorFile</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/flight-recorder.html">
+        <h2>Continuous Profiling with JFR</h2>
+        <p>Start a bounded Java Flight Recorder recording with low operational friction.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:StartFlightRecording</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/native-memory.html">
+        <h2>Native Memory Investigation</h2>
+        <p>Explain RSS beyond Java heap: metaspace, thread stacks, direct buffers, and JVM internals.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:NativeMemoryTracking</span><span class="flag-pill">-XX:+PrintNMTStatistics</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/profiling-stacks.html">
+        <h2>Better Linux Profiling Stacks</h2>
+        <p>Improve frame-pointer based stack traces for perf, async-profiler, and eBPF tooling.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+PreserveFramePointer</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/virtual-threads-structured-concurrency.html">
+        <h2>Virtual Threads and Structured Concurrency</h2>
+        <p>Scale blocking I/O with virtual threads and keep related subtasks bounded by a scope.</p>
+        <div class="flag-list"><span class="flag-pill">--enable-preview</span><span class="flag-pill">-Djdk.virtualThreadScheduler.parallelism</span><span class="flag-pill">-Djdk.virtualThreadScheduler.maxPoolSize</span><span class="flag-pill">-Djdk.traceVirtualThreadLocals</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/runtime-reproducibility.html">
+        <h2>Stable Runtime Defaults</h2>
+        <p>Pin encoding, timezone, and locale so logs and data pipelines behave consistently.</p>
+        <div class="flag-list"><span class="flag-pill">-Dfile.encoding</span><span class="flag-pill">-Duser.timezone</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/module-access.html">
+        <h2>Module Access Workaround</h2>
+        <p>Use explicit module opens as a temporary bridge for reflective legacy libraries.</p>
+        <div class="flag-list"><span class="flag-pill">--add-opens</span><span class="flag-pill">--add-exports</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/tls-security.html">
+        <h2>TLS and Module Security</h2>
+        <p>Configure truststores, keystores, TLS policy, and narrow module-access exceptions.</p>
+        <div class="flag-list"><span class="flag-pill">-Djavax.net.ssl.trustStore</span><span class="flag-pill">-Djdk.tls.disabledAlgorithms</span><span class="flag-pill">--add-opens</span></div>
+      </a>
+      <a class="recipe-card" href="recipes/print-ergonomics.html">
+        <h2>Print JVM Ergonomics</h2>
+        <p>Show selected heap, GC, and VM settings at startup for support and diagnostics.</p>
+        <div class="flag-list"><span class="flag-pill">-XX:+PrintCommandLineFlags</span><span class="flag-pill">-XshowSettings:vm</span></div>
+      </a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Built from the JVM flag catalog. See <a href="about.html">About</a>.</p>
+  </footer>
+
+  <script>
+    (function () {
+      const toggle = document.getElementById("nav-menu-toggle");
+      const panel = document.getElementById("nav-menu-panel");
+      if (!toggle || !panel) return;
+      function setOpen(open) {
+        toggle.setAttribute("aria-expanded", String(open));
+        panel.hidden = !open;
+      }
+      toggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        setOpen(toggle.getAttribute("aria-expanded") !== "true");
+      });
+      panel.addEventListener("click", (e) => { if (e.target.closest("a")) setOpen(false); });
+      document.addEventListener("click", (e) => { if (!e.target.closest(".nav-menu")) setOpen(false); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    })();
+  </script>
+</body>
+</html>

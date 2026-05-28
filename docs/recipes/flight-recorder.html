@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Java Flight Recorder</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Continuous</span> Profiling with JFR</h1>
+    </div>
+    <p>Start a bounded Java Flight Recorder recording directly from the launch command.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:StartFlightRecording</span></div>
+      <p>
+        <code>-XX:StartFlightRecording</code> starts JFR at JVM launch. It can write to disk,
+        limit file size or age, dump on exit, and use different settings profiles.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:StartFlightRecording=filename=recordings/app-%p.jfr</dt>
+        <dd>Starts JFR immediately and writes the recording to a file. <code>%p</code> expands to the JVM process ID.</dd>
+        <dt>dumponexit=true</dt>
+        <dd>Dumps the recording when the JVM exits, useful for short-lived jobs or graceful shutdown analysis.</dd>
+        <dt>maxsize=256m</dt>
+        <dd>Limits how much recording data is kept on disk. Use this to avoid filling local storage during continuous recording.</dd>
+        <dt>settings=profile</dt>
+        <dd>Uses a more detailed JFR event configuration than the default. It is useful during targeted profiling and may add more overhead than a light continuous recording.</dd>
+        <dt>duration=10m</dt>
+        <dd>Stops the recording automatically after ten minutes, which is helpful for controlled load tests.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for always-available incident context, performance baselines, latency analysis,
+        allocation profiling, lock contention, and CPU investigations without attaching a tool
+        after the process is already sick.
+      </p>
+      <div class="callout">Enable GC-root path collection only for targeted leak analysis because it can be expensive.</div>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        Java Flight Recorder became an open feature in Java 11. The <code>-XX:StartFlightRecording</code>
+        launch option is the normal way to start a recording at JVM startup on modern JDKs.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/328" target="_blank" rel="noopener noreferrer">JEP 328</a> - Flight Recorder, delivered in JDK 11.</li>
+        <li><a href="https://openjdk.org/jeps/349" target="_blank" rel="noopener noreferrer">JEP 349</a> - JFR Event Streaming, delivered in JDK 14.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:StartFlightRecording=filename=recordings/app-%p.jfr,dumponexit=true,maxsize=256m \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this for always-available incident context with bounded disk usage.</p>
+      <pre><code>java -XX:StartFlightRecording=name=profile,settings=profile,duration=10m,filename=profile.jfr \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this during a controlled profiling window, such as a load test.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Open the resulting <code>.jfr</code> in JDK Mission Control and check CPU, allocation, GC, lock, and thread views.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:StartFlightRecording">StartFlightRecording</a>.</footer>
+</body>
+</html>

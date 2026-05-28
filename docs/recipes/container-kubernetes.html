@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Container or Kubernetes Service</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Container</span> or Kubernetes Service</h1>
+    </div>
+    <p>Size the JVM from container limits and make CPU or memory ergonomics visible.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:MaxRAMPercentage</span><span class="flag-pill">-XX:InitialRAMPercentage</span><span class="flag-pill">-XX:MaxDirectMemorySize</span><span class="flag-pill">-XX:ActiveProcessorCount</span><span class="flag-pill">-Xlog:gc*</span><span class="flag-pill">-Xlog:os</span></div>
+      <p>
+        <code>-XX:MaxRAMPercentage</code> caps heap as a percentage of the memory available to the JVM,
+        but heap is not the whole pod footprint. Direct buffers, metaspace, thread stacks, code
+        cache, GC internals, agents, and native libraries also count against the container limit.
+        <code>-XX:ActiveProcessorCount</code> overrides the CPU count used by GC, compiler, and common
+        pool ergonomics when quota detection or pod sizing needs an explicit value.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:InitialRAMPercentage=50</dt>
+        <dd>Sets the initial heap as a percentage of detected available memory. In a container, that should be the cgroup memory limit when container support is active.</dd>
+        <dt>-XX:MaxRAMPercentage=75</dt>
+        <dd>Sets the maximum heap as a percentage of detected available memory. Leave space for non-heap memory, especially direct buffers, thread stacks, metaspace, native libraries, and monitoring agents.</dd>
+        <dt>-XX:MaxDirectMemorySize=256m</dt>
+        <dd>Caps memory used by direct byte buffers. This is important for Netty, NIO, gRPC, Kafka clients, database drivers, and other I/O-heavy libraries because direct memory lives outside the Java heap.</dd>
+        <dt>-XX:ActiveProcessorCount=2</dt>
+        <dd>Overrides the CPU count used by JVM ergonomics. This affects GC thread counts, compiler behavior, and APIs such as <code>Runtime.availableProcessors()</code>.</dd>
+        <dt>-Xlog:gc*</dt>
+        <dd>Records allocation pressure, heap occupancy, and GC time. Use this before changing collector or heap policies so the tuning is based on observed behavior.</dd>
+        <dt>-Xlog:os=info</dt>
+        <dd>Prints OS-level runtime details. In containerized deployments, use this with startup settings and platform metrics to confirm what memory and CPU limits the JVM sees.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for Docker and Kubernetes workloads where pod memory is the real boundary. Leave
+        headroom for metaspace, direct buffers, thread stacks, JIT code cache, native libraries, and
+        the process itself.
+      </p>
+      <p>
+        BellSoft's memory guide calls out the central trap: heap sizing flags do not control total
+        JVM memory consumption. In Kubernetes, the safe budget is the pod memory limit minus
+        non-heap JVM memory and native process overhead.
+      </p>
+      <div class="callout">A common starting point is 60-70% heap in a container, then adjust after observing RSS, direct memory, and GC behavior. Use higher percentages only after proving non-heap headroom is stable.</div>
+    </section>
+
+    <section>
+      <h2>Container security posture</h2>
+      <p>
+        JVM memory flags are only one part of a safe Kubernetes launch. Pair them with platform
+        controls that reduce blast radius and avoid leaking sensitive material through process
+        arguments or diagnostics.
+      </p>
+      <ul>
+        <li>Set Kubernetes memory requests and limits so JVM ergonomics have a real boundary.</li>
+        <li>Run with a read-only root filesystem and mount only the writable paths needed for logs, dumps, temp files, or JFR recordings.</li>
+        <li>Do not pass secrets as JVM command-line flags because arguments can appear in process listings, diagnostics, crash reports, or support bundles.</li>
+        <li>Mount truststores, keystores, and credentials from Kubernetes Secrets or a secret manager, then reference file paths from the JVM or application config.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        The percentage-based RAM flags are intended for modern container-aware JVMs and are most
+        relevant on Java 10+. <code>-XX:MaxDirectMemorySize</code> and <code>-XX:ActiveProcessorCount</code>
+        are JVM options rather than language features. <code>-Xlog</code> examples require Java 9+.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>No single JEP owns container memory ergonomics; these flags evolved through HotSpot container-awareness work.</li>
+        <li><a href="https://openjdk.org/jeps/158" target="_blank" rel="noopener noreferrer">JEP 158</a> - Unified JVM Logging, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener noreferrer">JEP 271</a> - Unified GC Logging, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:InitialRAMPercentage=50 -XX:MaxRAMPercentage=70 \
+  -Xlog:gc*,os=info \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this when the pod memory limit should drive heap sizing.</p>
+      <pre><code>java -XX:MaxRAMPercentage=65 -XX:MaxDirectMemorySize=256m \
+  -Xlog:gc*,os=info \
+  -jar reactive-api.jar</code></pre>
+      <p class="example-caption">Use this for I/O-heavy services where direct buffers can grow outside the heap.</p>
+      <pre><code>java -XX:MaxRAMPercentage=65 -XX:ActiveProcessorCount=2 \
+  -Xlog:os=trace \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this when a small CPU quota needs explicit JVM ergonomics.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <ul>
+        <li>Compare JVM startup output and <code>-Xlog:os</code> data with Kubernetes memory and CPU limits.</li>
+        <li>Monitor RSS, not only Java heap, because direct buffers and thread stacks are outside <code>-Xmx</code>.</li>
+        <li>Check GC logs for total GC time, allocation pressure, and heap occupancy after load stabilizes.</li>
+        <li>For I/O-heavy applications, track direct memory separately with JFR, NMT, or application metrics.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>References</h2>
+      <p>
+        See BellSoft's
+        <a href="https://bell-sw.com/blog/guide-to-jvm-memory-configuration-options/" target="_blank" rel="noopener noreferrer">Guide to JVM memory configuration options</a>
+        for memory flags and Oracle's Java command documentation for Java 25 option syntax.
+      </p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:ActiveProcessorCount">ActiveProcessorCount</a>.</footer>
+</body>
+</html>

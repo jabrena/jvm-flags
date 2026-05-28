@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - G1 Pause Target</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Predictable</span> G1 Pauses</h1>
+    </div>
+    <p>Give G1 a pause-time target while keeping the default collector family.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+UseG1GC</span><span class="flag-pill">-XX:MaxGCPauseMillis</span><span class="flag-pill">-Xmx</span></div>
+      <p>
+        <code>-XX:MaxGCPauseMillis</code> tells G1 the pause-time goal to optimize toward. It is a
+        target, not a hard guarantee, and too aggressive a value can reduce throughput or increase
+        concurrent GC pressure.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+UseG1GC</dt>
+        <dd>Explicitly selects the Garbage-First collector. Use it when you want the command line to document the collector choice instead of relying on JVM defaults.</dd>
+        <dt>-XX:MaxGCPauseMillis=100</dt>
+        <dd>Sets G1's soft pause-time target to 100 ms. G1 changes young-generation sizing, mixed collection work, and evacuation decisions to aim for this target, but it cannot guarantee it.</dd>
+        <dt>-Xms4g -Xmx4g</dt>
+        <dd>Starts and caps the heap at 4 GB. Fixed heap sizing reduces runtime resizing noise during pause analysis.</dd>
+        <dt>-Xlog:gc*</dt>
+        <dd>Records G1 young collections, concurrent marking, mixed collections, humongous allocations, and heap occupancy trends.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>How G1 works</h2>
+      <p>
+        G1 splits the heap into many equal-sized regions instead of one contiguous young generation
+        and old generation. It tracks which regions contain the most reclaimable garbage and collects
+        a selected set of regions during evacuation pauses. Young collections copy live objects out
+        of eden and survivor regions; mixed collections can also include old regions after concurrent
+        marking identifies reclaimable space.
+      </p>
+      <p>
+        The pause target influences how much work G1 chooses for each pause. A lower target usually
+        means smaller collection sets and more frequent GC work; a higher target gives G1 room to do
+        more work per pause and may improve throughput.
+      </p>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for normal services where G1 is otherwise healthy but default pause behavior is a
+        little too loose for your service-level objective.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        G1 is available in all cataloged releases here and became the default collector in Java 9.
+        <code>-XX:MaxGCPauseMillis</code> is a soft goal used by several collectors, including G1.
+        Use <code>-Xlog:gc*</code> on Java 9+ and legacy GC logging on Java 8.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/248" target="_blank" rel="noopener noreferrer">JEP 248</a> - Make G1 the Default Garbage Collector, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener noreferrer">JEP 271</a> - Unified GC Logging, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+UseG1GC -XX:MaxGCPauseMillis=100 \
+  -Xms4g -Xmx4g \
+  -Xlog:gc*:file=logs/g1.log:time,uptime,level,tags \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this for a service with a clear pause budget and enough heap headroom.</p>
+      <pre><code>java -XX:+UseG1GC -XX:MaxGCPauseMillis=200 \
+  -Xmx6g -jar app.jar</code></pre>
+      <p class="example-caption">Use a looser target when throughput matters and 100 ms creates too much GC activity.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Check whether pauses actually move toward the goal and whether throughput or CPU usage gets worse.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:MaxGCPauseMillis">MaxGCPauseMillis</a>.</footer>
+</body>
+</html>

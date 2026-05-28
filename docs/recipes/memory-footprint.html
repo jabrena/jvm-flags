@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Memory Footprint</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Memory-Constrained</span> Service</h1>
+    </div>
+    <p>Reduce committed heap slack when process footprint is more important than peak throughput.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:MaxHeapFreeRatio</span><span class="flag-pill">-XX:MinHeapFreeRatio</span><span class="flag-pill">-Xmx</span></div>
+      <p>
+        <code>-XX:MaxHeapFreeRatio</code> and <code>-XX:MinHeapFreeRatio</code> influence how much
+        free heap the JVM tries to keep after collection. Lower values can reduce footprint at the
+        cost of more heap resizing or GC activity.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-Xmx512m</dt>
+        <dd>Limits the Java heap to 512 MB. This protects the host or container from unbounded heap growth but does not limit total process RSS.</dd>
+        <dt>-XX:MaxHeapFreeRatio=20</dt>
+        <dd>Asks the JVM to shrink the heap when too much of it is free after GC. Lower values can return memory sooner.</dd>
+        <dt>-XX:MinHeapFreeRatio=10</dt>
+        <dd>Asks the JVM to keep at least this percentage of heap free after GC. Too low a value can cause more frequent heap expansion and collection.</dd>
+        <dt>-Xlog:gc*</dt>
+        <dd>Shows whether shrinking and growing the heap creates extra GC activity or latency.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>GC behavior</h2>
+      <p>
+        These flags do not select a collector. They influence heap sizing decisions made around GC
+        cycles. Lower free-ratio targets can reduce committed heap after load drops, but they can
+        also make the JVM resize the heap more often when traffic is bursty.
+      </p>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for small services, sidecars, developer tools, or shared hosts where RSS matters
+        and latency or throughput targets are modest.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>-Xmx</code>, <code>-XX:MinHeapFreeRatio</code>, and <code>-XX:MaxHeapFreeRatio</code> are
+        longstanding HotSpot options and apply across all cataloged Java versions. The logging form
+        in the examples, <code>-Xlog:gc*</code>, applies to Java 9+.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>Heap free-ratio tuning predates the modern JEP process and does not have a dedicated feature JEP.</li>
+        <li><a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener noreferrer">JEP 271</a> - Unified GC Logging, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -Xmx512m -XX:MaxHeapFreeRatio=20 -XX:MinHeapFreeRatio=10 \
+  -Xlog:gc*:file=logs/footprint-gc.log:time,uptime,level,tags \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this only after comparing process RSS and GC activity against the default free-ratio behavior.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Compare RSS, GC frequency, and response latency before and after lowering the free-ratio values.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog area: <a href="../java-version.html?java=25">Memory flags</a>.</footer>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Class Data Sharing</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Class</span> Data Sharing</h1>
+    </div>
+    <p>Use CDS and AppCDS archives to reduce startup work and share class metadata across JVM processes.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-Xshare:on</span><span class="flag-pill">-Xshare:auto</span><span class="flag-pill">-XX:ArchiveClassesAtExit</span><span class="flag-pill">-XX:SharedArchiveFile</span><span class="flag-pill">-XX:DumpLoadedClassList</span><span class="flag-pill">-XX:SharedClassListFile</span></div>
+      <p>
+        Class Data Sharing stores class metadata in a shared archive file. The JVM can map that
+        archive at startup instead of parsing, verifying, and laying out the same classes from
+        scratch every time.
+      </p>
+    </section>
+
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-Xshare:on</dt>
+        <dd>Requires CDS archive use. If the JVM cannot use the archive, startup fails. Use this when you want deployment to prove the archive is valid.</dd>
+        <dt>-Xshare:auto</dt>
+        <dd>Lets the JVM use CDS when possible and continue without it when the archive is unavailable or incompatible. This is the forgiving operational mode.</dd>
+        <dt>-XX:ArchiveClassesAtExit=app.jsa</dt>
+        <dd>Creates a dynamic CDS archive when the application exits. This is the simplest AppCDS training workflow: run the app once with representative startup paths, then reuse the generated archive.</dd>
+        <dt>-XX:SharedArchiveFile=app.jsa</dt>
+        <dd>Loads classes from the specified archive. For application archives, use the same application class path, module path, and JDK build that were used to create the archive.</dd>
+        <dt>-XX:DumpLoadedClassList=app.classlist</dt>
+        <dd>Writes the names of loaded classes to a class-list file during a training run. Use this for the static archive workflow.</dd>
+        <dt>-XX:SharedClassListFile=app.classlist</dt>
+        <dd>Reads a class-list file while dumping a static CDS archive with <code>-Xshare:dump</code>.</dd>
+      </dl>
+    </section>
+
+    <section>
+      <h2>How CDS works</h2>
+      <p>
+        During normal startup, the JVM loads classes, parses class files, verifies bytecode, creates
+        internal metadata, and links classes as needed. CDS moves a portion of that work into an
+        archive-generation step. Later JVMs map the archive into memory and reuse the archived
+        metadata.
+      </p>
+      <p>
+        The default JDK already ships with a CDS archive for platform classes. Application CDS
+        extends that idea to application and library classes. This is most useful for short-lived
+        services, serverless functions, CLIs, test workers, and horizontally scaled services where
+        many JVMs start with the same code.
+      </p>
+      <div class="callout">
+        CDS is sensitive to the JDK image, class path, module path, and application artifact set.
+        Rebuild the archive when those inputs change.
+      </div>
+    </section>
+
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use CDS when startup time or memory sharing matters: command-line tools, build workers,
+        batch jobs, container autoscaling, serverless functions, or dense hosts running many JVMs
+        from the same application image.
+      </p>
+      <p>
+        It is less important for a single long-running process where startup is rare and class
+        metadata is a small part of total memory.
+      </p>
+    </section>
+
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        Basic CDS is older than the cataloged releases, while AppCDS became generally useful in
+        Java 10. Default CDS archives are available from Java 12, and dynamic CDS archives are
+        available from Java 13. The Java 25 commands in this recipe use the modern AppCDS workflow.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/310" target="_blank" rel="noopener noreferrer">JEP 310</a> - Application Class-Data Sharing, delivered in JDK 10.</li>
+        <li><a href="https://openjdk.org/jeps/341" target="_blank" rel="noopener noreferrer">JEP 341</a> - Default CDS Archives, delivered in JDK 12.</li>
+        <li><a href="https://openjdk.org/jeps/350" target="_blank" rel="noopener noreferrer">JEP 350</a> - Dynamic CDS Archives, delivered in JDK 13.</li>
+        <li><a href="https://openjdk.org/jeps/483" target="_blank" rel="noopener noreferrer">JEP 483</a> - Ahead-of-Time Class Loading &amp; Linking, delivered in JDK 24 and built on the CDS/archive direction.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <h3>Use the default CDS archive strictly</h3>
+      <pre><code>java -Xshare:on -jar app.jar</code></pre>
+      <p class="example-caption">Use this when you want startup to fail if the archive cannot be mapped.</p>
+
+      <h3>Create a dynamic AppCDS archive</h3>
+      <pre><code>java -XX:ArchiveClassesAtExit=app.jsa \
+  -jar app.jar --warmup</code></pre>
+      <p class="example-caption">Run a representative path so the archive captures classes actually used by the application.</p>
+
+      <h3>Run with the generated archive</h3>
+      <pre><code>java -Xshare:on -XX:SharedArchiveFile=app.jsa \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use the same JDK and application artifact set that produced <code>app.jsa</code>.</p>
+
+      <h3>Create a class list, then a static archive</h3>
+      <pre><code>java -XX:DumpLoadedClassList=app.classlist \
+  -jar app.jar --warmup
+
+java -Xshare:dump \
+  -XX:SharedClassListFile=app.classlist \
+  -XX:SharedArchiveFile=app-static.jsa \
+  -cp app.jar</code></pre>
+      <p class="example-caption">Use this when you want an explicit class-list based archive build step.</p>
+    </section>
+
+    <section>
+      <h2>Verify</h2>
+      <ul>
+        <li>Use <code>-Xlog:cds=info</code> to confirm which archive is mapped at startup.</li>
+        <li>Measure startup time before and after using the archive.</li>
+        <li>Compare RSS and shared memory when multiple JVMs run on the same host.</li>
+        <li>Regenerate the archive after JDK upgrades, dependency changes, or class path changes.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>References</h2>
+      <p>
+        See Oracle's Java 25
+        <a href="https://docs.oracle.com/en/java/javase/25/vm/class-data-sharing.html" target="_blank" rel="noopener noreferrer">Class Data Sharing guide</a>
+        and the
+        <a href="https://docs.oracle.com/en/java/javase/25/docs/specs/man/java.html" target="_blank" rel="noopener noreferrer">java command reference</a>.
+      </p>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog area: <a href="../concepts.html#domain-classes">Classes and modules</a>.</footer>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Virtual Threads and Structured Concurrency</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Virtual Threads</span> and Structured Concurrency</h1>
+    </div>
+    <p>Use virtual threads for high-throughput blocking I/O, then group related subtasks with structured concurrency.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags and launch options</h2>
+      <div class="flag-list"><span class="flag-pill">--enable-preview</span><span class="flag-pill">-Djdk.virtualThreadScheduler.parallelism</span><span class="flag-pill">-Djdk.virtualThreadScheduler.maxPoolSize</span><span class="flag-pill">-Djdk.tracePinnedThreads</span><span class="flag-pill">-Djdk.traceVirtualThreadLocals</span></div>
+      <p>
+        Virtual threads are standard in modern Java and usually need no JVM flag. Structured
+        concurrency in Java 25 uses <code>StructuredTaskScope</code>, which is still a preview API,
+        so code that uses it must be compiled and run with <code>--enable-preview</code>.
+      </p>
+      <p>
+        <code>-Djdk.virtualThreadScheduler.parallelism</code> sets the target number of carrier
+        threads used by the virtual-thread scheduler. <code>-Djdk.virtualThreadScheduler.maxPoolSize</code>
+        sets an upper bound for scheduler carrier threads when compensation is needed. <code>-Djdk.tracePinnedThreads</code>
+        is a diagnostic property for finding code that pins a virtual thread to its carrier.
+        <code>-Djdk.traceVirtualThreadLocals</code> helps find code that stores thread-local values
+        in virtual threads.
+      </p>
+    </section>
+    <section>
+      <h2>Option details</h2>
+      <dl>
+        <dt>--enable-preview</dt>
+        <dd>Enables preview APIs at compile time and run time. In Java 25, <code>StructuredTaskScope</code> is preview, so both <code>javac</code> and <code>java</code> need this option for code that imports it.</dd>
+        <dt>-Djdk.virtualThreadScheduler.parallelism=4</dt>
+        <dd>Sets the target parallelism of the virtual-thread scheduler. This is the normal target number of carrier platform threads used to run virtual threads, which can be useful in small containers.</dd>
+        <dt>-Djdk.virtualThreadScheduler.maxPoolSize=8</dt>
+        <dd>Sets the maximum number of carrier platform threads the scheduler may create. This is different from <code>parallelism</code>: parallelism is the target, while max pool size is the ceiling used when the scheduler compensates for blocking or pinned carriers.</dd>
+        <dt>-Djdk.tracePinnedThreads=short</dt>
+        <dd>Prints a short stack trace when a virtual thread is pinned to its carrier while blocking. Use it during investigation to find synchronized or native blocking regions that limit scalability.</dd>
+        <dt>-Djdk.traceVirtualThreadLocals=true</dt>
+        <dd>Prints a stack trace when code sets a thread-local value from a virtual thread. Use it to find libraries or application code that accidentally keep per-request state in many short-lived virtual threads.</dd>
+      </dl>
+    </section>
+
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for services that handle many concurrent blocking I/O operations, such as HTTP
+        calls, database queries, file operations, queue consumers, or fan-out request handlers.
+        Virtual threads provide scale, not faster CPU execution, so they are best for waiting-heavy
+        workloads rather than CPU-bound loops.
+      </p>
+      <p>
+        Structured concurrency is useful when one request splits into related subtasks and all of
+        them must finish, fail, or be cancelled as one unit. It improves cancellation, error
+        handling, and thread-dump observability compared with unbounded ad hoc futures.
+      </p>
+      <div class="callout">Avoid pooling virtual threads. Prefer one virtual thread per task and keep blocking code simple and synchronous.</div>
+    </section>
+
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        Virtual threads were previewed in Java 19 and Java 20, then finalized in Java 21. Structured
+        concurrency incubated in Java 19 and Java 20, then previewed from Java 21 through Java 25.
+        It continues as a sixth preview in Java 26 and a seventh preview targeted to Java 27. In
+        Java 25, <code>StructuredTaskScope</code> is still preview, so both compile and run steps need
+        <code>--enable-preview</code>.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/425" target="_blank" rel="noopener noreferrer">JEP 425</a> - Virtual Threads preview, delivered in JDK 19.</li>
+        <li><a href="https://openjdk.org/jeps/436" target="_blank" rel="noopener noreferrer">JEP 436</a> - Virtual Threads second preview, delivered in JDK 20.</li>
+        <li><a href="https://openjdk.org/jeps/444" target="_blank" rel="noopener noreferrer">JEP 444</a> - Virtual Threads final, delivered in JDK 21.</li>
+        <li><a href="https://openjdk.org/jeps/428" target="_blank" rel="noopener noreferrer">JEP 428</a> - Structured Concurrency incubator, delivered in JDK 19.</li>
+        <li><a href="https://openjdk.org/jeps/437" target="_blank" rel="noopener noreferrer">JEP 437</a> - Structured Concurrency second incubator, delivered in JDK 20.</li>
+        <li><a href="https://openjdk.org/jeps/453" target="_blank" rel="noopener noreferrer">JEP 453</a> - Structured Concurrency preview, delivered in JDK 21.</li>
+        <li><a href="https://openjdk.org/jeps/462" target="_blank" rel="noopener noreferrer">JEP 462</a> - Structured Concurrency second preview, delivered in JDK 22.</li>
+        <li><a href="https://openjdk.org/jeps/480" target="_blank" rel="noopener noreferrer">JEP 480</a> - Structured Concurrency third preview, delivered in JDK 23.</li>
+        <li><a href="https://openjdk.org/jeps/499" target="_blank" rel="noopener noreferrer">JEP 499</a> - Structured Concurrency fourth preview, delivered in JDK 24.</li>
+        <li><a href="https://openjdk.org/jeps/505" target="_blank" rel="noopener noreferrer">JEP 505</a> - Structured Concurrency fifth preview, delivered in JDK 25.</li>
+        <li><a href="https://openjdk.org/jeps/525" target="_blank" rel="noopener noreferrer">JEP 525</a> - Structured Concurrency sixth preview, targeted to JDK 26.</li>
+        <li><a href="https://openjdk.org/jeps/533" target="_blank" rel="noopener noreferrer">JEP 533</a> - Structured Concurrency seventh preview, targeted to JDK 27.</li>
+        <li><a href="https://openjdk.org/jeps/491" target="_blank" rel="noopener noreferrer">JEP 491</a> - Synchronize Virtual Threads without Pinning, delivered in JDK 24.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <h3>Run a virtual-thread-per-task service</h3>
+      <pre><code>java -jar app.jar</code></pre>
+      <p class="example-caption">No virtual-thread flag is needed when the application itself creates virtual threads.</p>
+
+      <h3>Run Java 25 code that uses StructuredTaskScope</h3>
+      <pre><code>javac --release 25 --enable-preview Main.java
+java --enable-preview Main</code></pre>
+      <p class="example-caption">The preview option must be present at both compile time and run time.</p>
+
+      <h3>Cap carrier parallelism for a constrained container</h3>
+      <pre><code>java -Djdk.virtualThreadScheduler.parallelism=4 \
+  -Djdk.virtualThreadScheduler.maxPoolSize=8 \
+  --enable-preview \
+  -jar app.jar</code></pre>
+      <p class="example-caption">This does not limit the number of virtual threads. It sets a target of 4 carrier threads and a ceiling of 8 carriers for scheduler compensation.</p>
+
+      <h3>Trace pinned virtual threads during investigation</h3>
+      <pre><code>java -Djdk.tracePinnedThreads=short \
+  --enable-preview \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this in staging or a focused reproduction because the trace output can be noisy.</p>
+
+      <h3>Trace virtual-thread-local usage</h3>
+      <pre><code>java -Djdk.traceVirtualThreadLocals=true \
+  --enable-preview \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this to find thread-local writes that may create avoidable memory pressure with many virtual threads.</p>
+    </section>
+
+    <section>
+      <h2>Complete code example</h2>
+      <p>
+        This example uses structured concurrency to fetch two pieces of a profile as one scoped
+        operation. If one subtask fails, the scope fails as a unit instead of leaving unrelated
+        work running in the background.
+      </p>
+      <pre><code>import java.time.Duration;
+import java.util.concurrent.StructuredTaskScope;
+import java.util.concurrent.StructuredTaskScope.Joiner;
+
+record Profile(String user, String orders) {}
+
+public class Main {
+  public static void main(String[] args) throws Exception {
+    System.out.println(loadProfile());
+  }
+
+  static Profile loadProfile() throws Exception {
+    try (var scope = StructuredTaskScope.open(
+        Joiner.allSuccessfulOrThrow(),
+        config -> config.withTimeout(Duration.ofSeconds(2)))) {
+      var user = scope.fork(Main::fetchUser);
+      var orders = scope.fork(Main::fetchOrders);
+
+      scope.join();
+      return new Profile(user.get(), orders.get());
+    }
+  }
+
+  static String fetchUser() throws InterruptedException {
+    Thread.sleep(Duration.ofMillis(100));
+    return "user-123";
+  }
+
+  static String fetchOrders() throws InterruptedException {
+    Thread.sleep(Duration.ofMillis(150));
+    return "orders=7";
+  }
+}</code></pre>
+      <span class="code-note">Compile and run with <code>--enable-preview</code> because this example imports <code>StructuredTaskScope</code>.</span>
+    </section>
+
+    <section>
+      <h2>Verify</h2>
+      <ul>
+        <li>Measure throughput and request latency under realistic concurrent blocking I/O.</li>
+        <li>Use thread dumps to confirm virtual threads and scope hierarchy are visible.</li>
+        <li>Check for pinned-thread traces before assuming virtual threads will scale cleanly.</li>
+        <li>Check virtual-thread-local traces before carrying request context with <code>ThreadLocal</code>.</li>
+        <li>Keep CPU-bound work on bounded executors instead of flooding virtual threads.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>References</h2>
+      <p>
+        See Oracle's Java 25 guides for
+        <a href="https://docs.oracle.com/en/java/javase/25/core/virtual-threads.html" target="_blank" rel="noopener noreferrer">virtual threads</a>
+        and
+        <a href="https://docs.oracle.com/en/java/javase/25/core/structured-concurrency.html" target="_blank" rel="noopener noreferrer">structured concurrency</a>.
+      </p>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog area: <a href="../concepts.html#domain-concurrency">Concurrency flags</a>.</footer>
+</body>
+</html>

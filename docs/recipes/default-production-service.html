@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Default Production Service</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Default</span> Production Service</h1>
+    </div>
+    <p>Use this baseline for ordinary long-running Java services before adding collector-specific tuning.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-Xms</span><span class="flag-pill">-Xmx</span><span class="flag-pill">-Xlog:gc*</span></div>
+      <p>
+        <code>-Xms</code> sets the initial Java heap and <code>-Xmx</code> sets the maximum heap.
+        <code>-Xlog:gc*</code> records collector behavior so later tuning is based on real pause,
+        allocation, and heap-pressure data.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-Xms512m</dt>
+        <dd>Starts the JVM with a 512 MB Java heap. A lower initial heap reduces startup footprint, but the heap may grow later and trigger additional GC work while the process warms up.</dd>
+        <dt>-Xmx2g</dt>
+        <dd>Caps the Java heap at 2 GB. This is not the whole process limit: metaspace, thread stacks, direct buffers, code cache, native libraries, and GC structures also consume memory.</dd>
+        <dt>-Xlog:gc*:file=logs/gc.log:time,uptime,level,tags</dt>
+        <dd>Enables unified GC logging for all GC tags, writes to a file, and includes enough metadata to correlate events with application logs and deployment time.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>Default GC behavior</h2>
+      <p>
+        On a modern server-class HotSpot JVM, the default collector is typically G1. G1 divides the
+        heap into regions and collects selected regions to balance throughput, memory reclamation,
+        and pause-time goals. It performs many marking and cleanup phases concurrently, but evacuation
+        pauses still happen when live objects are copied out of selected regions.
+      </p>
+      <p>
+        This recipe does not force a collector because the JVM defaults are a good first baseline.
+        Add a collector flag only after GC logs show a real latency, footprint, or throughput problem.
+      </p>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Start here for web APIs, workers, and message consumers that do not yet have a proven
+        latency or throughput problem. On current HotSpot releases, the JVM usually selects G1 for
+        server-class machines, so many services need only heap limits and observability first.
+      </p>
+      <div class="callout">Use equal <code>-Xms</code> and <code>-Xmx</code> when you prefer predictable committed memory. Use a smaller <code>-Xms</code> when startup footprint matters.</div>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        <code>-Xms</code> and <code>-Xmx</code> are longstanding JVM options and apply across all
+        cataloged Java versions. <code>-Xlog:gc*</code> uses unified logging, so use it on Java 9+;
+        on Java 8 use the legacy GC logging flags instead. G1 became the default HotSpot collector
+        in Java 9.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li><a href="https://openjdk.org/jeps/248" target="_blank" rel="noopener noreferrer">JEP 248</a> - Make G1 the Default Garbage Collector, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/158" target="_blank" rel="noopener noreferrer">JEP 158</a> - Unified JVM Logging, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener noreferrer">JEP 271</a> - Unified GC Logging, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -Xms512m -Xmx2g \
+  -Xlog:gc*:file=logs/gc.log:time,uptime,level,tags \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use this when the service should start modestly but may grow under traffic.</p>
+      <pre><code>java -Xms2g -Xmx2g \
+  -Xlog:gc*:stdout:time,uptime,level,tags \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use equal heap bounds when you want stable committed heap and fewer resizing decisions.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Check the GC log for selected collector, pause times, heap occupancy after full cycles, and whether the process is close to <code>-Xmx</code>.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related catalog flags: <a href="../java-version.html?java=25">Java 25 graph</a>.</footer>
+</body>
+</html>

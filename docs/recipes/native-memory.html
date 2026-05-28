@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Native Memory</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Native</span> Memory Investigation</h1>
+    </div>
+    <p>Explain process memory that is not part of the Java heap.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:NativeMemoryTracking</span><span class="flag-pill">-XX:+PrintNMTStatistics</span></div>
+      <p>
+        <code>-XX:NativeMemoryTracking=summary</code> records native memory categories. With
+        <code>-XX:+PrintNMTStatistics</code>, the JVM prints a summary at exit so you can see memory
+        used by metaspace, code cache, GC, compiler, threads, and internal structures.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:NativeMemoryTracking=summary</dt>
+        <dd>Enables category-level accounting for JVM native memory. This is usually enough to see whether memory is going to threads, class metadata, code cache, GC, compiler, or internal allocations.</dd>
+        <dt>-XX:NativeMemoryTracking=detail</dt>
+        <dd>Collects more detailed native allocation information. It is more expensive and is best for targeted investigations.</dd>
+        <dt>-XX:+PrintNMTStatistics</dt>
+        <dd>Prints NMT data when the JVM exits, which is useful for batch jobs or reproductions where you want a final memory summary.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this when RSS is much larger than <code>-Xmx</code>, especially with Netty, JNI,
+        direct buffers, many threads, class loading churn, or container memory pressure.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        Native Memory Tracking is a HotSpot diagnostic facility available across the modern JDKs in
+        this catalog. Use <code>summary</code> for lower-overhead investigations and <code>detail</code>
+        when you need more allocation-site information.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>Native Memory Tracking does not have a dedicated feature JEP; it is part of HotSpot serviceability diagnostics.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:NativeMemoryTracking=summary \
+  -XX:+PrintNMTStatistics \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use summary mode first for production-like investigations.</p>
+      <pre><code>java -XX:NativeMemoryTracking=detail \
+  -jar app.jar</code></pre>
+      <p class="example-caption">Use detail mode only when summary mode shows the problem but not enough location detail.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Use <code>jcmd &lt;pid&gt; VM.native_memory summary</code> during runtime and compare the result with OS-level RSS.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:NativeMemoryTracking">NativeMemoryTracking</a>.</footer>
+</body>
+</html>

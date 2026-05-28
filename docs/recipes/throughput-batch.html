@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe - Throughput Batch</title>
+  <link rel="stylesheet" href="../css/site.css">
+  <link rel="icon" type="image/png" href="../images/java-icon.png">
+</head>
+<body class="page-recipe-detail">
+  <header>
+    <div class="header-title-row">
+      <a class="back-link" href="../recipes.html">&larr; Recipes</a>
+      <h1><span>Throughput</span> Batch Job</h1>
+    </div>
+    <p>Favor total work completed over pause consistency for batch-style processes.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Flags</h2>
+      <div class="flag-list"><span class="flag-pill">-XX:+UseParallelGC</span><span class="flag-pill">-Xms</span><span class="flag-pill">-Xmx</span></div>
+      <p>
+        <code>-XX:+UseParallelGC</code> selects a throughput-oriented collector. It can pause the
+        application for collection work, but it is often efficient for CPU-bound batch jobs that are
+        judged by total runtime.
+      </p>
+    </section>
+    <section>
+      <h2>Flag details</h2>
+      <dl>
+        <dt>-XX:+UseParallelGC</dt>
+        <dd>Selects the Parallel collector, which uses multiple GC worker threads and prioritizes total throughput over low pause times.</dd>
+        <dt>-Xms8g -Xmx8g</dt>
+        <dd>Gives the batch job a fixed 8 GB heap so the JVM does not spend time growing the heap while processing the workload.</dd>
+        <dt>-Xlog:gc*</dt>
+        <dd>Records full and young collections so you can compare total GC time with total job duration.</dd>
+      </dl>
+    </section>
+    <section>
+      <h2>How Parallel GC works</h2>
+      <p>
+        Parallel GC uses stop-the-world young and old generation collections with multiple worker
+        threads. During a collection, application threads are paused while GC threads reclaim memory.
+        This makes individual pauses longer than low-latency collectors, but the collector can be
+        efficient when the goal is maximum work completed per unit of time.
+      </p>
+      <p>
+        This fits batch jobs because there is usually no interactive user waiting on a single
+        request. The right measurement is often wall-clock completion time, not the longest pause.
+      </p>
+    </section>
+    <section>
+      <h2>When to use it</h2>
+      <p>
+        Use this for ETL, offline indexing, large imports, compilers, test suites, and report
+        generation when no user is waiting on an individual request.
+      </p>
+    </section>
+
+    <section>
+      <h2>Java version support</h2>
+      <p>
+        Parallel GC and <code>-Xms</code>/<code>-Xmx</code> are longstanding HotSpot options and apply
+        across all cataloged Java versions. The <code>-Xlog:gc*</code> form is Java 9+; Java 8 uses
+        legacy GC logging flags.
+      </p>
+    </section>
+    <section>
+      <h2>Related JEPs</h2>
+      <ul>
+        <li>Parallel GC predates the modern JEP process and does not have a dedicated feature JEP.</li>
+        <li><a href="https://openjdk.org/jeps/158" target="_blank" rel="noopener noreferrer">JEP 158</a> - Unified JVM Logging, delivered in JDK 9.</li>
+        <li><a href="https://openjdk.org/jeps/271" target="_blank" rel="noopener noreferrer">JEP 271</a> - Unified GC Logging, delivered in JDK 9.</li>
+      </ul>
+    </section>
+    <section>
+      <h2>Examples</h2>
+      <pre><code>java -XX:+UseParallelGC -Xms8g -Xmx8g \
+  -Xlog:gc*:file=logs/batch-gc.log:time,uptime,level,tags \
+  -jar batch.jar</code></pre>
+      <p class="example-caption">Use this for repeatable benchmark-style runs with the same input size.</p>
+      <pre><code>java -XX:+UseParallelGC -Xmx16g \
+  -jar indexer.jar --rebuild</code></pre>
+      <p class="example-caption">Use a larger max heap when the job benefits from fewer collections and memory is available.</p>
+    </section>
+    <section>
+      <h2>Verify</h2>
+      <p>Measure wall-clock completion time, CPU utilization, and total GC time across repeated runs with the same input.</p>
+    </section>
+  </main>
+  <footer class="site-footer">Related flag: <a href="../jvm-flag.html?java=25&amp;flag=-XX:+UseParallelGC">UseParallelGC</a>.</footer>
+</body>
+</html>
